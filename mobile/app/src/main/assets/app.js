@@ -269,6 +269,8 @@
 
     doc.style.setProperty('--apple-blue', primary);
     doc.style.setProperty('--apple-glow', hexToRgba(primary, 0.38));
+    doc.style.setProperty('--brand-accent', primary);
+    doc.style.setProperty('--brand-secondary', secondary);
 
     // 2. Light vs AMOLED Surface & Background Orchestration
     if (isDarkMode) {
@@ -2904,6 +2906,22 @@
     if (btnDoneCookieGuide) {
       btnDoneCookieGuide.addEventListener('click', () => {
         if (cookieGuideModal) cookieGuideModal.classList.add('hidden');
+      });
+    }
+
+    if (cookieGuideModal) {
+      cookieGuideModal.addEventListener('click', (e) => {
+        if (e.target === cookieGuideModal) {
+          cookieGuideModal.classList.add('hidden');
+        }
+      });
+    }
+
+    if (inAppUpdateModal) {
+      inAppUpdateModal.addEventListener('click', (e) => {
+        if (e.target === inAppUpdateModal) {
+          inAppUpdateModal.classList.add('hidden');
+        }
       });
     }
 

@@ -1017,18 +1017,21 @@
         </div>
       </div>
     <!-- In-App APK Update AMOLED Modal Dialog -->
-    <div id="inAppUpdateModal" class="format-modal-backdrop hidden" style="z-index: 9999;">
-      <div class="apple-modal-card update-dialog-card">
-        <div class="update-modal-header">
-          <div class="update-badge-icon">🚀</div>
-          <div>
-            <div style="font-size: 16px; font-weight: 700; color: var(--text-primary);">New Update Available</div>
-            <div id="updateVersionBadge" class="update-ver-tag">v1.0.1 Released</div>
+    <!-- In-App APK Update AMOLED Modal Dialog -->
+    <div id="inAppUpdateModal" class="glass-popup-backdrop hidden" style="z-index: 99999;">
+      <div class="glass-popup-card update-dialog-card">
+        <div class="glass-popup-header">
+          <div class="glass-popup-title-row">
+            <div class="glass-popup-icon-badge" style="background: linear-gradient(135deg, var(--brand-accent), var(--brand-secondary));">🚀</div>
+            <div>
+              <div class="glass-popup-title">New Update Available</div>
+              <div id="updateVersionBadge" class="update-ver-tag">v1.0.2 Released</div>
+            </div>
           </div>
         </div>
 
-        <div class="update-modal-body">
-          <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 8px; letter-spacing: 0.5px;">What's New in this Version:</div>
+        <div class="glass-popup-scrollable" style="max-height: 48vh;">
+          <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.5px;">What's New in this Version:</div>
           <ul id="updateChangelogList" class="update-changelog-list">
             <!-- Dynamic bullet points -->
           </ul>
@@ -1044,45 +1047,45 @@
           </div>
         </div>
 
-        <div class="update-modal-footer">
-          <button type="button" id="btnUpdateNow" class="apple-btn-primary update-btn-now" style="width: 100%; margin-bottom: 8px; justify-content: center;">
+        <div class="update-modal-footer" style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px;">
+          <button type="button" id="btnUpdateNow" class="apple-btn-primary update-btn-now" style="width: 100%; padding: 12px; font-size: 13px; font-weight: 700; justify-content: center;">
             <span>⚡ Update Now</span>
           </button>
           <div style="display: flex; gap: 8px; width: 100%;">
-            <button type="button" id="btnUpdateRemindLater" class="settings-secondary-btn" style="flex: 1; padding: 9px 10px; font-size: 11.5px; border-radius: 8px;">⏰ Remind Later</button>
-            <button type="button" id="btnUpdateSkip" class="settings-secondary-btn" style="flex: 1; padding: 9px 10px; font-size: 11.5px; border-radius: 8px;">✕ Skip Version</button>
+            <button type="button" id="btnUpdateRemindLater" class="settings-secondary-btn" style="flex: 1; padding: 10px; font-size: 11.5px; border-radius: 10px;">⏰ Remind Later</button>
+            <button type="button" id="btnUpdateSkip" class="settings-secondary-btn" style="flex: 1; padding: 10px; font-size: 11.5px; border-radius: 10px;">✕ Skip Version</button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Mobile Cookie Guide & Auto-Extractor Modal -->
-    <div id="cookieGuideModal" class="format-modal-backdrop hidden" style="z-index: 9999;">
-      <div class="apple-modal-card cookie-guide-modal-card">
-        <div class="update-modal-header" style="border-bottom: 1px solid var(--border-subtle); padding-bottom: 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <div class="update-badge-icon" style="background: rgba(10, 132, 255, 0.15); color: #0A84FF;">🍪</div>
+    <div id="cookieGuideModal" class="glass-popup-backdrop hidden" style="z-index: 99999;">
+      <div class="glass-popup-card">
+        <div class="glass-popup-header">
+          <div class="glass-popup-title-row">
+            <div class="glass-popup-icon-badge">🍪</div>
             <div>
-              <div style="font-size: 15px; font-weight: 700; color: #fff;">Mobile Cookie Guide</div>
-              <div style="font-size: 10.5px; color: var(--text-tertiary);">How to get &amp; auto-adjust cookies directly on your Android phone</div>
+              <div class="glass-popup-title">Mobile Cookie Guide</div>
+              <div class="glass-popup-sub">Get &amp; auto-adjust cookies directly on Android</div>
             </div>
           </div>
-          <button type="button" id="closeCookieGuideBtn" style="background: none; border: none; color: #fff; font-size: 18px; cursor: pointer; padding: 4px 8px;">✕</button>
+          <button type="button" id="closeCookieGuideBtn" class="glass-popup-close-btn" aria-label="Close">✕</button>
         </div>
 
-        <div class="cookie-guide-body" style="max-height: 52vh; overflow-y: auto; padding-right: 4px;">
+        <div class="glass-popup-scrollable" style="max-height: 54vh;">
           <!-- Quick 1-Tap Auto Adjuster Box -->
-          <div class="cookie-guide-box" style="background: rgba(10, 132, 255, 0.08); border: 1px solid rgba(10, 132, 255, 0.25); border-radius: 10px; padding: 12px; margin-bottom: 14px;">
-            <div style="font-size: 12px; font-weight: 700; color: #58a6ff; margin-bottom: 4px;">⚡ 1-Tap Cookie Auto-Adjuster</div>
-            <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 8px;">Paste ANY raw text, JSON, or cookie line copied from your browser. We will automatically extract, clean, and activate your session:</div>
-            <textarea id="quickAutoAdjustInput" rows="2" placeholder="Paste raw cookie text, JSON, or headers here..." style="width: 100%; font-family: monospace; font-size: 11px; border-radius: 6px; background: rgba(0,0,0,0.5); color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 6px 8px; box-sizing: border-box;"></textarea>
-            <button type="button" id="btnRunAutoAdjust" class="apple-btn-primary" style="width: 100%; margin-top: 8px; padding: 8px 12px; font-size: 12px; justify-content: center;">
+          <div class="cookie-guide-box">
+            <div class="cookie-guide-box-title">⚡ 1-Tap Cookie Auto-Adjuster</div>
+            <div class="cookie-guide-box-desc">Paste ANY raw text, JSON, or cookie line copied from your browser. We will automatically extract, clean, and activate your session:</div>
+            <textarea id="quickAutoAdjustInput" rows="2" placeholder="Paste raw cookie text, JSON, or headers here..." style="width: 100%; font-family: monospace; font-size: 11px; border-radius: 8px; background: rgba(0,0,0,0.5); color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 8px; box-sizing: border-box;"></textarea>
+            <button type="button" id="btnRunAutoAdjust" class="apple-btn-primary" style="width: 100%; margin-top: 8px; padding: 10px 14px; font-size: 12.5px; font-weight: 700; justify-content: center;">
               <span>✨ Auto-Format &amp; Apply Now</span>
             </button>
           </div>
 
           <!-- Step-by-Step Android Phone Guide -->
-          <div style="font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 8px;">📱 How to get cookies on Android phone (100% Free):</div>
+          <div style="font-size: 12px; font-weight: 700; color: var(--text-primary); margin-top: 4px; margin-bottom: 2px;">📱 How to get cookies on Android phone (100% Free):</div>
           
           <div class="cookie-step-card">
             <span class="cookie-step-num">1</span>
@@ -1125,8 +1128,8 @@
           </div>
         </div>
 
-        <div style="margin-top: 12px; text-align: center;">
-          <button type="button" id="btnDoneCookieGuide" class="settings-secondary-btn" style="width: 100%; padding: 9px; font-size: 12px;">Close Guide</button>
+        <div style="margin-top: 6px;">
+          <button type="button" id="btnDoneCookieGuide" class="settings-secondary-btn" style="width: 100%; padding: 10px; font-size: 12px; font-weight: 600; border-radius: 12px;">Close Guide</button>
         </div>
       </div>
     </div>
