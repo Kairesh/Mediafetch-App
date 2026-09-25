@@ -1,0 +1,10 @@
+# Gradle build and cache
+.gradle/
+build/
+app/build/
+local.properties
+.idea/
+*.iml
+.DS_Store
+captures/
+.cxx/

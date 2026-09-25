@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>MediaFetch Share Sheet</title>
+    <link rel="stylesheet" href="share_sheet.css">
+</head>
+<body>
+    <div id="backdrop" class="backdrop"></div>
+
+    <div id="sheetCard" class="sheet-card">
+        <!-- Top Drag Pill -->
+        <div class="drag-bar">
+            <div class="drag-pill"></div>
+        </div>
+
+        <!-- Header -->
+        <div class="sheet-header">
+            <div class="brand-group">
+                <div class="app-icon-badge">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </div>
+                <div>
+                    <h2 class="app-title">MediaFetch</h2>
+                    <p class="app-subtitle">Quick Share Downloader</p>
+                </div>
+            </div>
+            <button id="closeBtn" class="icon-close-btn" aria-label="Close">✕</button>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingBox" class="loading-box">
+            <div class="apple-spinner"></div>
+            <p class="loading-text">Fetching instant stream & qualities...</p>
+        </div>
+
+        <!-- Content Box -->
+        <div id="contentBox" class="content-box" style="display: none;">
+            <!-- Media Preview Card -->
+            <div class="media-card">
+                <div class="thumb-container">
+                    <img id="mediaThumb" src="" alt="Thumbnail" onerror="this.src='https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800';" />
+                    <span id="mediaDuration" class="duration-tag">00:00</span>
+                </div>
+                <div class="media-details">
+                    <span id="platformTag" class="platform-tag">YouTube</span>
+                    <h3 id="mediaTitle" class="media-title">Title loading...</h3>
+                    <p id="mediaAuthor" class="media-author">Author</p>
+                </div>
+            </div>
+
+            <!-- Carousel Multi-Slide Ribbon Strip -->
+            <div id="carouselSection" class="carousel-section" style="display: none;">
+                <div class="carousel-header-row">
+                    <div>
+                        <span class="carousel-title">📸 Carousel Slides</span>
+                        <span id="carouselCountBadge" class="carousel-badge">0 slides</span>
+                    </div>
+                    <button type="button" id="downloadAllSlidesBtn" class="download-all-slides-chip">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        <span>Download All</span>
+                    </button>
+                </div>
+                <div id="carouselSlidesTrack" class="carousel-slides-track"></div>
+            </div>
+
+            <!-- Format Segmented Control -->
+            <div class="format-nav">
+                <button class="format-btn active" id="videoTabBtn" data-tab="video">🎬 Video</button>
+                <button class="format-btn" id="audioTabBtn" data-tab="audio">🎵 Audio (320k)</button>
+                <button class="format-btn" id="photoTabBtn" data-tab="photos" style="display: none;">🖼️ Photos</button>
+            </div>
+
+            <!-- Quality Download Options List -->
+            <div id="qualitiesContainer" class="qualities-container">
+                <!-- Dynamically Rendered Quality Cards -->
+            </div>
+
+            <!-- Footer: Switch to Full Studio if needed -->
+            <div class="sheet-footer">
+                <button id="openStudioBtn" class="studio-link">
+                    <span>Open in Full Studio (Trimmer & Gallery)</span>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17l10-10M7 7h10v10"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Duplicate Warning Modal -->
+        <div id="duplicateModal" class="duplicate-modal" style="display: none;">
+            <div class="duplicate-box">
+                <div class="duplicate-icon">⚠️</div>
+                <h4 class="duplicate-title">File Already Downloaded</h4>
+                <p id="duplicateDesc" class="duplicate-desc">You already have this media saved in your device storage.</p>
+                <div class="duplicate-actions">
+                    <button id="overwriteBtn" class="dup-btn confirm">Download Again</button>
+                    <button id="cancelDupBtn" class="dup-btn cancel">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="share_sheet.js"></script>
+</body>
+</html>

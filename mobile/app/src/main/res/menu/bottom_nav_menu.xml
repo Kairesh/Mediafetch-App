@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_downloader"
+        android:icon="@drawable/ic_nav_download"
+        android:title="Downloader" />
+    <item
+        android:id="@+id/nav_search_studio"
+        android:icon="@drawable/ic_nav_search"
+        android:title="Search Studio" />
+    <item
+        android:id="@+id/nav_history"
+        android:icon="@drawable/ic_nav_history"
+        android:title="History" />
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@drawable/ic_nav_settings"
+        android:title="Settings" />
+</menu>

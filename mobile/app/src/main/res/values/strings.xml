@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">MediaFetch</string>
+    <string name="channel_download_name">MediaFetch Downloads</string>
+    <string name="channel_download_desc">Notifications for ongoing and completed downloads</string>
+    <string name="widget_description">Quick 1-tap media downloader and clip trimmer widget</string>
+</resources>
