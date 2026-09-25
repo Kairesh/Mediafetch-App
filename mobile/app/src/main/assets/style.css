@@ -2948,6 +2948,116 @@ body {
   background: var(--accent-primary);
 }
 
+/* Visual Surface & Glassmorphism Style Grid */
+.visual-style-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.visual-style-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 12px 6px;
+  background: var(--input-bg);
+  border: 1px solid var(--app-card-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.visual-style-card:active {
+  transform: scale(0.96);
+}
+
+.visual-style-card.active {
+  border-color: var(--brand-accent);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+.visual-style-icon-preview {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+  margin-bottom: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  transition: all 0.2s ease;
+}
+
+.solid-preview {
+  background: linear-gradient(135deg, #1c1c24, #0d0d12);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.glass-preview {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.prism-preview {
+  background: linear-gradient(135deg, rgba(191, 90, 242, 0.35), rgba(10, 132, 255, 0.35));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.6), 0 0 14px rgba(10, 132, 255, 0.4);
+}
+
+.visual-style-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.visual-style-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.visual-style-desc {
+  font-size: 9.5px;
+  color: var(--text-tertiary);
+  line-height: 1.25;
+}
+
+.visual-style-check {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--brand-accent);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.6);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.visual-style-card.active .visual-style-check {
+  opacity: 1;
+  transform: scale(1);
+}
+
 /* Preset Themes Grid */
 .theme-presets-grid {
   display: grid;
@@ -3621,6 +3731,190 @@ body {
   border-radius: 3px;
   transition: width 0.15s ease;
 }
+
+/* ==========================================================================
+   WHOLE-APP VISUAL DESIGN SYSTEM: LIQUID GLASSMORPHY & CYBER AURORA
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   THEME STYLE 2: 💎 LIQUID GLASSMORPHY (Apple VisionOS / iOS Liquid Glass)
+   Translucent frosted acrylic surfaces, specular rim highlights, glossy depth.
+   Colors are 100% preserved and tint the glowing reflections and buttons!
+   -------------------------------------------------------------------------- */
+html[data-glass-style="glass"] {
+  --app-bg: #06060a !important;
+}
+
+html[data-glass-style="glass"] .app-viewport {
+  background: radial-gradient(circle at 50% 0%, var(--accent-glow) 0%, transparent 45%);
+}
+
+html[data-glass-style="glass"] .apple-card,
+html[data-glass-style="glass"] .settings-card,
+html[data-glass-style="glass"] .media-analysis-workspace,
+html[data-glass-style="glass"] .format-modal-content,
+html[data-glass-style="glass"] .bottom-sheet-drawer,
+html[data-glass-style="glass"] .search-card,
+html[data-glass-style="glass"] .media-item-card,
+html[data-glass-style="glass"] .history-empty-card,
+html[data-glass-style="glass"] .settings-preset-box,
+html[data-glass-style="glass"] .theme-live-preview-box,
+html[data-glass-style="glass"] .incoming-share-banner,
+html[data-glass-style="glass"] .loading-card,
+html[data-glass-style="glass"] .cookie-guide-box,
+html[data-glass-style="glass"] .cookie-step-card,
+html[data-glass-style="glass"] .queue-item {
+  background: rgba(22, 22, 32, 0.72) !important;
+  backdrop-filter: blur(28px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.6), inset 0 1px 1.5px rgba(255, 255, 255, 0.38) !important;
+}
+
+html[data-glass-style="glass"][data-theme="light"] .apple-card,
+html[data-glass-style="glass"][data-theme="light"] .settings-card,
+html[data-glass-style="glass"][data-theme="light"] .media-analysis-workspace,
+html[data-glass-style="glass"][data-theme="light"] .format-modal-content,
+html[data-glass-style="glass"][data-theme="light"] .bottom-sheet-drawer,
+html[data-glass-style="glass"][data-theme="light"] .search-card,
+html[data-glass-style="glass"][data-theme="light"] .media-item-card {
+  background: rgba(255, 255, 255, 0.74) !important;
+  border: 1px solid rgba(0, 0, 0, 0.10) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08), inset 0 1px 1.5px rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Glass Inputs & Search Wrappers */
+html[data-glass-style="glass"] .search-input-wrapper,
+html[data-glass-style="glass"] .select-input,
+html[data-glass-style="glass"] .apple-input,
+html[data-glass-style="glass"] .studio-search-bar,
+html[data-glass-style="glass"] .color-hex-field input,
+html[data-glass-style="glass"] .template-builder-box {
+  background: rgba(255, 255, 255, 0.06) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Glass Buttons with Specular Sheen */
+html[data-glass-style="glass"] .apple-btn-primary,
+html[data-glass-style="glass"] .fetch-submit-btn,
+html[data-glass-style="glass"] .theme-preview-btn,
+html[data-glass-style="glass"] .update-btn-now {
+  background: var(--accent-gradient) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.32) !important;
+  box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.55), 0 8px 24px var(--accent-glow) !important;
+}
+
+html[data-glass-style="glass"] .settings-secondary-btn,
+html[data-glass-style="glass"] .seg-tab,
+html[data-glass-style="glass"] .filter-chip,
+html[data-glass-style="glass"] .quick-action-chip,
+html[data-glass-style="glass"] .history-action-btn,
+html[data-glass-style="glass"] .quality-chip,
+html[data-glass-style="glass"] .filename-tag-chip,
+html[data-glass-style="glass"] .paste-chip {
+  background: rgba(255, 255, 255, 0.07) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.22), 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+}
+
+html[data-glass-style="glass"] .seg-tab.active,
+html[data-glass-style="glass"] .filter-chip.active,
+html[data-glass-style="glass"] .quality-chip.selected {
+  background: var(--accent-gradient) !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.6), 0 6px 20px var(--accent-glow) !important;
+}
+
+/* --------------------------------------------------------------------------
+   THEME STYLE 3: ✨ CYBER AURORA PRISM (Holographic Refractive Glass Depth)
+   Dual-tone chromatic dispersion, luminous edge reflections, vibrant aura.
+   -------------------------------------------------------------------------- */
+html[data-glass-style="prism"] {
+  --app-bg: #070710 !important;
+}
+
+html[data-glass-style="prism"] .app-viewport {
+  background: radial-gradient(circle at 20% 0%, var(--accent-glow) 0%, transparent 40%),
+              radial-gradient(circle at 80% 15%, rgba(191, 90, 242, 0.25) 0%, transparent 35%);
+}
+
+html[data-glass-style="prism"] .apple-card,
+html[data-glass-style="prism"] .settings-card,
+html[data-glass-style="prism"] .media-analysis-workspace,
+html[data-glass-style="prism"] .format-modal-content,
+html[data-glass-style="prism"] .bottom-sheet-drawer,
+html[data-glass-style="prism"] .search-card,
+html[data-glass-style="prism"] .media-item-card,
+html[data-glass-style="prism"] .history-empty-card,
+html[data-glass-style="prism"] .settings-preset-box,
+html[data-glass-style="prism"] .theme-live-preview-box,
+html[data-glass-style="prism"] .incoming-share-banner,
+html[data-glass-style="prism"] .loading-card,
+html[data-glass-style="prism"] .cookie-guide-box,
+html[data-glass-style="prism"] .cookie-step-card,
+html[data-glass-style="prism"] .queue-item {
+  background: linear-gradient(145deg, rgba(22, 18, 36, 0.80), rgba(10, 12, 24, 0.88)) !important;
+  backdrop-filter: blur(34px) saturate(220%) !important;
+  -webkit-backdrop-filter: blur(34px) saturate(220%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 24px var(--accent-glow), inset 0 1px 2px rgba(255, 255, 255, 0.5) !important;
+  position: relative;
+}
+
+/* Iridescent Chromatic Top Rim */
+html[data-glass-style="prism"] .apple-card::before,
+html[data-glass-style="prism"] .settings-card::before,
+html[data-glass-style="prism"] .media-analysis-workspace::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.85), var(--brand-accent), transparent);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  pointer-events: none;
+}
+
+html[data-glass-style="prism"] .apple-btn-primary,
+html[data-glass-style="prism"] .fetch-submit-btn,
+html[data-glass-style="prism"] .theme-preview-btn,
+html[data-glass-style="prism"] .update-btn-now {
+  background: var(--accent-gradient) !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  box-shadow: inset 0 1.5px 2px rgba(255, 255, 255, 0.7), 0 10px 28px var(--accent-glow) !important;
+  backdrop-filter: blur(18px) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+}
+
+html[data-glass-style="prism"] .settings-secondary-btn,
+html[data-glass-style="prism"] .seg-tab,
+html[data-glass-style="prism"] .filter-chip,
+html[data-glass-style="prism"] .quick-action-chip,
+html[data-glass-style="prism"] .quality-chip,
+html[data-glass-style="prism"] .filename-tag-chip,
+html[data-glass-style="prism"] .paste-chip {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  backdrop-filter: blur(16px) !important;
+  box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.28), 0 4px 14px rgba(0, 0, 0, 0.3) !important;
+}
+
+html[data-glass-style="prism"] .seg-tab.active,
+html[data-glass-style="prism"] .filter-chip.active,
+html[data-glass-style="prism"] .quality-chip.selected {
+  background: linear-gradient(135deg, var(--brand-accent), var(--brand-secondary)) !important;
+  border-color: rgba(255, 255, 255, 0.6) !important;
+  box-shadow: inset 0 1.5px 2px rgba(255, 255, 255, 0.8), 0 6px 24px var(--accent-glow) !important;
+}
+
 
 
 

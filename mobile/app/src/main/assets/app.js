@@ -385,8 +385,37 @@
     } catch (_) {}
   }
 
+  // Visual Surface & Glassmorphism System (Solid AMOLED / Liquid Glass / Cyber Aurora)
+  let currentVisualStyle = 'glass';
+
+  function applyVisualStyle(styleKey) {
+    const validStyles = ['solid', 'glass', 'prism'];
+    if (!validStyles.includes(styleKey)) styleKey = 'glass';
+    currentVisualStyle = styleKey;
+    document.documentElement.setAttribute('data-glass-style', styleKey);
+
+    try {
+      localStorage.setItem('mediafetch_visual_style', styleKey);
+    } catch (_) {}
+
+    document.querySelectorAll('.visual-style-card').forEach(card => {
+      const isActive = (card.getAttribute('data-style') === styleKey);
+      card.classList.toggle('active', isActive);
+    });
+  }
+
+  function initVisualStyle() {
+    try {
+      const saved = localStorage.getItem('mediafetch_visual_style') || 'glass';
+      applyVisualStyle(saved);
+    } catch (_) {
+      applyVisualStyle('glass');
+    }
+  }
+
   // Theme Initializer
   function initTheme() {
+    initVisualStyle();
     const savedMode = localStorage.getItem('mediafetch_color_mode');
     isDarkMode = (savedMode !== 'light'); // AMOLED Dark mode by default
 
@@ -2518,6 +2547,24 @@
         }
       });
     }
+
+    // Visual Surface & Glassmorphic Style selection
+    document.querySelectorAll('.visual-style-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const style = card.getAttribute('data-style');
+        if (style) {
+          applyVisualStyle(style);
+          if (window.AndroidBridge && window.AndroidBridge.showToast) {
+            const names = {
+              'solid': '⚡ Switched to Pure Solid AMOLED theme',
+              'glass': '💎 Switched to Liquid Glassmorphism theme',
+              'prism': '✨ Switched to Cyber Aurora Prism theme'
+            };
+            window.AndroidBridge.showToast(names[style] || 'Theme updated');
+          }
+        }
+      });
+    });
 
     // Curated Complete Themes selection
     document.querySelectorAll('.theme-preset-card').forEach(card => {
