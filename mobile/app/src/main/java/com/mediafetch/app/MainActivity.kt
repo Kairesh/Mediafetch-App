@@ -123,7 +123,8 @@ class MainActivity : AppCompatActivity() {
                             if (skipped != info.versionCode) {
                                 withContext(Dispatchers.Main) {
                                     val jsonStr = info.toJsonObject().toString()
-                                    webView.evaluateJavascript("window.onUpdateAvailable && window.onUpdateAvailable($jsonStr);", null)
+                                    val b64 = android.util.Base64.encodeToString(jsonStr.toByteArray(Charsets.UTF_8), android.util.Base64.NO_WRAP)
+                                    webView.evaluateJavascript("window.onUpdateAvailableBase64 ? window.onUpdateAvailableBase64('$b64') : (window.onUpdateAvailable && window.onUpdateAvailable(JSON.parse(decodeURIComponent(escape(atob('$b64'))))));", null)
                                 }
                                 com.mediafetch.app.update.UpdateManager.showUpdateNotification(this@MainActivity, info)
                             }
@@ -255,11 +256,12 @@ class MainActivity : AppCompatActivity() {
             }, 300)
         }
 
-        if (intent.getBooleanExtra("open_update_dialog", false)) {
+        if (intent.getBooleanExtra("open_update_dialog", false) || intent.action == "com.mediafetch.app.ACTION_OPEN_UPDATE") {
             val updateJson = intent.getStringExtra("update_info_json")
             if (!updateJson.isNullOrBlank()) {
+                val b64 = android.util.Base64.encodeToString(updateJson.toByteArray(Charsets.UTF_8), android.util.Base64.NO_WRAP)
                 webView.postDelayed({
-                    webView.evaluateJavascript("window.onUpdateAvailable && window.onUpdateAvailable($updateJson);", null)
+                    webView.evaluateJavascript("window.onUpdateAvailableBase64 ? window.onUpdateAvailableBase64('$b64') : (window.onUpdateAvailable && window.onUpdateAvailable(JSON.parse(decodeURIComponent(escape(atob('$b64'))))));", null)
                 }, 350)
             }
         }
@@ -560,7 +562,8 @@ class MainActivity : AppCompatActivity() {
                 }
                 withContext(Dispatchers.Main) {
                     val jsonStr = checkResult.toJsonObject().toString()
-                    webView.evaluateJavascript("window.onUpdateCheckResult && window.onUpdateCheckResult($jsonStr);", null)
+                    val b64 = android.util.Base64.encodeToString(jsonStr.toByteArray(Charsets.UTF_8), android.util.Base64.NO_WRAP)
+                    webView.evaluateJavascript("window.onUpdateCheckResultBase64 ? window.onUpdateCheckResultBase64('$b64') : (window.onUpdateCheckResult && window.onUpdateCheckResult(JSON.parse(decodeURIComponent(escape(atob('$b64'))))));", null)
                 }
             }
         }

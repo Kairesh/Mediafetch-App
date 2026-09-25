@@ -20,6 +20,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONArray
 import org.json.JSONObject
+import android.widget.Toast
 import java.io.File
 import java.io.FileOutputStream
 import java.util.concurrent.TimeUnit
@@ -187,6 +188,7 @@ object UpdateManager {
             }
 
             val launchIntent = Intent(context, MainActivity::class.java).apply {
+                action = "com.mediafetch.app.ACTION_OPEN_UPDATE"
                 flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
                 putExtra("open_update_dialog", true)
                 putExtra("update_info_json", updateInfo.toJsonObject().toString())
@@ -205,6 +207,12 @@ object UpdateManager {
                 "Tap to review new features and install update."
             }
 
+            val updateAction = NotificationCompat.Action.Builder(
+                R.drawable.ic_stat_download,
+                "⚡ Update Now",
+                pendingIntent
+            ).build()
+
             val notification = NotificationCompat.Builder(context, CHANNEL_UPDATES_ID)
                 .setSmallIcon(R.drawable.ic_stat_download)
                 .setContentTitle("🚀 MediaFetch v${updateInfo.version} Available")
@@ -217,6 +225,7 @@ object UpdateManager {
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
+                .addAction(updateAction)
                 .build()
 
             manager.notify(9901, notification)
@@ -257,7 +266,8 @@ object UpdateManager {
             }
 
             val totalBytes = body.contentLength()
-            val destFile = File(activity.cacheDir, "MediaFetch_Update.apk")
+            val destDir = activity.getExternalFilesDir(null) ?: activity.cacheDir
+            val destFile = File(destDir, "MediaFetch_Update.apk")
             if (destFile.exists()) destFile.delete()
 
             body.byteStream().use { input ->
@@ -284,6 +294,8 @@ object UpdateManager {
                 }
             }
 
+            destFile.setReadable(true, false)
+
             withContext(Dispatchers.Main) {
                 onProgress(100)
                 triggerApkInstall(activity, destFile)
@@ -297,6 +309,22 @@ object UpdateManager {
 
     private fun triggerApkInstall(activity: Activity, apkFile: File) {
         try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if (!activity.packageManager.canRequestPackageInstalls()) {
+                    val intent = Intent(
+                        android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                        Uri.parse("package:${activity.packageName}")
+                    )
+                    activity.startActivity(intent)
+                    Toast.makeText(
+                        activity,
+                        "Please toggle 'Allow from this source' for MediaFetch to install updates.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    return
+                }
+            }
+
             val uri = FileProvider.getUriForFile(
                 activity,
                 "${activity.packageName}.fileprovider",
@@ -305,11 +333,13 @@ object UpdateManager {
 
             val intent = Intent(Intent.ACTION_VIEW).apply {
                 setDataAndType(uri, "application/vnd.android.package-archive")
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             activity.startActivity(intent)
         } catch (e: Exception) {
             e.printStackTrace()
+            Toast.makeText(activity, "Could not launch package installer: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
 }

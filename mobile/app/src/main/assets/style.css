@@ -3321,20 +3321,30 @@ body {
    Apple iOS Glassmorphic Glossy Center Popup Dialogs (Update & Cookie Guide)
    ========================================================================== */
 .glass-popup-backdrop {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.78);
-  backdrop-filter: blur(28px) saturate(190%);
-  -webkit-backdrop-filter: blur(28px) saturate(190%);
-  z-index: 99999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  box-sizing: border-box;
-  animation: glassFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  position: fixed !important;
+  inset: 0 !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(0, 0, 0, 0.78) !important;
+  backdrop-filter: blur(28px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+  z-index: 999999 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 16px !important;
+  box-sizing: border-box !important;
+  animation: glassFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  pointer-events: auto !important;
+}
+
+.glass-popup-backdrop.hidden {
+  display: none !important;
+  pointer-events: none !important;
 }
 
 @keyframes glassFadeIn {
@@ -3343,32 +3353,33 @@ body {
 }
 
 .glass-popup-card {
-  width: 100%;
-  max-width: 410px;
-  max-height: 84vh;
-  display: flex;
-  flex-direction: column;
-  background: linear-gradient(165deg, rgba(28, 28, 36, 0.95), rgba(14, 14, 20, 0.98));
-  backdrop-filter: blur(50px) saturate(200%);
-  -webkit-backdrop-filter: blur(50px) saturate(200%);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 24px;
-  padding: 18px;
-  box-sizing: border-box;
-  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.92),
+  width: 100% !important;
+  max-width: 410px !important;
+  max-height: 84vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  background: linear-gradient(165deg, rgba(24, 24, 32, 0.98), rgba(12, 12, 18, 0.99)) !important;
+  backdrop-filter: blur(50px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(50px) saturate(200%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 24px !important;
+  padding: 20px !important;
+  box-sizing: border-box !important;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.95),
               0 0 0 1px rgba(255, 255, 255, 0.08),
-              inset 0 1px 1.5px rgba(255, 255, 255, 0.35);
-  color: var(--text-primary);
-  animation: glassPopUp 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-  overflow: hidden;
-  position: relative;
+              inset 0 1px 1.5px rgba(255, 255, 255, 0.35) !important;
+  color: var(--text-primary) !important;
+  animation: glassPopUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  overflow: hidden !important;
+  position: relative !important;
+  margin: auto !important;
 }
 
 [data-theme="light"] .glass-popup-card {
-  background: linear-gradient(165deg, rgba(255, 255, 255, 0.97), rgba(240, 242, 248, 0.98));
-  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.98), rgba(240, 242, 248, 0.99)) !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.22),
-              inset 0 1px 1.5px rgba(255, 255, 255, 0.9);
+              inset 0 1px 1.5px rgba(255, 255, 255, 0.9) !important;
 }
 
 @keyframes glassPopUp {
@@ -3561,12 +3572,23 @@ body {
 }
 
 .update-changelog-list li {
-  font-size: 12px;
-  color: var(--text-secondary);
-  line-height: 1.4;
+  font-size: 12.5px;
+  color: var(--text-primary);
+  opacity: 0.95;
+  line-height: 1.42;
   display: flex;
   align-items: flex-start;
   gap: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="light"] .update-changelog-list li {
+  color: #111111;
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .update-changelog-list li::before {
@@ -3574,6 +3596,7 @@ body {
   color: var(--brand-accent);
   font-weight: 700;
   flex-shrink: 0;
+  margin-top: 1px;
 }
 
 .update-progress-wrap {

@@ -2927,30 +2927,41 @@
 
     // In-App APK Auto-Updater Controller
     function showUpdateModal(info) {
-      if (!inAppUpdateModal || !info) return;
+      const modal = document.getElementById('inAppUpdateModal');
+      const badge = document.getElementById('updateVersionBadge');
+      const list = document.getElementById('updateChangelogList');
+      const progressWrap = document.getElementById('updateDownloadProgressWrap');
+      const progressFill = document.getElementById('updateProgressFill');
+      const percentText = document.getElementById('updatePercentText');
+      const btnNow = document.getElementById('btnUpdateNow');
+
+      if (!modal || !info) return;
       activeUpdateInfo = info;
-      if (updateVersionBadge) updateVersionBadge.textContent = `v${info.version} Released`;
-      if (updateChangelogList) {
-        updateChangelogList.innerHTML = '';
-        const notes = Array.isArray(info.releaseNotes) ? info.releaseNotes : [info.releaseNotes || 'Bug fixes and performance improvements'];
+      if (badge) badge.textContent = `v${info.version} Available`;
+      if (list) {
+        list.innerHTML = '';
+        const notes = Array.isArray(info.releaseNotes) && info.releaseNotes.length > 0
+          ? info.releaseNotes
+          : [typeof info.releaseNotes === 'string' && info.releaseNotes ? info.releaseNotes : 'Bug fixes and performance improvements'];
         notes.forEach(note => {
           const li = document.createElement('li');
           li.textContent = note;
-          updateChangelogList.appendChild(li);
+          list.appendChild(li);
         });
       }
-      if (updateDownloadProgressWrap) updateDownloadProgressWrap.classList.add('hidden');
-      if (updateProgressFill) updateProgressFill.style.width = '0%';
-      if (updatePercentText) updatePercentText.textContent = '0%';
-      if (btnUpdateNow) {
-        btnUpdateNow.disabled = false;
-        btnUpdateNow.innerHTML = '<span>⚡ Update Now</span>';
+      if (progressWrap) progressWrap.classList.add('hidden');
+      if (progressFill) progressFill.style.width = '0%';
+      if (percentText) percentText.textContent = '0%';
+      if (btnNow) {
+        btnNow.disabled = false;
+        btnNow.innerHTML = '<span>⚡ Update Now</span>';
       }
-      inAppUpdateModal.classList.remove('hidden');
+      modal.classList.remove('hidden');
     }
 
     function hideUpdateModal() {
-      if (inAppUpdateModal) inAppUpdateModal.classList.add('hidden');
+      const modal = document.getElementById('inAppUpdateModal');
+      if (modal) modal.classList.add('hidden');
     }
 
     const closeUpdateModalBtn = document.getElementById('closeUpdateModalBtn');
@@ -2973,10 +2984,16 @@
 
     if (btnUpdateNow) {
       btnUpdateNow.addEventListener('click', () => {
-        if (!activeUpdateInfo || !activeUpdateInfo.apkUrl) return;
-        if (updateDownloadProgressWrap) updateDownloadProgressWrap.classList.remove('hidden');
+        if (!activeUpdateInfo || !activeUpdateInfo.apkUrl) {
+          if (window.AndroidBridge && window.AndroidBridge.showToast) {
+            window.AndroidBridge.showToast('No update APK download URL available');
+          }
+          return;
+        }
+        const progressWrap = document.getElementById('updateDownloadProgressWrap');
+        if (progressWrap) progressWrap.classList.remove('hidden');
         btnUpdateNow.disabled = true;
-        btnUpdateNow.innerHTML = '<span>⏳ Downloading APK...</span>';
+        btnUpdateNow.innerHTML = '<span>⏳ Starting Download...</span>';
         if (window.AndroidBridge && window.AndroidBridge.downloadAndInstallUpdate) {
           window.AndroidBridge.downloadAndInstallUpdate(activeUpdateInfo.apkUrl);
         }
@@ -3015,6 +3032,16 @@
       }
     };
 
+    window.onUpdateAvailableBase64 = function (b64) {
+      try {
+        const jsonStr = decodeURIComponent(escape(atob(b64)));
+        const data = JSON.parse(jsonStr);
+        window.onUpdateAvailable(data);
+      } catch (err) {
+        console.error('Failed to parse update available Base64', err);
+      }
+    };
+
     window.onUpdateCheckResult = function (res) {
       if (!res) {
         if (window.AndroidBridge && window.AndroidBridge.showToast) {
@@ -3028,30 +3055,54 @@
         }
         return;
       }
-      const info = res.update || res;
+      const info = res.update || (res.hasUpdate ? res.update : null);
       if (info && info.apkUrl) {
         showUpdateModal(info);
       } else {
         if (window.AndroidBridge && window.AndroidBridge.showToast) {
-          window.AndroidBridge.showToast('You are on the latest MediaFetch build!');
+          window.AndroidBridge.showToast('✨ You are on the latest MediaFetch build!');
         }
       }
     };
 
+    window.onUpdateCheckResultBase64 = function (b64) {
+      try {
+        const jsonStr = decodeURIComponent(escape(atob(b64)));
+        const data = JSON.parse(jsonStr);
+        window.onUpdateCheckResult(data);
+      } catch (err) {
+        console.error('Failed to parse update check result Base64', err);
+      }
+    };
+
     window.onUpdateDownloadProgress = function (percent) {
-      if (updateDownloadProgressWrap) updateDownloadProgressWrap.classList.remove('hidden');
       const p = Math.max(0, Math.min(100, Math.round(percent || 0)));
-      if (updatePercentText) updatePercentText.textContent = `${p}%`;
-      if (updateProgressFill) updateProgressFill.style.width = `${p}%`;
+      const progressWrap = document.getElementById('updateDownloadProgressWrap');
+      const percentText = document.getElementById('updatePercentText');
+      const progressFill = document.getElementById('updateProgressFill');
+      const btnNow = document.getElementById('btnUpdateNow');
+
+      if (progressWrap) progressWrap.classList.remove('hidden');
+      if (percentText) percentText.textContent = `${p}%`;
+      if (progressFill) progressFill.style.width = `${p}%`;
+      if (btnNow) {
+        btnNow.disabled = true;
+        if (p >= 100) {
+          btnNow.innerHTML = '<span>🚀 Launching Installer...</span>';
+        } else {
+          btnNow.innerHTML = `<span>⏳ Downloading... ${p}%</span>`;
+        }
+      }
     };
 
     window.onUpdateDownloadError = function (errMsg) {
+      const btnNow = document.getElementById('btnUpdateNow');
+      if (btnNow) {
+        btnNow.disabled = false;
+        btnNow.innerHTML = '<span>⚡ Retry Update</span>';
+      }
       if (window.AndroidBridge && window.AndroidBridge.showToast) {
         window.AndroidBridge.showToast('Update download failed: ' + errMsg);
-      }
-      if (btnUpdateNow) {
-        btnUpdateNow.disabled = false;
-        btnUpdateNow.innerHTML = '<span>⚡ Retry Update</span>';
       }
     };
 
