@@ -2953,6 +2953,13 @@
       if (inAppUpdateModal) inAppUpdateModal.classList.add('hidden');
     }
 
+    const closeUpdateModalBtn = document.getElementById('closeUpdateModalBtn');
+    if (closeUpdateModalBtn) {
+      closeUpdateModalBtn.addEventListener('click', () => {
+        hideUpdateModal();
+      });
+    }
+
     if (manualCheckUpdateBtn) {
       manualCheckUpdateBtn.addEventListener('click', () => {
         if (window.AndroidBridge && window.AndroidBridge.showToast) {

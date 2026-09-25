@@ -112,17 +112,21 @@ class MainActivity : AppCompatActivity() {
                     handleIncomingIntent(intent)
                     refreshTasksToJs()
 
-                    // Check for updates in background
+                    // Check for updates on app launch
                     activityScope.launch {
-                        kotlinx.coroutines.delay(1500L)
-                        val checkResult = com.mediafetch.app.update.UpdateManager.checkForUpdate(this@MainActivity, force = false)
+                        kotlinx.coroutines.delay(1000L)
+                        val checkResult = com.mediafetch.app.update.UpdateManager.checkForUpdate(this@MainActivity, force = true)
                         val info = checkResult.updateInfo
                         if (info != null) {
-                            withContext(Dispatchers.Main) {
-                                val jsonStr = info.toJsonObject().toString()
-                                webView.evaluateJavascript("window.onUpdateAvailable && window.onUpdateAvailable($jsonStr);", null)
+                            val prefs = getSharedPreferences("mediafetch_update_prefs", Context.MODE_PRIVATE)
+                            val skipped = prefs.getInt("skipped_version_code", -1)
+                            if (skipped != info.versionCode) {
+                                withContext(Dispatchers.Main) {
+                                    val jsonStr = info.toJsonObject().toString()
+                                    webView.evaluateJavascript("window.onUpdateAvailable && window.onUpdateAvailable($jsonStr);", null)
+                                }
+                                com.mediafetch.app.update.UpdateManager.showUpdateNotification(this@MainActivity, info)
                             }
-                            com.mediafetch.app.update.UpdateManager.showUpdateNotification(this@MainActivity, info)
                         }
                     }
                 }
@@ -207,6 +211,7 @@ class MainActivity : AppCompatActivity() {
 
         requestRequiredPermissions()
         bindDownloadService()
+        com.mediafetch.app.update.UpdateCheckReceiver.schedulePeriodicCheck(this)
     }
 
     private fun passWindowInsetsToJs() {

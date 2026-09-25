@@ -1016,9 +1016,11 @@
           <p>No active downloads. Shared media will appear here!</p>
         </div>
       </div>
-    <!-- In-App APK Update AMOLED Modal Dialog -->
-    <!-- In-App APK Update AMOLED Modal Dialog -->
-    <div id="inAppUpdateModal" class="glass-popup-backdrop hidden" style="z-index: 99999;">
+    </div>
+  </div>
+
+  <!-- In-App APK Update AMOLED Modal Dialog -->
+  <div id="inAppUpdateModal" class="glass-popup-backdrop hidden" style="z-index: 999999;">
       <div class="glass-popup-card update-dialog-card">
         <div class="glass-popup-header">
           <div class="glass-popup-title-row">
@@ -1028,6 +1030,7 @@
               <div id="updateVersionBadge" class="update-ver-tag">v1.0.2 Released</div>
             </div>
           </div>
+          <button type="button" id="closeUpdateModalBtn" class="glass-popup-close-btn" aria-label="Close">✕</button>
         </div>
 
         <div class="glass-popup-scrollable" style="max-height: 48vh;">
@@ -1133,8 +1136,6 @@
         </div>
       </div>
     </div>
-
-  </div>
 
   <script src="app.js"></script>
 </body>
