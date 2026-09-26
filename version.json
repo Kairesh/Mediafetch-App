@@ -4,16 +4,17 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "Official MediaFetch v1.0.0 release. Apple AMOLED theme, 3-tier icon themes, Search Studio, and multi-threaded engine.",
   "mobile": {
-    "version": "1.0.11",
-    "versionCode": 12,
+    "version": "1.0.12",
+    "versionCode": 13,
     "releaseDate": "2026-09-27",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": false,
     "releaseNotes": [
-      "📁 Collapsed Subfolders by Default: All subfolders now start closed with ▶ toggle icon so full folder structures are immediately visible without endless scrolling.",
-      "🚀 Fluid Touch Scrolling & Sliced Items Fix: Playlist batch list expands up to 60vh with smooth touch momentum scrolling; eliminates clipped items.",
-      "✨ Zero Dead Space: Eliminated excessive negative bottom padding and 100vh stretch across views for a tighter, native mobile layout.",
-      "🎨 Minimalist Theme Cards: Removed emojis/icons from Pure AMOLED, Liquid Glass, and Cyber Aurora theme cards for a clean, minimal typography look."
+      "🗂️ Deep Google Drive Hierarchy: Supports up to 8 levels of nested subfolders and sub-subfolders with complete relative path names.",
+      "🚀 Fluid Unconstrained Scrolling: Removed touch-interception locks so entire playlist and subfolder trees scroll natively with momentum.",
+      "🎬 Batch Format Pill Carousel: Horizontal swipeable format pills (1080p, 720p, 480p, MP3) with intuitive UI guidance hint.",
+      "⏱️ Accurate Media Timelines: Fixed 00:00 duration bug across all items with real length probing and HD footage badges.",
+      "⚡ Adobe CEP Plugin Sync: Full deep-tree recursive scanning, corrected selection counts, and reliable batch downloads."
     ]
   }
 }
