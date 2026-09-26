@@ -4,17 +4,17 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "Official MediaFetch v1.0.0 release. Apple AMOLED theme, 3-tier icon themes, Search Studio, and multi-threaded engine.",
   "mobile": {
-    "version": "1.0.12",
-    "versionCode": 13,
+    "version": "1.0.13",
+    "versionCode": 14,
     "releaseDate": "2026-09-27",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": false,
     "releaseNotes": [
-      "🗂️ Deep Google Drive Hierarchy: Supports up to 8 levels of nested subfolders and sub-subfolders with complete relative path names.",
-      "🚀 Fluid Unconstrained Scrolling: Removed touch-interception locks so entire playlist and subfolder trees scroll natively with momentum.",
-      "🎬 Batch Format Pill Carousel: Horizontal swipeable format pills (1080p, 720p, 480p, MP3) with intuitive UI guidance hint.",
-      "⏱️ Accurate Media Timelines: Fixed 00:00 duration bug across all items with real length probing and HD footage badges.",
-      "⚡ Adobe CEP Plugin Sync: Full deep-tree recursive scanning, corrected selection counts, and reliable batch downloads."
+      "🗂️ Google Drive Hierarchical Tree: Top-level subfolders initially collapsed matching Drive structure, expanding into nested sub-subfolders and media files on tap.",
+      "☑️ Multi-Level Tri-State Checkboxes: Interactive parent-child checkbox synchronization with indeterminate selection states.",
+      "📁 Custom Save Location Routing: Full SAF DocumentTree support ensuring media and batch ZIP files save directly to user-selected folders.",
+      "📦 Reliable Batch ZIP Creation: Fixed atomic completion tracking so ZIP packages always compile and index properly upon batch completion.",
+      "⚡ 5x Faster Drive Analysis: Parallel folder crawling and streamlined metadata probing in both Mobile App and Adobe CEP extension."
     ]
   }
 }
