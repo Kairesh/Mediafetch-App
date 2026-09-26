@@ -4,17 +4,16 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "Official MediaFetch v1.0.0 release. Apple AMOLED theme, 3-tier icon themes, Search Studio, and multi-threaded engine.",
   "mobile": {
-    "version": "1.0.16",
-    "versionCode": 17,
+    "version": "1.0.17",
+    "versionCode": 18,
     "releaseDate": "2026-09-27",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": false,
     "releaseNotes": [
-      "🧹 Auto Cache Cleaner & Zero Residual Storage: Immediate post-download cleanup eliminates cache buildup (down from 100+ MB to 0 MB) automatically without manual action.",
-      "🚀 Low-End Device RAM & Hardware Acceleration: Highly optimized 565 bitmap decoding and hardware acceleration drastically lowers memory footprint for ultra-smooth performance.",
-      "🔌 Adobe CEP In-Process Daemon: Repackaged background service with zero external Node dependency and instant offline queueing to eliminate analysis timeouts.",
-      "📁 Custom Folder Naming & Cloud Tree Preservation: Seamless nested folder hierarchy maintained in AE/PR project panels and disk.",
-      "📦 Subfolder Preservation in ZIP: Preserves nested folder directories inside .ZIP archives for clean one-click extraction."
+      "🧹 Deep Chromium & APK Cache Purge: Auto-wipes hidden WebView HTTP/GPU caches and update APKs, bringing App Info cache down to near zero automatically.",
+      "⚡ Instant Drive Status Detection: Real-time detection of 404 deleted or 403 private Google Drive folders with clear actionable user guidance.",
+      "🔌 Auto-Clearing Analysis Error: Plugin now instantly clears stale timeouts and reconnects seamlessly with in-process background daemon.",
+      "🚀 Low-End Device RAM & Smoothness: High-efficiency RGB_565 decoding and hardware acceleration eliminate lags and device heating."
     ]
   }
 }
