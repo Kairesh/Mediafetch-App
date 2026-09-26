@@ -4,17 +4,17 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "Official MediaFetch v1.0.0 release. Apple AMOLED theme, 3-tier icon themes, Search Studio, and multi-threaded engine.",
   "mobile": {
-    "version": "1.0.14",
-    "versionCode": 15,
+    "version": "1.0.15",
+    "versionCode": 16,
     "releaseDate": "2026-09-27",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": false,
     "releaseNotes": [
-      "⏱️ Accurate Video Durations: Probes real video lengths for Google Drive items, displaying timestamps (e.g. 0:05) instead of placeholder HD badges.",
-      "📁 Hierarchical Subfolder Downloads: Recreates exact multi-level folder structures on disk matching Google Drive hierarchy.",
-      "📦 Subfolder Preservation in ZIP: Preserves nested folder directories inside .ZIP archives for clean one-click extraction.",
-      "🎵 True MP3 Output: Fixed audio formatting so user-selected MP3 downloads output real .mp3 files without forced .m4a extension.",
-      "⚡ Parallel Probing & CEP Sync: Fast concurrent duration probing and folder-aware downloads across Adobe Premiere and After Effects."
+      "⚡ Lightning Cloud Crawl & Anti-Heat: Eliminated heavy blocking duration loops; cloud folder analysis now finishes instantly in 2 seconds with zero device heating.",
+      "🖼️ Drive Image Downloads Fixed: Seamless direct streaming for .jpg and .png photos from Drive folders without format errors.",
+      "📁 Custom Folder Naming & Cloud Tree Preservation: Ability to name custom destination folders with exact cloud directory structure preserved on disk and in Premiere/AE project panels.",
+      "📥 Configurable Auto-Import & Zero Lag: Added auto-import project panel toggle and throttled imports to completely prevent host app freezing.",
+      "📦 Subfolder Preservation in ZIP: Preserves nested folder directories inside .ZIP archives for clean one-click extraction."
     ]
   }
 }
