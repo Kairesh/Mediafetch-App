@@ -4,17 +4,19 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "Official MediaFetch v1.0.0 release. Apple AMOLED theme, 3-tier icon themes, Search Studio, and multi-threaded engine.",
   "mobile": {
-    "version": "1.0.6",
-    "versionCode": 7,
+    "version": "1.0.7",
+    "versionCode": 8,
     "releaseDate": "2026-09-26",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": false,
     "releaseNotes": [
-      "🎨 Ae / Premiere Pro Style 2D Color Studio: 2D gradient picker square, rainbow hue spectrum, real-time preview & dual background gradients (Start & End)",
-      "☀️ Full Pure Light Theme Overhaul: Clean crisp cards, high-contrast readable typography, frosted liquid glass & crystalline styling",
-      "📱 Dynamic Themed App Switcher & Share Sheet: Clean native header matching theme color in Android tabs; share icon adapts to active theme",
-      "📂 Transparent APK Update Location: Saved directly to 'Download/MediaFetch/' with explicit on-screen folder path notifications",
-      "🛡️ Cyber Aurora & Glassmorphism Fixes: Resolved drawer peek issues and polished layout across all visual styles"
+      "☁️ Cloud Video & Remote Trimming: Download & stream from Google Drive, Dropbox, OneDrive, and direct URLs without downloading gigabytes first",
+      "📦 Playlist & Batch Packaging (.ZIP): Choose between saving separate files or bundling all items into a single .ZIP archive",
+      "📸 Carousel Multi-Slide Studio: Slide checkbox selector, photo/video filters, and 1-tap download of selected slides as files or .ZIP",
+      "📁 Custom Local Storage Location: Pick and persist your own download destination folder for both batches and single media",
+      "⚡ Multi-Threaded Queue Manager: Real-time queue speed banner & parallel throughput tracking across downloads",
+      "✓ Duplicate Detection: Instant badge notification on preview cards when media is already downloaded to local storage",
+      "🚀 Plugin Performance Optimization: Zero input lag during license activation with GPU-composited overlay and cached machine IDs"
     ]
   }
 }
