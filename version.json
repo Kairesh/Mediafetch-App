@@ -4,17 +4,17 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "Official MediaFetch v1.0.0 release. Apple AMOLED theme, 3-tier icon themes, Search Studio, and multi-threaded engine.",
   "mobile": {
-    "version": "1.0.8",
-    "versionCode": 9,
+    "version": "1.0.9",
+    "versionCode": 10,
     "releaseDate": "2026-09-26",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": false,
     "releaseNotes": [
+      "⚡ Google Drive Folder Batch & Multi-Format Fix: Properly downloads images (.jpg, .png) and videos (.mp4) without validation failures or corrupted extensions",
+      "🎬 Clean Timeline Labels: Replaced 00:00 on video/image footages with dedicated PHOTO / HD FOOTAGE tags",
+      "🔌 Adobe CEP Plugin Bundled Update: Synchronized server.js daemon with Google Drive folder multi-file scraper and query param support",
       "📁 Google Drive Shared Folder Multi-Footage Extraction: Full batch detection and multi-file listing for Drive folders without HTTP 400 errors",
-      "📸 Carousel Selection & Direct Download: Checkbox selectors on slides, Select All / Deselect, and 1-tap Download Selected without extra prompts",
-      "✨ Quick Share Branding: Real MediaFetch high-res icon in share sheet header",
-      "☁️ Cloud Video & Remote Trimming: Download & stream from Google Drive, Dropbox, OneDrive, and direct URLs without downloading gigabytes first",
-      "📦 Playlist & Batch Packaging (.ZIP): Choose between saving separate files or bundling all items into a single .ZIP archive"
+      "📸 Carousel Selection & Direct Download: Checkbox selectors on slides, Select All / Deselect, and 1-tap Download Selected without extra prompts"
     ]
   }
 }
