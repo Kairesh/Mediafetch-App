@@ -4,17 +4,16 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "Official MediaFetch v1.0.0 release. Apple AMOLED theme, 3-tier icon themes, Search Studio, and multi-threaded engine.",
   "mobile": {
-    "version": "1.0.9",
-    "versionCode": 10,
-    "releaseDate": "2026-09-26",
+    "version": "1.0.10",
+    "versionCode": 11,
+    "releaseDate": "2026-09-27",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": false,
     "releaseNotes": [
-      "⚡ Google Drive Folder Batch & Multi-Format Fix: Properly downloads images (.jpg, .png) and videos (.mp4) without validation failures or corrupted extensions",
-      "🎬 Clean Timeline Labels: Replaced 00:00 on video/image footages with dedicated PHOTO / HD FOOTAGE tags",
-      "🔌 Adobe CEP Plugin Bundled Update: Synchronized server.js daemon with Google Drive folder multi-file scraper and query param support",
-      "📁 Google Drive Shared Folder Multi-Footage Extraction: Full batch detection and multi-file listing for Drive folders without HTTP 400 errors",
-      "📸 Carousel Selection & Direct Download: Checkbox selectors on slides, Select All / Deselect, and 1-tap Download Selected without extra prompts"
+      "📁 Collapsible Subfolder Tree (Accordion / Down Arrow Toggle ▼): Cloud folders and subfolders recursively parse and display with expandable/collapsible toggle controls and dedicated master checkboxes for downloading whole subfolders.",
+      "🎬 Real Video Duration Probing & Accurate Timeline Badges: Fast HTTP Range mvhd atom probing extracts real video duration; eliminates 00:00 by showing true duration, 🎬 HD FOOTAGE, or 📸 PHOTO.",
+      "📦 ZIP Packaging & Custom Destination: Choose any local destination folder with Browse button or bundle selected files into a single .ZIP archive directly.",
+      "⚡ Google Drive Folder Batch & Multi-Format Support: Seamlessly handles nested subfolders, images, and videos without missing files or undefined counts"
     ]
   }
 }
