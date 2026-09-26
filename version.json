@@ -4,19 +4,17 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "Official MediaFetch v1.0.0 release. Apple AMOLED theme, 3-tier icon themes, Search Studio, and multi-threaded engine.",
   "mobile": {
-    "version": "1.0.7",
-    "versionCode": 8,
+    "version": "1.0.8",
+    "versionCode": 9,
     "releaseDate": "2026-09-26",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": false,
     "releaseNotes": [
+      "📁 Google Drive Shared Folder Multi-Footage Extraction: Full batch detection and multi-file listing for Drive folders without HTTP 400 errors",
+      "📸 Carousel Selection & Direct Download: Checkbox selectors on slides, Select All / Deselect, and 1-tap Download Selected without extra prompts",
+      "✨ Quick Share Branding: Real MediaFetch high-res icon in share sheet header",
       "☁️ Cloud Video & Remote Trimming: Download & stream from Google Drive, Dropbox, OneDrive, and direct URLs without downloading gigabytes first",
-      "📦 Playlist & Batch Packaging (.ZIP): Choose between saving separate files or bundling all items into a single .ZIP archive",
-      "📸 Carousel Multi-Slide Studio: Slide checkbox selector, photo/video filters, and 1-tap download of selected slides as files or .ZIP",
-      "📁 Custom Local Storage Location: Pick and persist your own download destination folder for both batches and single media",
-      "⚡ Multi-Threaded Queue Manager: Real-time queue speed banner & parallel throughput tracking across downloads",
-      "✓ Duplicate Detection: Instant badge notification on preview cards when media is already downloaded to local storage",
-      "🚀 Plugin Performance Optimization: Zero input lag during license activation with GPU-composited overlay and cached machine IDs"
+      "📦 Playlist & Batch Packaging (.ZIP): Choose between saving separate files or bundling all items into a single .ZIP archive"
     ]
   }
 }
