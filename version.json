@@ -4,17 +4,17 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "Official MediaFetch v1.0.0 release. Apple AMOLED theme, 3-tier icon themes, Search Studio, and multi-threaded engine.",
   "mobile": {
-    "version": "1.0.5",
-    "versionCode": 6,
-    "releaseDate": "2026-09-25",
+    "version": "1.0.6",
+    "versionCode": 7,
+    "releaseDate": "2026-09-26",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": false,
     "releaseNotes": [
-      "🛡️ Cyber Aurora Bottom Drawer Fix: Resolved bottom sheet staying visible/cut off in Aurora glass mode",
-      "🏷️ Dynamic Settings Version: Version badge now always accurately mirrors installed APK version from system",
-      "💾 Automatic Download Folder Backup: Downloaded APK updates are automatically saved to your phone's 'Download/MediaFetch/' directory",
-      "💎 Whole-App Liquid Glassmorphism & Cyber Aurora Prism UI",
-      "🚀 Direct In-App APK Updater with live download progress & 1-tap installation"
+      "🎨 Ae / Premiere Pro Style 2D Color Studio: 2D gradient picker square, rainbow hue spectrum, real-time preview & dual background gradients (Start & End)",
+      "☀️ Full Pure Light Theme Overhaul: Clean crisp cards, high-contrast readable typography, frosted liquid glass & crystalline styling",
+      "📱 Dynamic Themed App Switcher & Share Sheet: Clean native header matching theme color in Android tabs; share icon adapts to active theme",
+      "📂 Transparent APK Update Location: Saved directly to 'Download/MediaFetch/' with explicit on-screen folder path notifications",
+      "🛡️ Cyber Aurora & Glassmorphism Fixes: Resolved drawer peek issues and polished layout across all visual styles"
     ]
   }
 }
