@@ -125,6 +125,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 0;
+  padding-bottom: calc(var(--safe-bottom, 20px) + 95px);
 }
 
 /* System Notch / Status Bar Spacer */
@@ -4742,3 +4743,351 @@ html[data-glass-style="prism"] .quality-chip.selected {
 
 
 
+
+
+/* ==========================================================================
+   FLOATING DOCK & AURA THEME ARCHITECTURE (REF: media_1790638361612.png)
+   ========================================================================== */
+
+/* 1. Atmospheric Moving Gradient from Bottom to Footer */
+.footer-ambient-backdrop {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 160px;
+  background: radial-gradient(ellipse at 50% 100%, rgba(var(--accent-rgb, 10, 132, 255), 0.3) 0%, rgba(var(--accent-rgb, 10, 132, 255), 0.08) 50%, transparent 80%);
+  background-size: 200% 200%;
+  pointer-events: none;
+  z-index: 990;
+  opacity: 0.9;
+  transition: opacity 0.4s ease;
+}
+
+[data-theme-style="glass"] .footer-ambient-backdrop,
+[data-theme-style="prism"] .footer-ambient-backdrop {
+  animation: abstractAuraMove 10s ease-in-out infinite alternate;
+}
+
+[data-theme-style="solid"] .footer-ambient-backdrop,
+[data-theme="amoled"] .footer-ambient-backdrop {
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.75) 60%, #000000 100%);
+  animation: none;
+}
+
+@keyframes abstractAuraMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* 2. Floating Capsule Pill Dock (Exact match to media_1790638361612.png) */
+.floating-pill-dock {
+  position: fixed;
+  bottom: calc(var(--safe-bottom, 20px) + 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: rgba(14, 18, 28, 0.88);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+  padding: 8px 18px;
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.85), 0 0 25px -4px rgba(var(--accent-rgb, 10, 132, 255), 0.4);
+  z-index: 999;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.floating-nav-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.floating-nav-btn .nav-icon-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.5);
+  background: transparent;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.floating-nav-btn:active .nav-icon-circle {
+  transform: scale(0.92);
+}
+
+.floating-nav-btn.active .nav-icon-circle {
+  background: var(--brand-accent);
+  color: #ffffff;
+  box-shadow: 0 4px 18px rgba(var(--accent-rgb, 10, 132, 255), 0.55);
+  transform: scale(1.08);
+}
+
+/* 3. Search Studio: Category Tabs Bar (Never overflow or clip) */
+.ms-category-tabs-bar {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  overflow-x: auto !important;
+  scrollbar-width: none !important;
+  -webkit-overflow-scrolling: touch !important;
+  padding: 6px 2px 10px !important;
+  margin-bottom: 6px !important;
+  flex-wrap: nowrap !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.ms-category-tabs-bar::-webkit-scrollbar {
+  display: none !important;
+}
+
+.ms-cat-tab {
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  padding: 8px 16px !important;
+  border-radius: 9999px !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.ms-cat-tab.active {
+  background: var(--brand-accent) !important;
+  border-color: var(--brand-accent) !important;
+  color: #000000 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 16px -2px rgba(var(--accent-rgb, 10, 132, 255), 0.45) !important;
+  transform: scale(1.02) !important;
+}
+
+/* 4. Sleek Multi-Filter Mode Pill */
+.sleek-mode-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 8px 14px !important;
+  border-radius: 9999px !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.sleek-mode-pill:active {
+  transform: scale(0.94) !important;
+}
+
+.sleek-mode-pill.active {
+  background: rgba(var(--accent-rgb, 10, 132, 255), 0.15) !important;
+  border-color: var(--brand-accent) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 12px rgba(var(--accent-rgb, 10, 132, 255), 0.3) !important;
+}
+
+/* 5. Platform Carousel Pills */
+.platform-filter-carousel {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  overflow-x: auto !important;
+  scrollbar-width: none !important;
+  -webkit-overflow-scrolling: touch !important;
+  padding: 4px 2px 12px !important;
+  flex-wrap: nowrap !important;
+  width: 100% !important;
+}
+
+.platform-filter-carousel::-webkit-scrollbar {
+  display: none !important;
+}
+
+.ms-platform-pill {
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 6px 14px !important;
+  border-radius: 9999px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: rgba(255, 255, 255, 0.65) !important;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.ms-platform-pill.active {
+  background: rgba(var(--accent-rgb, 10, 132, 255), 0.2) !important;
+  border-color: var(--brand-accent) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 12px -2px rgba(var(--accent-rgb, 10, 132, 255), 0.4) !important;
+}
+
+/* 6. Theme Differentiation for Search Result Cards (.ms-card) & History Cards (.history-card) */
+
+/* A. Solid AMOLED Theme: Pure deep solid black for battery saving */
+[data-theme-style="solid"] .ms-card,
+[data-theme="amoled"] .ms-card,
+[data-theme-style="solid"] .history-card,
+[data-theme="amoled"] .history-card {
+  background: #0c0d12 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 10px 24px -5px rgba(0, 0, 0, 0.8) !important;
+}
+
+[data-theme-style="solid"] .ms-card::before,
+[data-theme="amoled"] .ms-card::before,
+[data-theme-style="solid"] .history-card::before,
+[data-theme="amoled"] .history-card::before {
+  display: none !important;
+}
+
+/* B. Liquid Glassmorphism & Cyber Aurora Prism: Frosted glass with moving abstract gradient (Ref: media_1790638625189.png) */
+[data-theme-style="glass"] .ms-card,
+[data-theme-style="prism"] .ms-card,
+[data-theme-style="glass"] .history-card,
+[data-theme-style="prism"] .history-card {
+  position: relative !important;
+  overflow: hidden !important;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%), rgba(16, 20, 30, 0.65) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.25) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease !important;
+}
+
+[data-theme-style="glass"] .ms-card::before,
+[data-theme-style="prism"] .ms-card::before,
+[data-theme-style="glass"] .history-card::before,
+[data-theme-style="prism"] .history-card::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: radial-gradient(circle at 80% 20%, rgba(var(--accent-rgb, 10, 132, 255), 0.24) 0%, transparent 60%),
+              radial-gradient(circle at 20% 80%, rgba(138, 43, 226, 0.2) 0%, transparent 60%) !important;
+  background-size: 200% 200% !important;
+  animation: abstractAuraMove 12s ease-in-out infinite alternate !important;
+  pointer-events: none !important;
+  border-radius: inherit !important;
+  z-index: 0 !important;
+}
+
+/* Card Content & Text Legibility */
+.ms-card-content,
+.history-card-content {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.ms-card-title {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  font-size: 12px !important;
+  line-height: 1.35 !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9) !important;
+  margin-bottom: 4px !important;
+}
+
+.ms-card-author {
+  color: rgba(255, 255, 255, 0.75) !important;
+  font-size: 10.5px !important;
+  font-weight: 500 !important;
+}
+
+.ms-card-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin-top: 8px !important;
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+.ms-btn-download {
+  flex: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  background: var(--brand-accent) !important;
+  color: #000000 !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  padding: 8px 10px !important;
+  border-radius: 9999px !important;
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(var(--accent-rgb, 10, 132, 255), 0.4) !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.ms-btn-download:active {
+  transform: scale(0.95) !important;
+}
+
+.ms-btn-trim {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #38bdf8 !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  padding: 7px 12px !important;
+  border-radius: 9999px !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.ms-btn-trim:active {
+  transform: scale(0.95) !important;
+}
+
+/* Common Vector Icon Utilities */
+.pill-svg,
+.cat-tab-svg {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  vertical-align: middle !important;
+  flex-shrink: 0 !important;
+  stroke: currentColor !important;
+}

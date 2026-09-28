@@ -4,16 +4,17 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "Official MediaFetch v1.0.0 release. Apple AMOLED theme, 3-tier icon themes, Search Studio, and multi-threaded engine.",
   "mobile": {
-    "version": "1.0.17",
-    "versionCode": 21,
+    "version": "1.0.22",
+    "versionCode": 22,
     "releaseDate": "2026-09-29",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": false,
     "releaseNotes": [
-      "Restored classic v1.0.17 optimized UI: ultra-smooth, lightweight, and blazing fast.",
-      "Deep Chromium & APK Cache Purge: Auto-wipes hidden WebView HTTP/GPU caches and update APKs.",
-      "Instant Drive Status Detection: Real-time detection of 404 deleted or 403 private Google Drive folders.",
-      "Low-End Device RAM & Smoothness: High-efficiency RGB_565 decoding and hardware acceleration."
+      "Liquid Floating Capsule Dock: Elevated bottom navigation with glossy glass finish and active theme glow.",
+      "100% Vector Icons: Completely replaced all emojis across the entire APK with crisp theme-adaptive SVG icons.",
+      "Search Studio Redesign: Fixed Photos & Wallpapers horizontal scrolling and redesigned Multi-Filter pill.",
+      "Theme Card Differentiation: Frosted glassmorphism with abstract moving gradient in Glass/Prism themes, pure solid deep black in AMOLED.",
+      "Atmospheric Footer Gradient: Moving ambient gradient aura radiating from bottom to the floating dock."
     ]
   }
 }

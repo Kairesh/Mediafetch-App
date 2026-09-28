@@ -1387,7 +1387,7 @@
 
         card.innerHTML = `
           <div class="card-row-left">
-            <div class="res-glyph-box" style="color:${isGifCard ? 'var(--apple-purple)' : 'var(--apple-cyan)'}">${isGifCard ? 'GIF' : '📸'}</div>
+            <div class="res-glyph-box" style="color:${isGifCard ? 'var(--apple-purple)' : 'var(--apple-cyan)'}">${isGifCard ? 'GIF' : '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;"><rect x="3" y="3" width="18" height="18" rx="3" ry="3"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>'}</div>
             <div class="card-details-text">
               <div class="card-title-line">
                 <span class="card-label-name">${q.label}</span>
@@ -1521,7 +1521,7 @@
           <span class="trim-q-name">${q.label.split(' ')[0]}</span>
           <span class="trim-q-fmt">${(q.ext || 'MP4').toUpperCase()}</span>
         </div>
-        <div class="trim-q-size">⚡ ~${sizeText}</div>
+        <div class="trim-q-size"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" class="pill-svg"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> ~${sizeText}</div>
       `;
 
       card.addEventListener('click', () => {
@@ -1630,20 +1630,20 @@
       if (isSpotify) {
         // Audio-only pills for Spotify (no video options)
         pillsContainer.innerHTML = `
-          <button type="button" class="pl-quality-pill active" data-quality="audio_mp3_320">🎵 320k Studio MP3</button>
-          <button type="button" class="pl-quality-pill" data-quality="audio_mp3_192">🎵 192k Standard MP3</button>
-          <button type="button" class="pl-quality-pill" data-quality="audio_mp3_128">🎵 128k Data Saver</button>
-          <button type="button" class="pl-quality-pill" data-quality="audio_wav_lossless">🎼 Lossless WAV</button>
+          <button type="button" class="pl-quality-pill active" data-quality="audio_mp3_320"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" class="pill-svg"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> 320k Studio MP3</button>
+          <button type="button" class="pl-quality-pill" data-quality="audio_mp3_192"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" class="pill-svg"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> 192k Standard MP3</button>
+          <button type="button" class="pl-quality-pill" data-quality="audio_mp3_128"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" class="pill-svg"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> 128k Data Saver</button>
+          <button type="button" class="pl-quality-pill" data-quality="audio_wav_lossless"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" class="pill-svg"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> Lossless WAV</button>
         `;
         selectedBatchQuality = 'audio_mp3_320';
       } else {
         // Video + Audio pills for YouTube & Google Drive
         pillsContainer.innerHTML = `
-          <button type="button" class="pl-quality-pill active" data-quality="1080p">🎬 1080p Full HD</button>
-          <button type="button" class="pl-quality-pill" data-quality="720p">🎬 720p HD</button>
-          <button type="button" class="pl-quality-pill" data-quality="480p">🎬 480p SD</button>
-          <button type="button" class="pl-quality-pill" data-quality="audio_mp3_320">🎵 320k Studio MP3</button>
-          <button type="button" class="pl-quality-pill" data-quality="audio_mp3_192">🎵 192k Standard MP3</button>
+          <button type="button" class="pl-quality-pill active" data-quality="1080p"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" class="pill-svg"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line></svg> 1080p Full HD</button>
+          <button type="button" class="pl-quality-pill" data-quality="720p"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" class="pill-svg"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line></svg> 720p HD</button>
+          <button type="button" class="pl-quality-pill" data-quality="480p"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" class="pill-svg"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line></svg> 480p SD</button>
+          <button type="button" class="pl-quality-pill" data-quality="audio_mp3_320"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" class="pill-svg"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> 320k Studio MP3</button>
+          <button type="button" class="pl-quality-pill" data-quality="audio_mp3_192"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" class="pill-svg"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> 192k Standard MP3</button>
         `;
         selectedBatchQuality = '1080p';
       }
@@ -1725,7 +1725,7 @@
           <div class="subfolder-header-left">
             <span class="subfolder-toggle-icon">▶</span>
             <input type="checkbox" class="subfolder-master-cb" checked title="Select/Deselect folder">
-            <span class="subfolder-name">📁 ${folderName}</span>
+            <span class="subfolder-name"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" class="pill-svg"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg> ${folderName}</span>
           </div>
           <span class="subfolder-count">${subNode.totalCount} files</span>
         `;
@@ -1768,7 +1768,7 @@
       if (node.files && node.files.length > 0) {
         node.files.forEach(({ item, index }) => {
           const isImg = item.isImage || /\.(jpg|jpeg|png|webp|gif|bmp)$/i.test(item.title);
-          const badgeText = isImg ? '📸 PHOTO' : (item.formattedDuration && item.formattedDuration !== '00:00' && item.formattedDuration !== 'HD FOOTAGE' ? item.formattedDuration : (item.durationSeconds > 0 ? formatSec(item.durationSeconds) : '🎬 HD FOOTAGE'));
+          const badgeText = isImg ? 'PHOTO' : (item.formattedDuration && item.formattedDuration !== '00:00' && item.formattedDuration !== 'HD FOOTAGE' ? item.formattedDuration : (item.durationSeconds > 0 ? formatSec(item.durationSeconds) : 'HD MEDIA'));
           const row = document.createElement('div');
           row.className = 'playlist-row';
           row.innerHTML = `
@@ -1798,7 +1798,7 @@
     } else {
       items.forEach((item, index) => {
         const isImg = item.isImage || /\.(jpg|jpeg|png|webp|gif|bmp)$/i.test(item.title);
-        const badgeText = isImg ? '📸 PHOTO' : (item.formattedDuration && item.formattedDuration !== '00:00' && item.formattedDuration !== 'HD FOOTAGE' ? item.formattedDuration : (item.durationSeconds > 0 ? formatSec(item.durationSeconds) : '🎬 HD FOOTAGE'));
+        const badgeText = isImg ? 'PHOTO' : (item.formattedDuration && item.formattedDuration !== '00:00' && item.formattedDuration !== 'HD FOOTAGE' ? item.formattedDuration : (item.durationSeconds > 0 ? formatSec(item.durationSeconds) : 'HD MEDIA'));
         const row = document.createElement('div');
         row.className = 'playlist-row';
         row.innerHTML = `
@@ -1932,7 +1932,7 @@
         <input type="checkbox" class="carousel-slide-checkbox" data-index="${idx}" ${isChecked ? 'checked' : ''}>
         <div class="slide-img-box">
           <img src="${slide.thumbnail || slide.url}" alt="Slide ${slide.slideIndex}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'95\\' height=\\'100\\' fill=\\'%23333\\'><rect width=\\'100%\\' height=\\'100%\\'/></svg>'">
-          <span class="slide-badge">#${slide.slideIndex} ${isVid ? '🎬' : '📸'}</span>
+          <span class="slide-badge">#${slide.slideIndex} ${isVid ? 'VIDEO' : 'PHOTO'}</span>
         </div>
         <button type="button" class="slide-action-btn">⬇ Download</button>
       `;
@@ -1973,8 +1973,8 @@
     if (downloadSelectedSlidesBtnText) {
       const isZip = Boolean(carouselZipToggle && carouselZipToggle.checked);
       downloadSelectedSlidesBtnText.textContent = isZip
-        ? `📥 Download ${count} Slides as .ZIP`
-        : `📥 Download Selected (${count} Slides)`;
+        ? `Download ${count} Slides as .ZIP`
+        : `Download Selected (${count} Slides)`;
     }
   }
 
@@ -2120,7 +2120,7 @@
       const ext = q ? q.ext : 'mp4';
       const exists = window.AndroidBridge.checkFileExists(customTitle, ext);
       if (exists) {
-        const proceed = confirm(`⚠️ File Already Downloaded\n\nYou already have "${customTitle}" saved in your device storage.\n\nDo you want to download again?`);
+        const proceed = confirm(`File Already Downloaded\n\nYou already have "${customTitle}" saved in your device storage.\n\nDo you want to download again?`);
         if (!proceed) return;
       }
     }
@@ -2179,7 +2179,7 @@
       const trimBtn = document.createElement('button');
       trimBtn.type = 'button';
       trimBtn.className = 'chapter-action-btn';
-      trimBtn.innerHTML = '✂️ Trim';
+      trimBtn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" class="pill-svg"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg> Trim';
       trimBtn.title = 'Open in Clip Trimmer';
       trimBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -2305,7 +2305,7 @@
           ${!isDone ? `<button class="ctrl-btn cancel-btn" data-id="${task.id}">Cancel</button>` : ''}
           ${isDone ? `<button class="ctrl-btn highlight open-btn" data-path="${task.filePath}">Open</button>` : ''}
           ${isDone ? `<button class="ctrl-btn share-btn" data-path="${task.filePath}">Share</button>` : ''}
-          <button class="ctrl-btn redownload-btn" data-url="${task.url}" title="Download again in another format">🔄 Re-Download</button>
+          <button class="ctrl-btn redownload-btn" data-url="${task.url}" title="Download again in another format"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" class="pill-svg"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg> Re-Download</button>
         </div>
       </div>
     `;
@@ -2560,7 +2560,7 @@
       if (mediaSettingsView) mediaSettingsView.classList.add('hidden');
       if (mediaHistoryView) mediaHistoryView.classList.remove('hidden');
       if (downloadsDrawer) downloadsDrawer.classList.remove('open');
-      if (modeSwitchIcon) modeSwitchIcon.textContent = '⚡';
+      if (modeSwitchIcon) modeSwitchIcon.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>';
       if (modeSwitchLabel) modeSwitchLabel.textContent = 'Downloader';
       if (modeSwitchBtn) {
         modeSwitchBtn.classList.remove('active-search-mode');
@@ -2572,7 +2572,7 @@
       mediaSearchView.classList.add('hidden');
       if (mediaHistoryView) mediaHistoryView.classList.add('hidden');
       if (mediaSettingsView) mediaSettingsView.classList.remove('hidden');
-      if (modeSwitchIcon) modeSwitchIcon.textContent = '⚡';
+      if (modeSwitchIcon) modeSwitchIcon.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>';
       if (modeSwitchLabel) modeSwitchLabel.textContent = 'Downloader';
       if (modeSwitchBtn) {
         modeSwitchBtn.classList.remove('active-search-mode');
@@ -2584,7 +2584,7 @@
       if (mediaSettingsView) mediaSettingsView.classList.add('hidden');
       if (mediaHistoryView) mediaHistoryView.classList.add('hidden');
       mediaSearchView.classList.remove('hidden');
-      if (modeSwitchIcon) modeSwitchIcon.textContent = '⚡';
+      if (modeSwitchIcon) modeSwitchIcon.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>';
       if (modeSwitchLabel) modeSwitchLabel.textContent = 'Downloader';
       if (modeSwitchBtn) {
         modeSwitchBtn.classList.add('active-search-mode');
@@ -2599,7 +2599,7 @@
       if (mediaHistoryView) mediaHistoryView.classList.add('hidden');
       mediaSearchView.classList.add('hidden');
       mediaFetchView.classList.remove('hidden');
-      if (modeSwitchIcon) modeSwitchIcon.textContent = '🔍';
+      if (modeSwitchIcon) modeSwitchIcon.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>';
       if (modeSwitchLabel) modeSwitchLabel.textContent = 'Search Studio';
       if (modeSwitchBtn) {
         modeSwitchBtn.classList.remove('active-search-mode');
@@ -2611,6 +2611,17 @@
       if (window.AndroidBridge && window.AndroidBridge.onAppModeChanged) {
         window.AndroidBridge.onAppModeChanged(currentAppMode);
       }
+    } catch (_) {}
+
+    // Sync Floating Bottom Nav Dock (Ref: media_1790638361612.png)
+    try {
+      document.querySelectorAll('#floatingBottomNav .floating-nav-btn').forEach(btn => {
+        if (btn.getAttribute('data-mode') === currentAppMode) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
     } catch (_) {}
   }
   window.toggleAppMode = toggleAppMode;
@@ -2662,7 +2673,15 @@
     msMultiSelectToggle.addEventListener('click', () => {
       isMultiSelectMode = !isMultiSelectMode;
       msMultiSelectToggle.classList.toggle('active', isMultiSelectMode);
-      msMultiSelectCheck.textContent = isMultiSelectMode ? '☑️' : '◻️';
+      if (msMultiSelectToggle) {
+        if (isMultiSelectMode) {
+          msMultiSelectToggle.classList.add('active');
+          if (msMultiSelectCheck) msMultiSelectCheck.innerHTML = '<rect x="3" y="3" width="18" height="18" rx="4" fill="currentColor"></rect><polyline points="9 12 11 14 15 10" stroke="#000" stroke-width="2.5" fill="none"></polyline>';
+        } else {
+          msMultiSelectToggle.classList.remove('active');
+          if (msMultiSelectCheck) msMultiSelectCheck.innerHTML = '<rect x="3" y="3" width="18" height="18" rx="4"></rect>';
+        }
+      }
 
       if (!isMultiSelectMode) {
         // Reset to single select: pick the first selected or all
@@ -2794,7 +2813,7 @@
       const row = document.createElement('div');
       row.className = 'suggestion-item';
       row.innerHTML = `
-        <span class="suggestion-icon">🔍</span>
+        <span class="suggestion-icon"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
         <span class="suggestion-text">${item}</span>
       `;
       row.addEventListener('click', () => {
@@ -2889,8 +2908,21 @@
           <div class="ms-card-title">${item.title}</div>
           <div class="ms-card-author">${item.author}</div>
           <div class="ms-card-actions">
-            <button class="ms-btn-download" title="Select Download Quality & Format">⚡ Download</button>
-            ${isVideo ? '<button class="ms-btn-trim" title="Trim Video Clip">✂️ Trim</button>' : ''}
+            <button class="ms-btn-download" title="Select Download Quality & Format">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" class="pill-svg">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span>Download</span>
+            </button>
+            ${isVideo ? `<button class="ms-btn-trim" title="Trim Video Clip">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" class="pill-svg">
+                <circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle>
+                <line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line>
+              </svg>
+              <span>Trim</span>
+            </button>` : ''}
           </div>
         </div>
       `;
@@ -2954,30 +2986,30 @@
     if (isVideo) {
       if (isSocialOrYt) {
         options.push(
-          { format: '1080p', label: '1080p Full HD Video', sub: 'MP4 • Highest Quality Video & Audio', badge: '1080p MP4', icon: '🎬', iconClass: '' },
-          { format: '720p', label: '720p HD Video', sub: 'MP4 • Balanced Size & Fast Download', badge: '720p MP4', icon: '⚡', iconClass: '' },
-          { format: '480p', label: '480p SD Video', sub: 'MP4 • Compact Size (Data Saver)', badge: '480p MP4', icon: '📱', iconClass: '' },
-          { format: 'mp3', label: 'Extract Audio (MP3)', sub: 'MP3 • High Bitrate Clean Audio Track', badge: '320k MP3', icon: '🎵', iconClass: 'audio-icon' }
+          { format: '1080p', label: '1080p Full HD Video', sub: 'MP4 • Highest Quality Video & Audio', badge: '1080p MP4', icon: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line></svg>', iconClass: '' },
+          { format: '720p', label: '720p HD Video', sub: 'MP4 • Balanced Size & Fast Download', badge: '720p MP4', icon: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>', iconClass: '' },
+          { format: '480p', label: '480p SD Video', sub: 'MP4 • Compact Size (Data Saver)', badge: '480p MP4', icon: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>', iconClass: '' },
+          { format: 'mp3', label: 'Extract Audio (MP3)', sub: 'MP3 • High Bitrate Clean Audio Track', badge: '320k MP3', icon: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>', iconClass: 'audio-icon' }
         );
       } else {
         options.push(
-          { format: 'best', label: 'Original 4K / HD Video', sub: `${item.resolutionBadge || 'HD Media'} • Direct Stream`, badge: 'Full Video', icon: '🎬', iconClass: '' },
-          { format: 'mp3', label: 'Extract Audio (MP3)', sub: 'MP3 • Audio Track Only', badge: 'HQ MP3', icon: '🎵', iconClass: 'audio-icon' }
+          { format: 'best', label: 'Original 4K / HD Video', sub: `${item.resolutionBadge || 'HD Media'} • Direct Stream`, badge: 'Full Video', icon: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line></svg>', iconClass: '' },
+          { format: 'mp3', label: 'Extract Audio (MP3)', sub: 'MP3 • Audio Track Only', badge: 'HQ MP3', icon: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>', iconClass: 'audio-icon' }
         );
       }
     } else if (isAudio) {
       options.push(
-        { format: 'audio', label: 'Download HQ Audio Track', sub: `${item.durationFormatted || 'Audio'} • MP3 Master File`, badge: 'HQ MP3', icon: '🎵', iconClass: 'audio-icon' }
+        { format: 'audio', label: 'Download HQ Audio Track', sub: `${item.durationFormatted || 'Audio'} • MP3 Master File`, badge: 'HQ MP3', icon: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>', iconClass: 'audio-icon' }
       );
     } else if (isImage) {
       const isGifItem = item.mediaType === 'gif' || targetUrl.toLowerCase().includes('.gif') || (item.title && item.title.toLowerCase().includes('gif'));
       if (isGifItem) {
         options.push(
-          { format: 'gif', label: 'Animated GIF (Original Motion)', sub: 'Infinite Loop • High Quality GIF', badge: 'GIF Animation', icon: '✨', iconClass: 'image-icon' }
+          { format: 'gif', label: 'Animated GIF (Original Motion)', sub: 'Infinite Loop • High Quality GIF', badge: 'GIF Animation', icon: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>', iconClass: 'image-icon' }
         );
       }
       options.push(
-        { format: 'image', label: isGifItem ? 'Original GIF File' : 'Download High-Res Original', sub: `${item.resolutionBadge || 'Full Resolution'} • ${isGifItem ? 'Animated GIF' : 'Original JPG/PNG'}`, badge: isGifItem ? 'GIF' : 'High Res', icon: isGifItem ? 'GIF' : '🖼️', iconClass: 'image-icon' }
+        { format: 'image', label: isGifItem ? 'Original GIF File' : 'Download High-Res Original', sub: `${item.resolutionBadge || 'Full Resolution'} • ${isGifItem ? 'Animated GIF' : 'Original JPG/PNG'}`, badge: isGifItem ? 'GIF' : 'High Res', icon: isGifItem ? 'GIF' : '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>', iconClass: 'image-icon' }
       );
     }
 
@@ -3254,9 +3286,9 @@
           applyVisualStyle(style);
           if (window.AndroidBridge && window.AndroidBridge.showToast) {
             const names = {
-              'solid': '⚡ Switched to Pure Solid AMOLED theme',
-              'glass': '💎 Switched to Liquid Glassmorphism theme',
-              'prism': '✨ Switched to Cyber Aurora Prism theme'
+              'solid': 'Switched to Pure Solid AMOLED theme',
+              'glass': 'Switched to Liquid Glassmorphism theme',
+              'prism': 'Switched to Cyber Aurora Prism theme'
             };
             window.AndroidBridge.showToast(names[style] || 'Theme updated');
           }
@@ -3592,7 +3624,7 @@
       refreshCookiesBadge();
       if (cookieGuideModal) cookieGuideModal.classList.add('hidden');
       if (window.AndroidBridge && window.AndroidBridge.showToast) {
-        window.AndroidBridge.showToast('✨ Cookies auto-adjusted and applied successfully!');
+        window.AndroidBridge.showToast('Cookies auto-adjusted and applied successfully!');
       }
     }
 
@@ -3674,7 +3706,7 @@
       if (percentText) percentText.textContent = '0%';
       if (btnNow) {
         btnNow.disabled = false;
-        btnNow.innerHTML = '<span>⚡ Update Now</span>';
+        btnNow.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" class="pill-svg"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg><span>Update Now</span>';
       }
       modal.classList.remove('hidden');
     }
@@ -3713,7 +3745,7 @@
         const progressWrap = document.getElementById('updateDownloadProgressWrap');
         if (progressWrap) progressWrap.classList.remove('hidden');
         btnUpdateNow.disabled = true;
-        btnUpdateNow.innerHTML = '<span>⏳ Starting Download...</span>';
+        btnUpdateNow.innerHTML = '<span>Starting Download...</span>';
         if (window.AndroidBridge && window.AndroidBridge.downloadAndInstallUpdateWithVersion) {
           window.AndroidBridge.downloadAndInstallUpdateWithVersion(activeUpdateInfo.apkUrl, activeUpdateInfo.version || '1.0.6');
         } else if (window.AndroidBridge && window.AndroidBridge.downloadAndInstallUpdate) {
@@ -3782,7 +3814,7 @@
         showUpdateModal(info);
       } else {
         if (window.AndroidBridge && window.AndroidBridge.showToast) {
-          window.AndroidBridge.showToast('✨ You are on the latest MediaFetch build!');
+          window.AndroidBridge.showToast('You are on the latest MediaFetch build!');
         }
       }
     };
@@ -3817,10 +3849,10 @@
       if (btnNow) {
         btnNow.disabled = true;
         if (p >= 100) {
-          btnNow.innerHTML = '<span>🚀 Launching Installer...</span>';
+          btnNow.innerHTML = '<span>Launching Installer...</span>';
           if (savedBox) savedBox.classList.remove('hidden');
         } else {
-          btnNow.innerHTML = `<span>⏳ Downloading... ${p}%</span>`;
+          btnNow.innerHTML = `<span>Downloading... ${p}%</span>`;
         }
       }
     };
@@ -3829,7 +3861,7 @@
       const btnNow = document.getElementById('btnUpdateNow');
       if (btnNow) {
         btnNow.disabled = false;
-        btnNow.innerHTML = '<span>⚡ Retry Update</span>';
+        btnNow.innerHTML = '<span>Retry Update</span>';
       }
       if (window.AndroidBridge && window.AndroidBridge.showToast) {
         window.AndroidBridge.showToast('Update download failed: ' + errMsg);
@@ -3873,5 +3905,14 @@
   };
 
   initTheme();
+    // Setup Floating Bottom Nav Click Handlers
+  try {
+    document.querySelectorAll('#floatingBottomNav .floating-nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mode = btn.getAttribute('data-mode');
+        if (mode) toggleAppMode(mode);
+      });
+    });
+  } catch (_) {}
   initSettingsController();
 })();
