@@ -23,6 +23,7 @@ import android.os.Binder
 import android.os.Build
 import android.os.Environment
 import android.os.IBinder
+import android.widget.Toast
 import android.provider.MediaStore
 import androidx.core.app.NotificationCompat
 import androidx.core.content.FileProvider
@@ -75,12 +76,20 @@ class DownloadService : Service() {
         }
         serviceScope.launch(Dispatchers.IO) {
             try {
+                if (thumbnailBitmaps.size > 20) {
+                    val keyToRemove = thumbnailBitmaps.keys().nextElement()
+                    thumbnailBitmaps.remove(keyToRemove)?.recycle()
+                }
                 val req = Request.Builder().url(url).build()
                 httpClient.newCall(req).execute().use { resp ->
                     if (resp.isSuccessful) {
                         val stream = resp.body?.byteStream()
                         if (stream != null) {
-                            val bitmap = BitmapFactory.decodeStream(stream)
+                            val opts = BitmapFactory.Options().apply {
+                                inSampleSize = 2
+                                inPreferredConfig = Bitmap.Config.RGB_565
+                            }
+                            val bitmap = BitmapFactory.decodeStream(stream, null, opts)
                             if (bitmap != null) {
                                 thumbnailBitmaps[url] = bitmap
                                 withContext(Dispatchers.Main) {
@@ -95,6 +104,150 @@ class DownloadService : Service() {
     }
 
     var onTaskUpdated: ((DownloadTask) -> Unit)? = null
+
+    data class BatchZipEntry(val file: File, val subFolderName: String?)
+    private val batchCompletedFiles = ConcurrentHashMap<String, MutableList<BatchZipEntry>>()
+    private val batchTotalCounts = ConcurrentHashMap<String, Int>()
+    private val batchZipNames = ConcurrentHashMap<String, String>()
+    private val batchCustomFolders = ConcurrentHashMap<String, String?>()
+    private val batchProcessedCounts = ConcurrentHashMap<String, java.util.concurrent.atomic.AtomicInteger>()
+
+    fun registerBatchForZip(batchId: String, totalCount: Int, zipName: String, customFolder: String?) {
+        batchCompletedFiles[batchId] = mutableListOf()
+        batchTotalCounts[batchId] = totalCount
+        batchZipNames[batchId] = zipName
+        batchCustomFolders[batchId] = customFolder
+        batchProcessedCounts[batchId] = java.util.concurrent.atomic.AtomicInteger(0)
+    }
+
+    private fun checkBatchCompletionForZip(task: DownloadTask, completedFile: File?) {
+        val bId = task.batchId ?: return
+        if (!task.asZip) return
+        val list = batchCompletedFiles[bId] ?: return
+        val totalExpected = batchTotalCounts[bId] ?: -1
+        val counter = batchProcessedCounts[bId] ?: return
+
+        synchronized(list) {
+            if (completedFile != null && completedFile.exists() && completedFile.length() > 0L) {
+                list.add(BatchZipEntry(completedFile, task.subFolderName))
+            }
+            val processed = counter.incrementAndGet()
+            if (totalExpected > 0 && processed >= totalExpected) {
+                val zipName = batchZipNames[bId] ?: "MediaFetch_Bundle.zip"
+                val customFolder = batchCustomFolders[bId]
+                createZipArchiveForBatch(bId, zipName, customFolder)
+            }
+        }
+    }
+
+    private fun createZipArchiveForBatch(batchId: String, zipName: String, customFolder: String?) {
+        val files = batchCompletedFiles.remove(batchId) ?: return
+        batchTotalCounts.remove(batchId)
+        batchZipNames.remove(batchId)
+        batchCustomFolders.remove(batchId)
+        batchProcessedCounts.remove(batchId)
+
+        if (files.isEmpty()) return
+        serviceScope.launch(Dispatchers.IO) {
+            try {
+                val cleanZipName = if (zipName.endsWith(".zip", ignoreCase = true)) zipName else "$zipName.zip"
+                val prefs = getSharedPreferences("mediafetch_prefs", Context.MODE_PRIVATE)
+                val savedTreeUriStr = prefs.getString("custom_download_folder_uri", "") ?: ""
+
+                var zipSaved = false
+                if (savedTreeUriStr.isNotBlank()) {
+                    try {
+                        val treeUri = android.net.Uri.parse(savedTreeUriStr)
+                        val pickedDir = androidx.documentfile.provider.DocumentFile.fromTreeUri(applicationContext, treeUri)
+                        if (pickedDir != null && pickedDir.canWrite()) {
+                            val targetDoc = pickedDir.findFile(cleanZipName) ?: pickedDir.createFile("application/zip", cleanZipName)
+                            if (targetDoc != null) {
+                                contentResolver.openOutputStream(targetDoc.uri)?.use { os ->
+                                    java.util.zip.ZipOutputStream(os.buffered()).use { zos ->
+                                        val buffer = ByteArray(64 * 1024)
+                                        for (itemEntry in files) {
+                                            val f = itemEntry.file
+                                            if (!f.exists() || f.length() == 0L) continue
+                                            val relSub = if (!itemEntry.subFolderName.isNullOrBlank()) {
+                                                itemEntry.subFolderName.split(Regex("\\s*/\\s*")).filter { it.isNotBlank() }.joinToString("/")
+                                            } else ""
+                                            val entryPath = if (relSub.isNotBlank()) "$relSub/${f.name}" else f.name
+                                            val entry = java.util.zip.ZipEntry(entryPath)
+                                            zos.putNextEntry(entry)
+                                            f.inputStream().buffered().use { fis ->
+                                                var read: Int
+                                                while (fis.read(buffer).also { read = it } != -1) {
+                                                    zos.write(buffer, 0, read)
+                                                }
+                                            }
+                                            zos.closeEntry()
+                                        }
+                                    }
+                                }
+                                zipSaved = true
+                            }
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+
+                if (!zipSaved) {
+                    val publicFolder = when {
+                        !customFolder.isNullOrBlank() && File(customFolder).isAbsolute -> File(customFolder)
+                        !customFolder.isNullOrBlank() -> File(Environment.getExternalStorageDirectory(), customFolder)
+                        else -> File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "MediaFetch")
+                    }
+                    if (!publicFolder.exists()) publicFolder.mkdirs()
+
+                    val zipFile = File(publicFolder, cleanZipName)
+                    java.util.zip.ZipOutputStream(java.io.FileOutputStream(zipFile).buffered()).use { zos ->
+                        val buffer = ByteArray(64 * 1024)
+                        for (itemEntry in files) {
+                            val f = itemEntry.file
+                            if (!f.exists() || f.length() == 0L) continue
+                            val relSub = if (!itemEntry.subFolderName.isNullOrBlank()) {
+                                itemEntry.subFolderName.split(Regex("\\s*/\\s*")).filter { it.isNotBlank() }.joinToString("/")
+                            } else ""
+                            val entryPath = if (relSub.isNotBlank()) "$relSub/${f.name}" else f.name
+                            val entry = java.util.zip.ZipEntry(entryPath)
+                            zos.putNextEntry(entry)
+                            f.inputStream().buffered().use { fis ->
+                                var read: Int
+                                while (fis.read(buffer).also { read = it } != -1) {
+                                    zos.write(buffer, 0, read)
+                                }
+                            }
+                            zos.closeEntry()
+                        }
+                    }
+
+                    MediaScannerConnection.scanFile(
+                        applicationContext,
+                        arrayOf(zipFile.absolutePath),
+                        arrayOf("application/zip"),
+                        null
+                    )
+                }
+
+                // Immediately delete staging files bundled into zip to reclaim all cache storage
+                for (itemEntry in files) {
+                    try {
+                        val f = itemEntry.file
+                        if (f.exists() && f.parentFile?.name == "staging") {
+                            f.delete()
+                        }
+                    } catch (_: Exception) {}
+                }
+
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(applicationContext, "📦 Created ZIP: $cleanZipName (${files.size} items)!", Toast.LENGTH_LONG).show()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 
     inner class LocalBinder : Binder() {
         fun getService(): DownloadService = this@DownloadService
@@ -221,6 +374,14 @@ class DownloadService : Service() {
     private fun checkAllTasksCompleted() {
         val hasRunning = tasks.values.any { it.status == DownloadStatus.DOWNLOADING || it.status == DownloadStatus.QUEUED }
         if (!hasRunning) {
+            try {
+                val stagingFolder = File(cacheDir, "staging")
+                if (stagingFolder.exists()) {
+                    stagingFolder.listFiles()?.forEach { file ->
+                        try { file.delete() } catch (_: Exception) {}
+                    }
+                }
+            } catch (_: Exception) {}
             try {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     stopForeground(STOP_FOREGROUND_REMOVE)
@@ -349,6 +510,7 @@ class DownloadService : Service() {
         }
 
         val rawTitle = task.title
+            .replace(Regex("\\.(mp4|mov|mkv|webm|avi|flv|wmv|jpg|jpeg|png|webp|gif|bmp|mp3|wav|m4a|aac|flac|ogg|zip|rar)$", RegexOption.IGNORE_CASE), "")
             .replace(Regex("[\\\\/:*?\"<>|]"), "_")
             .trim()
             .replace(Regex("\\s+"), " ")
@@ -434,7 +596,12 @@ class DownloadService : Service() {
             task.status = DownloadStatus.DOWNLOADING
             onTaskUpdated?.invoke(task)
 
-            val effectiveExt = if (task.quality.isAudioOnly && !task.quality.ext.equals("wav", ignoreCase = true)) "m4a" else task.quality.ext
+            val effectiveExt = when {
+                task.quality.ext.equals("wav", ignoreCase = true) -> "wav"
+                task.quality.ext.equals("mp3", ignoreCase = true) || task.quality.id.contains("mp3", ignoreCase = true) -> "mp3"
+                task.quality.isAudioOnly -> task.quality.ext.ifBlank { "mp3" }
+                else -> task.quality.ext
+            }
             val fileName = buildOutputFileName(task, effectiveExt)
             var targetFile = getStagingFile(fileName)
 
@@ -760,6 +927,7 @@ class DownloadService : Service() {
             } catch (e: Exception) {
                 task.status = DownloadStatus.FAILED
                 task.errorMessage = e.message ?: "Download failed"
+                checkBatchCompletionForZip(task, null)
                 onTaskUpdated?.invoke(task)
                 return@withContext
             }
@@ -778,6 +946,7 @@ class DownloadService : Service() {
                 try {
                     exportToPublicMediaStore(targetFile, task)
                     downloadSubtitleFile(task, targetFile.name)
+                    checkBatchCompletionForZip(task, targetFile)
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
@@ -788,6 +957,15 @@ class DownloadService : Service() {
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
+
+                // Auto-clear staging cache immediately if not waiting for ZIP bundling
+                if (!task.asZip) {
+                    try {
+                        if (targetFile.exists() && targetFile.parentFile?.name == "staging") {
+                            targetFile.delete()
+                        }
+                    } catch (_: Exception) {}
+                }
             } else {
                 task.status = DownloadStatus.FAILED
                 task.errorMessage = if (targetFile.exists() && !isValidMediaFile(targetFile, isVideo)) {
@@ -796,6 +974,7 @@ class DownloadService : Service() {
                     "Stream unavailable. Check network and try again."
                 }
                 try { if (targetFile.exists()) targetFile.delete() } catch (_: Exception) {}
+                checkBatchCompletionForZip(task, null)
                 onTaskUpdated?.invoke(task)
             }
         }
@@ -2061,6 +2240,12 @@ class DownloadService : Service() {
                 else -> "video/mp4"
             }
 
+            val customFolderName = if (!task.customFolder.isNullOrBlank()) File(task.customFolder!!).name else null
+            val customFolderDir = if (!task.customFolder.isNullOrBlank()) File(task.customFolder!!) else null
+            val subFolderRel = if (!task.subFolderName.isNullOrBlank()) {
+                task.subFolderName!!.split(Regex("\\s*/\\s*")).filter { it.isNotBlank() }.joinToString("/")
+            } else ""
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 val collectionUri = when {
                     isImage -> MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
@@ -2068,11 +2253,17 @@ class DownloadService : Service() {
                     else -> MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
                 }
 
-                val relativeDir = when {
+                val baseDir = when {
+                    !customFolderName.isNullOrBlank() -> {
+                        if (isImage) Environment.DIRECTORY_PICTURES + "/$customFolderName"
+                        else if (isAudio) Environment.DIRECTORY_MUSIC + "/$customFolderName"
+                        else Environment.DIRECTORY_MOVIES + "/$customFolderName"
+                    }
                     isImage -> Environment.DIRECTORY_PICTURES + "/MediaFetch"
                     isAudio -> Environment.DIRECTORY_MUSIC + "/MediaFetch"
                     else -> Environment.DIRECTORY_MOVIES + "/MediaFetch"
                 }
+                val relativeDir = if (subFolderRel.isNotBlank()) "$baseDir/$subFolderRel" else baseDir
 
                 val values = ContentValues().apply {
                     put(MediaStore.MediaColumns.DISPLAY_NAME, sourceFile.name)
@@ -2092,12 +2283,54 @@ class DownloadService : Service() {
                     values.put(MediaStore.MediaColumns.IS_PENDING, 0)
                     contentResolver.update(itemUri, values, null, null)
                 }
+
+                // If a custom folder directory was explicitly chosen, also write file directly there
+                if (customFolderDir != null && customFolderDir.isAbsolute) {
+                    try {
+                        val targetDir = if (subFolderRel.isNotBlank()) File(customFolderDir, subFolderRel) else customFolderDir
+                        if (!targetDir.exists()) targetDir.mkdirs()
+                        val customFile = File(targetDir, sourceFile.name)
+                        sourceFile.copyTo(customFile, overwrite = true)
+                        MediaScannerConnection.scanFile(applicationContext, arrayOf(customFile.absolutePath), arrayOf(mimeType), null)
+                    } catch (_: Exception) {}
+                }
+
+                // Check SAF DocumentTree
+                val prefs = getSharedPreferences("mediafetch_prefs", Context.MODE_PRIVATE)
+                val savedTreeUriStr = prefs.getString("custom_download_folder_uri", "") ?: ""
+                if (savedTreeUriStr.isNotBlank()) {
+                    try {
+                        val treeUri = android.net.Uri.parse(savedTreeUriStr)
+                        val pickedDir = androidx.documentfile.provider.DocumentFile.fromTreeUri(applicationContext, treeUri)
+                        if (pickedDir != null && pickedDir.canWrite()) {
+                            var destFolderDoc: androidx.documentfile.provider.DocumentFile? = pickedDir
+                            if (subFolderRel.isNotBlank()) {
+                                for (part in subFolderRel.split("/")) {
+                                    if (part.isNotBlank() && destFolderDoc != null) {
+                                        val existing = destFolderDoc.findFile(part)
+                                        destFolderDoc = if (existing != null && existing.isDirectory) existing else (destFolderDoc.createDirectory(part) ?: destFolderDoc)
+                                    }
+                                }
+                            }
+                            val targetDoc = destFolderDoc?.findFile(sourceFile.name) ?: destFolderDoc?.createFile(mimeType, sourceFile.name)
+                            if (targetDoc != null) {
+                                contentResolver.openOutputStream(targetDoc.uri)?.use { os ->
+                                    sourceFile.inputStream().use { fis ->
+                                        fis.copyTo(os)
+                                    }
+                                }
+                            }
+                        }
+                    } catch (_: Exception) {}
+                }
             } else {
-                val publicFolder = when {
+                val baseFolder = when {
+                    customFolderDir != null -> customFolderDir
                     isImage -> File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "MediaFetch")
                     isAudio -> File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "MediaFetch")
                     else -> File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES), "MediaFetch")
                 }
+                val publicFolder = if (subFolderRel.isNotBlank()) File(baseFolder, subFolderRel) else baseFolder
                 if (!publicFolder.exists()) publicFolder.mkdirs()
                 val publicFile = File(publicFolder, sourceFile.name)
                 sourceFile.copyTo(publicFile, overwrite = true)

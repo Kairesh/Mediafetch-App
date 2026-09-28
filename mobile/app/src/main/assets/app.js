@@ -72,7 +72,8 @@
   let trimMediaType = 'video';
   let selectedTrimQualityId = '1080p';
 
-  // Playlist
+  // Playlist & Batch
+  let currentCustomFolder = null;
   const playlistSection = document.getElementById('playlistSection');
   const playlistItemsList = document.getElementById('playlistItemsList');
   const playlistCountBadge = document.getElementById('playlistCountBadge');
@@ -80,6 +81,9 @@
   const deselectAllBtn = document.getElementById('deselectAllBtn');
   const downloadBatchBtn = document.getElementById('downloadBatchBtn');
   const downloadBatchBtnText = document.getElementById('downloadBatchBtnText');
+  const playlistZipToggle = document.getElementById('playlistZipToggle');
+  const playlistSavePath = document.getElementById('playlistSavePath');
+  const playlistChangeFolderBtn = document.getElementById('playlistChangeFolderBtn');
 
   // Task List
   const downloadsTaskList = document.getElementById('downloadsTaskList');
@@ -95,7 +99,18 @@
   const carouselSection = document.getElementById('carouselSection');
   const carouselSlidesTrack = document.getElementById('carouselSlidesTrack');
   const carouselCountBadge = document.getElementById('carouselCountBadge');
+  const carouselSelectedCountBadge = document.getElementById('carouselSelectedCountBadge');
+  const carouselSelectAllBtn = document.getElementById('carouselSelectAllBtn');
+  const carouselDeselectBtn = document.getElementById('carouselDeselectBtn');
+  const carouselZipToggle = document.getElementById('carouselZipToggle');
+  const carouselSavePath = document.getElementById('carouselSavePath');
+  const carouselChangeFolderBtn = document.getElementById('carouselChangeFolderBtn');
+  const downloadSelectedSlidesBtn = document.getElementById('downloadSelectedSlidesBtn');
+  const downloadSelectedSlidesBtnText = document.getElementById('downloadSelectedSlidesBtnText');
   const downloadAllSlidesBtn = document.getElementById('downloadAllSlidesBtn');
+  let carouselSlidesData = [];
+  let selectedSlideIndices = new Set();
+  let currentCarouselFilter = 'all';
 
   // Playlist Quality
   let selectedBatchQuality = '1080p';
@@ -106,6 +121,20 @@
     document.documentElement.style.setProperty('--safe-top', topSafe + 'px');
     document.documentElement.style.setProperty('--safe-bottom', Math.max(20, bottomDp) + 'px');
   };
+
+  // Motion & Performance Controller (Default OFF for 60 FPS performance)
+  function applyMotionSetting(enabled) {
+    if (enabled) {
+      document.body.classList.remove('perf-mode');
+      document.documentElement.setAttribute('data-animations', 'true');
+    } else {
+      document.body.classList.add('perf-mode');
+      document.documentElement.setAttribute('data-animations', 'false');
+    }
+  }
+  const savedAnimations = localStorage.getItem('mediafetch_enable_animations');
+  const animationsEnabled = (savedAnimations === 'true'); // Default OFF
+  applyMotionSetting(animationsEnabled);
 
   const CURATED_THEMES = {
     sunset: {
@@ -233,6 +262,286 @@
     return `#${((1 << 24) + (rOut << 16) + (gOut << 8) + bOut).toString(16).slice(1)}`;
   }
 
+  // HSV & RGB Math for Color Studio
+  function hsvToRgb(h, s, v) {
+    const c = v * s;
+    const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+    const m = v - c;
+    let r = 0, g = 0, b = 0;
+    if (h >= 0 && h < 60) { r = c; g = x; b = 0; }
+    else if (h >= 60 && h < 120) { r = x; g = c; b = 0; }
+    else if (h >= 120 && h < 180) { r = 0; g = c; b = x; }
+    else if (h >= 180 && h < 240) { r = 0; g = x; b = c; }
+    else if (h >= 240 && h < 300) { r = x; g = 0; b = c; }
+    else if (h >= 300 && h <= 360) { r = c; g = 0; b = x; }
+    return [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)];
+  }
+
+  function rgbToHex(r, g, b) {
+    return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase();
+  }
+
+  function hexToHsv(hex) {
+    let c = (hex || '#0A84FF').replace('#', '');
+    if (c.length === 3) c = c.split('').map(x => x + x).join('');
+    const num = parseInt(c, 16);
+    const r = ((num >> 16) & 255) / 255;
+    const g = ((num >> 8) & 255) / 255;
+    const b = (num & 255) / 255;
+
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const d = max - min;
+    let h = 0;
+    const s = max === 0 ? 0 : d / max;
+    const v = max;
+
+    if (max !== min) {
+      switch (max) {
+        case r: h = ((g - b) / d + (g < b ? 6 : 0)) * 60; break;
+        case g: h = ((b - r) / d + 2) * 60; break;
+        case b: h = ((r - g) / d + 4) * 60; break;
+      }
+    }
+    return { h: Math.round(h), s: s, v: v };
+  }
+
+  let activeColorTarget = 'primary';
+  let currentColorH = 210;
+  let currentColorS = 1;
+  let currentColorV = 1;
+  let initialModalHex = '#0A84FF';
+  let isDraggingSquare = false;
+
+  function updateColorPickerUI(updateCrosshair = true) {
+    const square = document.getElementById('colorSatValSquare');
+    const crosshair = document.getElementById('colorSquareCrosshair');
+    const hueSlider = document.getElementById('colorHueSlider');
+    const currentSwatch = document.getElementById('pickerCurrentSwatch');
+    const hexInput = document.getElementById('colorCustomHexInput');
+    const headerDot = document.getElementById('pickerHeaderPreview');
+
+    if (square) square.style.backgroundColor = `hsl(${currentColorH}, 100%, 50%)`;
+    if (hueSlider) hueSlider.value = currentColorH;
+
+    const [r, g, b] = hsvToRgb(currentColorH, currentColorS, currentColorV);
+    const hex = rgbToHex(r, g, b);
+
+    if (currentSwatch) currentSwatch.style.backgroundColor = hex;
+    if (headerDot) {
+      headerDot.style.backgroundColor = hex;
+      headerDot.style.boxShadow = `0 0 10px ${hex}`;
+    }
+    if (hexInput && document.activeElement !== hexInput) {
+      hexInput.value = hex.replace('#', '');
+    }
+
+    if (updateCrosshair && square && crosshair) {
+      const x = currentColorS * 100;
+      const y = (1 - currentColorV) * 100;
+      crosshair.style.left = `${x}%`;
+      crosshair.style.top = `${y}%`;
+    }
+
+    // Real-time live preview update
+    if (currentActiveTheme) {
+      const tempPrimary = (activeColorTarget === 'primary') ? hex : currentActiveTheme.primary;
+      const tempSecondary = (activeColorTarget === 'secondary') ? hex : currentActiveTheme.secondary;
+      const tempBg = (activeColorTarget === 'bg') ? hex : currentActiveTheme.bg;
+      const tempSurface = (activeColorTarget === 'surface') ? hex : currentActiveTheme.surface;
+      updateThemeLivePreview(tempPrimary, tempSecondary, tempBg, tempSurface);
+    }
+  }
+
+  function openColorPickerModal(targetKey) {
+    activeColorTarget = targetKey;
+    const modal = document.getElementById('customColorPickerModal');
+    const titleEl = document.getElementById('colorPickerModalTitle');
+    const initialSwatch = document.getElementById('pickerInitialSwatch');
+
+    const titles = {
+      primary: 'Accent 1 (Gradient Start)',
+      secondary: 'Accent 2 (Gradient End)',
+      bg: 'Background Color 1 (Start)',
+      bgEnd: 'Background Color 2 (End)',
+      surface: 'Card & Surface Color'
+    };
+
+    if (titleEl) titleEl.textContent = titles[targetKey] || 'Color Studio';
+
+    let curHex = '#0A84FF';
+    if (currentActiveTheme) {
+      if (targetKey === 'primary') curHex = currentActiveTheme.primary || '#0A84FF';
+      else if (targetKey === 'secondary') curHex = currentActiveTheme.secondary || '#0060DF';
+      else if (targetKey === 'bg') curHex = currentActiveTheme.bg || '#000000';
+      else if (targetKey === 'bgEnd') curHex = currentActiveTheme.bgEnd || currentActiveTheme.bg || '#070710';
+      else if (targetKey === 'surface') curHex = currentActiveTheme.surface || '#121214';
+    }
+
+    initialModalHex = curHex;
+    if (initialSwatch) initialSwatch.style.backgroundColor = curHex;
+
+    const hsv = hexToHsv(curHex);
+    currentColorH = hsv.h;
+    currentColorS = hsv.s;
+    currentColorV = hsv.v;
+
+    if (modal) modal.classList.remove('hidden');
+    requestAnimationFrame(() => {
+      updateColorPickerUI(true);
+    });
+  }
+
+  function applyColorPickerSelection() {
+    const [r, g, b] = hsvToRgb(currentColorH, currentColorS, currentColorV);
+    const hex = rgbToHex(r, g, b);
+
+    if (!currentActiveTheme) currentActiveTheme = { ...CURATED_THEMES.blue };
+    if (activeColorTarget === 'primary') {
+      currentActiveTheme.primary = hex;
+    } else if (activeColorTarget === 'secondary') {
+      currentActiveTheme.secondary = hex;
+    } else if (activeColorTarget === 'bg') {
+      currentActiveTheme.bg = hex;
+    } else if (activeColorTarget === 'bgEnd') {
+      currentActiveTheme.bgEnd = hex;
+    } else if (activeColorTarget === 'surface') {
+      currentActiveTheme.surface = hex;
+    }
+
+    currentActiveTheme.id = 'custom';
+    applyFullTheme(currentActiveTheme, true);
+
+    const modal = document.getElementById('customColorPickerModal');
+    if (modal) modal.classList.add('hidden');
+
+    if (window.AndroidBridge && window.AndroidBridge.showToast) {
+      window.AndroidBridge.showToast('Theme updated!');
+    }
+  }
+
+  function cancelColorPickerSelection() {
+    if (currentActiveTheme) {
+      updateThemeLivePreview(
+        currentActiveTheme.primary,
+        currentActiveTheme.secondary,
+        currentActiveTheme.bg,
+        currentActiveTheme.surface
+      );
+    }
+    const modal = document.getElementById('customColorPickerModal');
+    if (modal) modal.classList.add('hidden');
+  }
+
+  function initColorPickerStudio() {
+    const square = document.getElementById('colorSatValSquare');
+    const hueSlider = document.getElementById('colorHueSlider');
+    const hexInput = document.getElementById('colorCustomHexInput');
+    const applyBtn = document.getElementById('applyColorPickerBtn');
+    const cancelBtn = document.getElementById('cancelColorPickerBtn');
+    const closeBtn = document.getElementById('closeColorPickerModalBtn');
+
+    function handlePointer(e) {
+      if (!square) return;
+      const rect = square.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+      const x = Math.max(0, Math.min(rect.width, clientX - rect.left));
+      const y = Math.max(0, Math.min(rect.height, clientY - rect.top));
+
+      currentColorS = Math.max(0, Math.min(1, x / rect.width));
+      currentColorV = Math.max(0, Math.min(1, 1 - (y / rect.height)));
+
+      const crosshair = document.getElementById('colorSquareCrosshair');
+      if (crosshair) {
+        crosshair.style.left = `${currentColorS * 100}%`;
+        crosshair.style.top = `${(1 - currentColorV) * 100}%`;
+      }
+      updateColorPickerUI(false);
+    }
+
+    if (square) {
+      square.addEventListener('mousedown', (e) => {
+        isDraggingSquare = true;
+        handlePointer(e);
+      });
+      window.addEventListener('mousemove', (e) => {
+        if (isDraggingSquare) handlePointer(e);
+      });
+      window.addEventListener('mouseup', () => {
+        isDraggingSquare = false;
+      });
+
+      square.addEventListener('touchstart', (e) => {
+        isDraggingSquare = true;
+        handlePointer(e);
+      }, { passive: false });
+      window.addEventListener('touchmove', (e) => {
+        if (isDraggingSquare) {
+          e.preventDefault();
+          handlePointer(e);
+        }
+      }, { passive: false });
+      window.addEventListener('touchend', () => {
+        isDraggingSquare = false;
+      });
+    }
+
+    if (hueSlider) {
+      hueSlider.addEventListener('input', (e) => {
+        currentColorH = parseInt(e.target.value, 10);
+        updateColorPickerUI(true);
+      });
+    }
+
+    if (hexInput) {
+      hexInput.addEventListener('input', (e) => {
+        let val = e.target.value.trim().replace('#', '');
+        if (val.length === 6 && /^[0-9A-Fa-f]{6}$/.test(val)) {
+          const hsv = hexToHsv('#' + val);
+          currentColorH = hsv.h;
+          currentColorS = hsv.s;
+          currentColorV = hsv.v;
+          updateColorPickerUI(true);
+        }
+      });
+    }
+
+    document.querySelectorAll('.swatch-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        const hex = pill.dataset.hex;
+        if (hex) {
+          const hsv = hexToHsv(hex);
+          currentColorH = hsv.h;
+          currentColorS = hsv.s;
+          currentColorV = hsv.v;
+          updateColorPickerUI(true);
+        }
+      });
+    });
+
+    if (applyBtn) applyBtn.addEventListener('click', applyColorPickerSelection);
+    if (cancelBtn) cancelBtn.addEventListener('click', cancelColorPickerSelection);
+    if (closeBtn) closeBtn.addEventListener('click', cancelColorPickerSelection);
+
+    // Swatch Triggers in Custom Studio
+    const triggerMap = [
+      { id: 'swatchTriggerPrimary', target: 'primary' },
+      { id: 'swatchTriggerSecondary', target: 'secondary' },
+      { id: 'swatchTriggerBg', target: 'bg' },
+      { id: 'swatchTriggerBgEnd', target: 'bgEnd' },
+      { id: 'swatchTriggerSurface', target: 'surface' }
+    ];
+
+    triggerMap.forEach(({ id, target }) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('click', () => openColorPickerModal(target));
+      }
+    });
+  }
+
   function updateThemeLivePreview(primary, secondary, bg, surface) {
     const previewBtn = document.getElementById('previewCtaBtn');
     if (previewBtn) {
@@ -255,8 +564,11 @@
     const primary = theme.primary || '#0A84FF';
     const secondary = theme.secondary || '#0060DF';
     const bg = theme.bg || '#000000';
-    const surface = theme.surface || '#0C0C0E';
-    const card = theme.card || 'rgba(22, 22, 26, 0.85)';
+    const bgEnd = theme.bgEnd || theme.bg || '#070710';
+    const surface = theme.surface || '#121214';
+    const card = theme.card || (surface === '#000000' ? '#121214' : surface);
+
+    currentActiveTheme.bgEnd = bgEnd;
 
     const doc = document.documentElement;
 
@@ -279,6 +591,8 @@
       doc.style.setProperty('--surface-amoled', surface);
       doc.style.setProperty('--card-amoled', card);
       doc.style.setProperty('--app-bg', bg);
+      doc.style.setProperty('--bg-gradient-start', bg);
+      doc.style.setProperty('--bg-gradient-end', bgEnd);
       doc.style.setProperty('--app-surface', surface);
       doc.style.setProperty('--app-card', card);
       doc.style.setProperty('--app-card-border', 'rgba(255, 255, 255, 0.09)');
@@ -292,16 +606,18 @@
       if (themeIconLight) themeIconLight.classList.add('hidden');
     } else {
       doc.setAttribute('data-theme', 'light');
-      doc.style.setProperty('--app-bg', '#F2F4F7');
+      doc.style.setProperty('--app-bg', '#F4F6F9');
+      doc.style.setProperty('--bg-gradient-start', '#F4F6F9');
+      doc.style.setProperty('--bg-gradient-end', '#EEF2F6');
       doc.style.setProperty('--app-surface', '#FFFFFF');
       doc.style.setProperty('--app-card', '#FFFFFF');
       doc.style.setProperty('--app-card-border', 'rgba(0, 0, 0, 0.08)');
-      doc.style.setProperty('--input-bg', 'rgba(0, 0, 0, 0.05)');
-      doc.style.setProperty('--input-border', 'rgba(0, 0, 0, 0.12)');
-      doc.style.setProperty('--text-primary', '#1C1C1E');
-      doc.style.setProperty('--text-secondary', '#6C6C70');
-      doc.style.setProperty('--text-tertiary', '#8E8E93');
-      doc.style.setProperty('--shadow-main', '0 10px 30px rgba(0, 0, 0, 0.06)');
+      doc.style.setProperty('--input-bg', '#FFFFFF');
+      doc.style.setProperty('--input-border', '#D1D5DB');
+      doc.style.setProperty('--text-primary', '#111827');
+      doc.style.setProperty('--text-secondary', '#4B5563');
+      doc.style.setProperty('--text-tertiary', '#6B7280');
+      doc.style.setProperty('--shadow-main', '0 10px 30px rgba(0, 0, 0, 0.05)');
       if (themeIconDark) themeIconDark.classList.add('hidden');
       if (themeIconLight) themeIconLight.classList.remove('hidden');
     }
@@ -319,30 +635,34 @@
         primary: primary,
         secondary: secondary,
         bg: bg,
+        bgEnd: bgEnd,
         surface: surface,
         card: card
       }));
     } catch (_) {}
 
-    if (updateInputs) {
-      const p1 = document.getElementById('pickerPrimary');
-      const h1 = document.getElementById('hexPrimaryInput');
-      const p2 = document.getElementById('pickerSecondary');
-      const h2 = document.getElementById('hexSecondaryInput');
-      const pb = document.getElementById('pickerBg');
-      const hb = document.getElementById('hexBgInput');
-      const ps = document.getElementById('pickerSurface');
-      const hs = document.getElementById('hexSurfaceInput');
+    // Synchronize Swatch Triggers
+    const dotPrimary = document.getElementById('dotPrimary');
+    const labelPrimary = document.getElementById('labelPrimary');
+    const dotSecondary = document.getElementById('dotSecondary');
+    const labelSecondary = document.getElementById('labelSecondary');
+    const dotBg = document.getElementById('dotBg');
+    const labelBg = document.getElementById('labelBg');
+    const dotBgEnd = document.getElementById('dotBgEnd');
+    const labelBgEnd = document.getElementById('labelBgEnd');
+    const dotSurface = document.getElementById('dotSurface');
+    const labelSurface = document.getElementById('labelSurface');
 
-      if (p1) p1.value = primary;
-      if (h1) h1.value = primary;
-      if (p2) p2.value = secondary;
-      if (h2) h2.value = secondary;
-      if (pb) pb.value = bg;
-      if (hb) hb.value = bg;
-      if (ps) ps.value = surface;
-      if (hs) hs.value = surface;
-    }
+    if (dotPrimary) dotPrimary.style.background = primary;
+    if (labelPrimary) labelPrimary.textContent = primary.toUpperCase();
+    if (dotSecondary) dotSecondary.style.background = secondary;
+    if (labelSecondary) labelSecondary.textContent = secondary.toUpperCase();
+    if (dotBg) dotBg.style.background = bg;
+    if (labelBg) labelBg.textContent = bg.toUpperCase();
+    if (dotBgEnd) dotBgEnd.style.background = bgEnd;
+    if (labelBgEnd) labelBgEnd.textContent = bgEnd.toUpperCase();
+    if (dotSurface) dotSurface.style.background = surface;
+    if (labelSurface) labelSurface.textContent = surface.toUpperCase();
 
     document.querySelectorAll('.theme-preset-card').forEach(cardEl => {
       const isCardActive = (cardEl.dataset.preset === theme.id);
@@ -543,6 +863,31 @@
     mediaPlatformBadge.textContent = mediaItem.platform || 'Media';
     mediaTitle.textContent = mediaItem.title || 'Shared Media';
     mediaAuthor.textContent = mediaItem.author || 'Creator';
+
+    // Duplicate Download Detection (Idea 4)
+    const duplicateBadge = document.getElementById('duplicateDownloadedBadge');
+    if (duplicateBadge) {
+      let isDownloaded = false;
+      const targetUrl = mediaItem.pageUrl || mediaItem.directUrl || (urlInput ? urlInput.value.trim() : '');
+      if (window.AndroidBridge && window.AndroidBridge.checkAlreadyDownloaded && targetUrl) {
+        try {
+          isDownloaded = window.AndroidBridge.checkAlreadyDownloaded(targetUrl);
+        } catch (_) {}
+      }
+      if (!isDownloaded && allTasks && allTasks.length > 0 && targetUrl) {
+        const checkUrl = targetUrl.toLowerCase();
+        isDownloaded = allTasks.some(t => t.status === 'COMPLETED' && (
+          (t.pageUrl && t.pageUrl.toLowerCase() === checkUrl) ||
+          (t.downloadUrl && t.downloadUrl.toLowerCase() === checkUrl) ||
+          (t.url && t.url.toLowerCase() === checkUrl)
+        ));
+      }
+      if (isDownloaded) {
+        duplicateBadge.classList.remove('hidden');
+      } else {
+        duplicateBadge.classList.add('hidden');
+      }
+    }
 
     const hasVideo = (mediaItem.qualities && mediaItem.qualities.some(q => !q.isAudioOnly && !q.isImage)) ||
                      (mediaItem.carouselSlides && mediaItem.carouselSlides.some(s => s.mediaType === 'video'));
@@ -1054,9 +1399,11 @@
           chipHtml = '<span class="chip-tag">RECOMMENDED</span>';
         }
 
+        const glyphIcon = isGifCard ? 'GIF' : '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3" ry="3"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>';
+
         card.innerHTML = `
           <div class="card-row-left">
-            <div class="res-glyph-box" style="color:${isGifCard ? 'var(--apple-purple)' : 'var(--apple-cyan)'}">${isGifCard ? 'GIF' : '📸'}</div>
+            <div class="res-glyph-box" style="color:${isGifCard ? 'var(--apple-purple)' : 'var(--apple-cyan)'}">${glyphIcon}</div>
             <div class="card-details-text">
               <div class="card-title-line">
                 <span class="card-label-name">${q.label}</span>
@@ -1190,7 +1537,7 @@
           <span class="trim-q-name">${q.label.split(' ')[0]}</span>
           <span class="trim-q-fmt">${(q.ext || 'MP4').toUpperCase()}</span>
         </div>
-        <div class="trim-q-size">⚡ ~${sizeText}</div>
+        <div class="trim-q-size"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.2" style="vertical-align: middle;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> ~${sizeText}</div>
       `;
 
       card.addEventListener('click', () => {
@@ -1299,20 +1646,20 @@
       if (isSpotify) {
         // Audio-only pills for Spotify (no video options)
         pillsContainer.innerHTML = `
-          <button type="button" class="pl-quality-pill active" data-quality="audio_mp3_320">🎵 320k Studio</button>
-          <button type="button" class="pl-quality-pill" data-quality="audio_mp3_192">🎵 192k Standard</button>
-          <button type="button" class="pl-quality-pill" data-quality="audio_mp3_128">🎵 128k Data Saver</button>
-          <button type="button" class="pl-quality-pill" data-quality="audio_wav_lossless">🔊 Lossless WAV</button>
+          <button type="button" class="pl-quality-pill active" data-quality="audio_mp3_320"><svg class="pill-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> <span>320k Studio MP3</span></button>
+          <button type="button" class="pl-quality-pill" data-quality="audio_mp3_192"><svg class="pill-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> <span>192k Standard MP3</span></button>
+          <button type="button" class="pl-quality-pill" data-quality="audio_mp3_128"><svg class="pill-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> <span>128k Data Saver</span></button>
+          <button type="button" class="pl-quality-pill" data-quality="audio_wav_lossless"><svg class="pill-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> <span>Lossless WAV</span></button>
         `;
         selectedBatchQuality = 'audio_mp3_320';
       } else {
-        // Video + Audio pills for YouTube
+        // Video + Audio pills for YouTube & Google Drive
         pillsContainer.innerHTML = `
-          <button type="button" class="pl-quality-pill active" data-quality="1080p">🎬 1080p HD</button>
-          <button type="button" class="pl-quality-pill" data-quality="720p">🎬 720p</button>
-          <button type="button" class="pl-quality-pill" data-quality="480p">🎬 480p</button>
-          <button type="button" class="pl-quality-pill" data-quality="audio_mp3_320">🎵 320k Audio</button>
-          <button type="button" class="pl-quality-pill" data-quality="audio_mp3_192">🎵 192k Audio</button>
+          <button type="button" class="pl-quality-pill active" data-quality="1080p"><svg class="pill-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line></svg> <span>1080p Full HD</span></button>
+          <button type="button" class="pl-quality-pill" data-quality="720p"><svg class="pill-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line></svg> <span>720p HD</span></button>
+          <button type="button" class="pl-quality-pill" data-quality="480p"><svg class="pill-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line></svg> <span>480p SD</span></button>
+          <button type="button" class="pl-quality-pill" data-quality="audio_mp3_320"><svg class="pill-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> <span>320k Studio MP3</span></button>
+          <button type="button" class="pl-quality-pill" data-quality="audio_mp3_192"><svg class="pill-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> <span>192k Standard MP3</span></button>
         `;
         selectedBatchQuality = '1080p';
       }
@@ -1326,21 +1673,163 @@
       });
     }
 
-    items.forEach((item, index) => {
-      const row = document.createElement('div');
-      row.className = 'playlist-row';
-      row.innerHTML = `
-        <input type="checkbox" class="playlist-cb" data-index="${index}" checked>
-        <img src="${item.thumbnail}" class="playlist-pic" alt="">
-        <div class="playlist-txt">
-          <div class="playlist-name">${item.title}</div>
-          <div class="playlist-len">${item.formattedDuration}</div>
-        </div>
-      `;
+    function buildFolderTree(items) {
+      const root = { name: 'root', folders: {}, files: [] };
+      items.forEach((item, index) => {
+        const rawPath = (item.subFolderName || item.subfolder || '').trim();
+        if (!rawPath) {
+          root.files.push({ item, index });
+          return;
+        }
+        const parts = rawPath.split(/\s*\/\s*/).filter(Boolean);
+        let current = root;
+        for (const part of parts) {
+          if (!current.folders[part]) {
+            current.folders[part] = { name: part, folders: {}, files: [], totalCount: 0 };
+          }
+          current = current.folders[part];
+        }
+        current.files.push({ item, index });
+      });
 
-      row.querySelector('.playlist-cb').addEventListener('change', updatePlaylistSelectedCount);
-      playlistItemsList.appendChild(row);
-    });
+      function calcCount(node) {
+        let count = node.files ? node.files.length : 0;
+        for (const sub of Object.values(node.folders)) {
+          count += calcCount(sub);
+        }
+        node.totalCount = count;
+        return count;
+      }
+      calcCount(root);
+      return root;
+    }
+
+    function updateParentFolderCbs(fromEl) {
+      let curr = fromEl.parentElement;
+      while (curr && curr.id !== 'playlistItemsList') {
+        if (curr.classList.contains('subfolder-items')) {
+          const parentGroup = curr.parentElement;
+          const parentCb = parentGroup?.querySelector(':scope > .subfolder-header .subfolder-master-cb');
+          if (parentCb) {
+            const allFiles = curr.querySelectorAll('.playlist-cb');
+            const checkedFiles = curr.querySelectorAll('.playlist-cb:checked');
+            if (checkedFiles.length === 0) {
+              parentCb.checked = false;
+              parentCb.indeterminate = false;
+            } else if (checkedFiles.length === allFiles.length) {
+              parentCb.checked = true;
+              parentCb.indeterminate = false;
+            } else {
+              parentCb.checked = false;
+              parentCb.indeterminate = true;
+            }
+          }
+        }
+        curr = curr.parentElement;
+      }
+    }
+
+    function renderTreeLevel(container, node, level = 0) {
+      // 1. Subfolders at this level
+      for (const [folderName, subNode] of Object.entries(node.folders)) {
+        const groupEl = document.createElement('div');
+        groupEl.className = 'subfolder-group';
+
+        const headerEl = document.createElement('div');
+        headerEl.className = 'subfolder-header';
+        headerEl.innerHTML = `
+          <div class="subfolder-header-left">
+            <span class="subfolder-toggle-icon">▶</span>
+            <input type="checkbox" class="subfolder-master-cb" checked title="Select/Deselect folder">
+            <span class="subfolder-name"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 3px;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg> ${folderName}</span>
+          </div>
+          <span class="subfolder-count">${subNode.totalCount} files</span>
+        `;
+
+        const childrenEl = document.createElement('div');
+        childrenEl.className = 'subfolder-items';
+        childrenEl.style.display = 'none';
+        if (level > 0) {
+          childrenEl.style.paddingLeft = `${12 + (level * 6)}px`;
+        }
+
+        renderTreeLevel(childrenEl, subNode, level + 1);
+
+        let isExpanded = false;
+        const toggleIcon = headerEl.querySelector('.subfolder-toggle-icon');
+        headerEl.addEventListener('click', (e) => {
+          if (e.target.classList.contains('subfolder-master-cb')) return;
+          isExpanded = !isExpanded;
+          childrenEl.style.display = isExpanded ? 'flex' : 'none';
+          toggleIcon.textContent = isExpanded ? '▼' : '▶';
+        });
+
+        const masterCb = headerEl.querySelector('.subfolder-master-cb');
+        masterCb.addEventListener('change', (e) => {
+          const checked = e.target.checked;
+          childrenEl.querySelectorAll('.playlist-cb, .subfolder-master-cb').forEach(cb => {
+            cb.checked = checked;
+            cb.indeterminate = false;
+          });
+          updateParentFolderCbs(groupEl);
+          updatePlaylistSelectedCount();
+        });
+
+        groupEl.appendChild(headerEl);
+        groupEl.appendChild(childrenEl);
+        container.appendChild(groupEl);
+      }
+
+      // 2. Direct files at this level (if any)
+      if (node.files && node.files.length > 0) {
+        node.files.forEach(({ item, index }) => {
+          const isImg = item.isImage || /\.(jpg|jpeg|png|webp|gif|bmp)$/i.test(item.title);
+          const badgeText = isImg ? 'PHOTO' : (item.formattedDuration && item.formattedDuration !== '00:00' && item.formattedDuration !== 'HD FOOTAGE' ? item.formattedDuration : (item.durationSeconds > 0 ? formatSec(item.durationSeconds) : 'HD MEDIA'));
+          const row = document.createElement('div');
+          row.className = 'playlist-row';
+          row.innerHTML = `
+            <input type="checkbox" class="playlist-cb" data-index="${index}" checked>
+            <img src="${item.thumbnail}" class="playlist-pic" alt="">
+            <div class="playlist-txt">
+              <div class="playlist-name">${item.title}</div>
+              <div class="playlist-len">${badgeText}</div>
+            </div>
+          `;
+
+          row.querySelector('.playlist-cb').addEventListener('change', () => {
+            updateParentFolderCbs(row);
+            updatePlaylistSelectedCount();
+          });
+
+          container.appendChild(row);
+        });
+      }
+    }
+
+    const hasSubfolders = items.some(it => (it.subFolderName && it.subFolderName.trim().length > 0) || (it.subfolder && it.subfolder.trim().length > 0));
+
+    if (hasSubfolders) {
+      const tree = buildFolderTree(items);
+      renderTreeLevel(playlistItemsList, tree, 0);
+    } else {
+      items.forEach((item, index) => {
+        const isImg = item.isImage || /\.(jpg|jpeg|png|webp|gif|bmp)$/i.test(item.title);
+        const badgeText = isImg ? 'PHOTO' : (item.formattedDuration && item.formattedDuration !== '00:00' && item.formattedDuration !== 'HD FOOTAGE' ? item.formattedDuration : (item.durationSeconds > 0 ? formatSec(item.durationSeconds) : 'HD MEDIA'));
+        const row = document.createElement('div');
+        row.className = 'playlist-row';
+        row.innerHTML = `
+          <input type="checkbox" class="playlist-cb" data-index="${index}" checked>
+          <img src="${item.thumbnail}" class="playlist-pic" alt="">
+          <div class="playlist-txt">
+            <div class="playlist-name">${item.title}</div>
+            <div class="playlist-len">${badgeText}</div>
+          </div>
+        `;
+
+        row.querySelector('.playlist-cb').addEventListener('change', updatePlaylistSelectedCount);
+        playlistItemsList.appendChild(row);
+      });
+    }
   }
 
   function updatePlaylistSelectedCount() {
@@ -1350,13 +1839,56 @@
 
   selectAllBtn.addEventListener('click', () => {
     playlistItemsList.querySelectorAll('.playlist-cb').forEach(cb => cb.checked = true);
+    playlistItemsList.querySelectorAll('.subfolder-master-cb').forEach(cb => { cb.checked = true; cb.indeterminate = false; });
     updatePlaylistSelectedCount();
   });
 
   deselectAllBtn.addEventListener('click', () => {
     playlistItemsList.querySelectorAll('.playlist-cb').forEach(cb => cb.checked = false);
+    playlistItemsList.querySelectorAll('.subfolder-master-cb').forEach(cb => { cb.checked = false; cb.indeterminate = false; });
     updatePlaylistSelectedCount();
   });
+
+  // Custom Folder Persistence & Picker
+  function updateCustomFolderLabels(folderPath) {
+    const display = folderPath ? (folderPath.split('/').pop() || folderPath) : 'Default (Downloads/MediaFetch)';
+    if (playlistSavePath) playlistSavePath.textContent = display;
+    if (carouselSavePath) carouselSavePath.textContent = display;
+  }
+
+  if (window.AndroidBridge && window.AndroidBridge.getCustomFolder) {
+    try {
+      const savedFolder = window.AndroidBridge.getCustomFolder();
+      if (savedFolder) {
+        currentCustomFolder = savedFolder;
+        updateCustomFolderLabels(savedFolder);
+      }
+    } catch (_) {}
+  }
+
+  window.onCustomFolderSelected = function (folderPath) {
+    currentCustomFolder = folderPath;
+    updateCustomFolderLabels(folderPath);
+    if (window.AndroidBridge && window.AndroidBridge.showToast) {
+      window.AndroidBridge.showToast(`Destination saved: ${folderPath}`);
+    }
+  };
+
+  if (playlistChangeFolderBtn) {
+    playlistChangeFolderBtn.addEventListener('click', () => {
+      if (window.AndroidBridge && window.AndroidBridge.pickCustomFolder) {
+        window.AndroidBridge.pickCustomFolder();
+      }
+    });
+  }
+
+  if (carouselChangeFolderBtn) {
+    carouselChangeFolderBtn.addEventListener('click', () => {
+      if (window.AndroidBridge && window.AndroidBridge.pickCustomFolder) {
+        window.AndroidBridge.pickCustomFolder();
+      }
+    });
+  }
 
   downloadBatchBtn.addEventListener('click', () => {
     const selected = [];
@@ -1369,30 +1901,82 @@
       return;
     }
 
-    if (window.AndroidBridge && window.AndroidBridge.startBatchDownload) {
+    const asZip = Boolean(playlistZipToggle && playlistZipToggle.checked);
+
+    if (window.AndroidBridge && window.AndroidBridge.startBatchDownloadWithOptions) {
+      window.AndroidBridge.startBatchDownloadWithOptions(
+        selectedBatchQuality,
+        JSON.stringify(selected),
+        asZip,
+        currentCustomFolder
+      );
+    } else if (window.AndroidBridge && window.AndroidBridge.startBatchDownload) {
       window.AndroidBridge.startBatchDownload(selectedBatchQuality, JSON.stringify(selected));
     }
     downloadsDrawer.classList.add('open');
   });
 
 
-  // Carousel Multi-Slide Ribbon Rendering & Downloads
+  // Carousel Multi-Slide Studio Rendering & Downloads
   function renderCarousel(slides) {
     if (!carouselSlidesTrack) return;
-    carouselSlidesTrack.innerHTML = '';
-    if (carouselCountBadge) carouselCountBadge.textContent = `${slides.length} slides`;
+    carouselSlidesData = slides || [];
+    selectedSlideIndices = new Set(carouselSlidesData.map((_, i) => i)); // All selected by default
+    currentCarouselFilter = 'all';
 
-    slides.forEach((slide) => {
-      const card = document.createElement('div');
-      card.className = 'carousel-slide-item';
+    if (carouselCountBadge) carouselCountBadge.textContent = `${carouselSlidesData.length} slides`;
+    updateCarouselFilterPillsUI();
+    renderFilteredCarouselSlides();
+    updateCarouselSelectedCount();
+  }
+
+  function renderFilteredCarouselSlides() {
+    if (!carouselSlidesTrack) return;
+    carouselSlidesTrack.innerHTML = '';
+
+    carouselSlidesData.forEach((slide, idx) => {
       const isVid = slide.mediaType === 'video';
+      if (currentCarouselFilter === 'image' && isVid) return;
+      if (currentCarouselFilter === 'video' && !isVid) return;
+
+      const isChecked = selectedSlideIndices.has(idx);
+      const card = document.createElement('div');
+      card.className = `carousel-slide-item ${isChecked ? 'selected' : ''}`;
+      card.dataset.index = idx;
+
+      const slideTypeIcon = isVid 
+        ? '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle;"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>'
+        : '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>';
+
       card.innerHTML = `
+        <input type="checkbox" class="carousel-slide-checkbox" data-index="${idx}" ${isChecked ? 'checked' : ''}>
         <div class="slide-img-box">
           <img src="${slide.thumbnail || slide.url}" alt="Slide ${slide.slideIndex}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'95\\' height=\\'100\\' fill=\\'%23333\\'><rect width=\\'100%\\' height=\\'100%\\'/></svg>'">
-          <span class="slide-badge">#${slide.slideIndex} ${isVid ? '🎬' : '📸'}</span>
+          <span class="slide-badge">#${slide.slideIndex} ${slideTypeIcon}</span>
         </div>
-        <button type="button" class="slide-action-btn">⬇ Download</button>
+        <button type="button" class="slide-action-btn"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 3px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download</button>
       `;
+
+      // Checkbox change listener
+      const cb = card.querySelector('.carousel-slide-checkbox');
+      cb.addEventListener('change', (e) => {
+        e.stopPropagation();
+        if (cb.checked) {
+          selectedSlideIndices.add(idx);
+          card.classList.add('selected');
+        } else {
+          selectedSlideIndices.delete(idx);
+          card.classList.remove('selected');
+        }
+        updateCarouselSelectedCount();
+      });
+
+      // Card tap selects/deselects
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.slide-action-btn') || e.target.closest('.carousel-slide-checkbox')) return;
+        cb.checked = !cb.checked;
+        cb.dispatchEvent(new Event('change'));
+      });
 
       card.querySelector('.slide-action-btn').addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1400,6 +1984,94 @@
       });
 
       carouselSlidesTrack.appendChild(card);
+    });
+  }
+
+  function updateCarouselSelectedCount() {
+    const count = selectedSlideIndices.size;
+    if (carouselSelectedCountBadge) carouselSelectedCountBadge.textContent = `${count} selected`;
+    if (downloadSelectedSlidesBtnText) {
+      const isZip = Boolean(carouselZipToggle && carouselZipToggle.checked);
+      downloadSelectedSlidesBtnText.textContent = isZip
+        ? `Download ${count} Slides as .ZIP`
+        : `Download Selected (${count} Slides)`;
+    }
+  }
+
+  function updateCarouselFilterPillsUI() {
+    document.querySelectorAll('.carousel-filter-chip').forEach(chip => {
+      if (chip.dataset.filter === currentCarouselFilter) {
+        chip.classList.add('active');
+      } else {
+        chip.classList.remove('active');
+      }
+    });
+  }
+
+  document.querySelectorAll('.carousel-filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      currentCarouselFilter = chip.dataset.filter || 'all';
+      updateCarouselFilterPillsUI();
+      renderFilteredCarouselSlides();
+    });
+  });
+
+  if (carouselSelectAllBtn) {
+    carouselSelectAllBtn.addEventListener('click', () => {
+      carouselSlidesData.forEach((_, i) => selectedSlideIndices.add(i));
+      renderFilteredCarouselSlides();
+      updateCarouselSelectedCount();
+    });
+  }
+
+  if (carouselDeselectBtn) {
+    carouselDeselectBtn.addEventListener('click', () => {
+      selectedSlideIndices.clear();
+      renderFilteredCarouselSlides();
+      updateCarouselSelectedCount();
+    });
+  }
+
+  if (carouselZipToggle) {
+    carouselZipToggle.addEventListener('change', () => {
+      updateCarouselSelectedCount();
+    });
+  }
+
+  if (downloadSelectedSlidesBtn) {
+    downloadSelectedSlidesBtn.addEventListener('click', () => {
+      if (selectedSlideIndices.size === 0) {
+        if (window.AndroidBridge) window.AndroidBridge.showToast('Please select at least one slide');
+        return;
+      }
+
+      const asZip = Boolean(carouselZipToggle && carouselZipToggle.checked);
+      const selectedSlides = [];
+      selectedSlideIndices.forEach(idx => {
+        if (carouselSlidesData[idx]) {
+          selectedSlides.push(carouselSlidesData[idx]);
+        }
+      });
+
+      if (window.AndroidBridge && window.AndroidBridge.startCarouselDownloadWithOptions) {
+        window.AndroidBridge.startCarouselDownloadWithOptions(
+          JSON.stringify(selectedSlides),
+          asZip,
+          currentCustomFolder
+        );
+      } else {
+        selectedSlides.forEach((slide, i) => {
+          setTimeout(() => downloadSingleSlide(slide), i * 350);
+        });
+      }
+
+      if (window.AndroidBridge && window.AndroidBridge.showToast) {
+        window.AndroidBridge.showToast(asZip
+          ? `Packaging ${selectedSlides.length} slides into .ZIP archive...`
+          : `Downloading ${selectedSlides.length} selected slides...`
+        );
+      }
+      if (downloadsDrawer) downloadsDrawer.classList.add('open');
     });
   }
 
@@ -1468,7 +2140,7 @@
       const ext = q ? q.ext : 'mp4';
       const exists = window.AndroidBridge.checkFileExists(customTitle, ext);
       if (exists) {
-        const proceed = confirm(`⚠️ File Already Downloaded\n\nYou already have "${customTitle}" saved in your device storage.\n\nDo you want to download again?`);
+        const proceed = confirm(`File Already Downloaded\n\nYou already have "${customTitle}" saved in your device storage.\n\nDo you want to download again?`);
         if (!proceed) return;
       }
     }
@@ -1527,7 +2199,7 @@
       const trimBtn = document.createElement('button');
       trimBtn.type = 'button';
       trimBtn.className = 'chapter-action-btn';
-      trimBtn.innerHTML = '✂️ Trim';
+      trimBtn.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 3px;"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg> Trim';
       trimBtn.title = 'Open in Clip Trimmer';
       trimBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1543,7 +2215,7 @@
       const dlBtn = document.createElement('button');
       dlBtn.type = 'button';
       dlBtn.className = 'chapter-action-btn';
-      dlBtn.innerHTML = '⬇️ Download';
+      dlBtn.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 3px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download';
       dlBtn.title = 'Download this chapter as separate track';
       dlBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1653,7 +2325,7 @@
           ${!isDone ? `<button class="ctrl-btn cancel-btn" data-id="${task.id}">Cancel</button>` : ''}
           ${isDone ? `<button class="ctrl-btn highlight open-btn" data-path="${task.filePath}">Open</button>` : ''}
           ${isDone ? `<button class="ctrl-btn share-btn" data-path="${task.filePath}">Share</button>` : ''}
-          <button class="ctrl-btn redownload-btn" data-url="${task.url}" title="Download again in another format">🔄 Re-Download</button>
+          <button class="ctrl-btn redownload-btn" data-url="${task.url}" title="Download again in another format"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 3px;"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg> Re-Download</button>
         </div>
       </div>
     `;
@@ -1699,11 +2371,42 @@
     return card;
   }
 
+  function updateQueueSpeedBanner() {
+    const banner = document.getElementById('queueSpeedBanner');
+    const countEl = document.getElementById('queueActiveCount');
+    const speedEl = document.getElementById('queueTotalSpeed');
+    if (!banner) return;
+
+    const activeTasks = allTasks.filter(t => t.status === 'DOWNLOADING');
+    if (activeTasks.length > 0) {
+      banner.classList.remove('hidden');
+      let totalSpeedBytes = 0;
+      activeTasks.forEach(t => {
+        if (t.speedBytesPerSec && t.speedBytesPerSec > 0) {
+          totalSpeedBytes += t.speedBytesPerSec;
+        }
+      });
+      if (countEl) countEl.textContent = `${activeTasks.length} Active Download${activeTasks.length > 1 ? 's' : ''}`;
+      if (speedEl) {
+        if (totalSpeedBytes > 0) {
+          const mbSpeed = (totalSpeedBytes / (1024 * 1024)).toFixed(1);
+          speedEl.textContent = `Total Speed: ${mbSpeed} MB/s`;
+        } else {
+          speedEl.textContent = 'Active Multi-Thread Queue';
+        }
+      }
+    } else {
+      banner.classList.add('hidden');
+    }
+  }
+
   function renderTasksList() {
     const activeTasks = allTasks.filter(t => t.status === 'DOWNLOADING' || t.status === 'QUEUED');
     if (activeDownloadsCount) activeDownloadsCount.classList.toggle('hidden', activeTasks.length === 0);
     if (drawerItemsCount) drawerItemsCount.textContent = `${allTasks.length} items`;
     if (emptyDownloadsState) emptyDownloadsState.classList.toggle('hidden', allTasks.length > 0);
+
+    updateQueueSpeedBanner();
 
     // 1. Populate Popup Bottom Sheet Drawer
     if (downloadsTaskList) {
@@ -1877,7 +2580,7 @@
       if (mediaSettingsView) mediaSettingsView.classList.add('hidden');
       if (mediaHistoryView) mediaHistoryView.classList.remove('hidden');
       if (downloadsDrawer) downloadsDrawer.classList.remove('open');
-      if (modeSwitchIcon) modeSwitchIcon.textContent = '⚡';
+      if (modeSwitchIcon) modeSwitchIcon.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>';
       if (modeSwitchLabel) modeSwitchLabel.textContent = 'Downloader';
       if (modeSwitchBtn) {
         modeSwitchBtn.classList.remove('active-search-mode');
@@ -1889,7 +2592,7 @@
       mediaSearchView.classList.add('hidden');
       if (mediaHistoryView) mediaHistoryView.classList.add('hidden');
       if (mediaSettingsView) mediaSettingsView.classList.remove('hidden');
-      if (modeSwitchIcon) modeSwitchIcon.textContent = '⚡';
+      if (modeSwitchIcon) modeSwitchIcon.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>';
       if (modeSwitchLabel) modeSwitchLabel.textContent = 'Downloader';
       if (modeSwitchBtn) {
         modeSwitchBtn.classList.remove('active-search-mode');
@@ -1901,7 +2604,7 @@
       if (mediaSettingsView) mediaSettingsView.classList.add('hidden');
       if (mediaHistoryView) mediaHistoryView.classList.add('hidden');
       mediaSearchView.classList.remove('hidden');
-      if (modeSwitchIcon) modeSwitchIcon.textContent = '⚡';
+      if (modeSwitchIcon) modeSwitchIcon.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>';
       if (modeSwitchLabel) modeSwitchLabel.textContent = 'Downloader';
       if (modeSwitchBtn) {
         modeSwitchBtn.classList.add('active-search-mode');
@@ -1916,7 +2619,7 @@
       if (mediaHistoryView) mediaHistoryView.classList.add('hidden');
       mediaSearchView.classList.add('hidden');
       mediaFetchView.classList.remove('hidden');
-      if (modeSwitchIcon) modeSwitchIcon.textContent = '🔍';
+      if (modeSwitchIcon) modeSwitchIcon.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>';
       if (modeSwitchLabel) modeSwitchLabel.textContent = 'Search Studio';
       if (modeSwitchBtn) {
         modeSwitchBtn.classList.remove('active-search-mode');
@@ -1979,7 +2682,9 @@
     msMultiSelectToggle.addEventListener('click', () => {
       isMultiSelectMode = !isMultiSelectMode;
       msMultiSelectToggle.classList.toggle('active', isMultiSelectMode);
-      msMultiSelectCheck.textContent = isMultiSelectMode ? '☑️' : '◻️';
+      msMultiSelectCheck.innerHTML = isMultiSelectMode 
+        ? '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align: middle;"><rect x="3" y="3" width="18" height="18" rx="3" ry="3"></rect><polyline points="9 12 11 14 15 10"></polyline></svg>'
+        : '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle;"><rect x="3" y="3" width="18" height="18" rx="3" ry="3"></rect></svg>';
 
       if (!isMultiSelectMode) {
         // Reset to single select: pick the first selected or all
@@ -2111,7 +2816,7 @@
       const row = document.createElement('div');
       row.className = 'suggestion-item';
       row.innerHTML = `
-        <span class="suggestion-icon">🔍</span>
+        <span class="suggestion-icon"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
         <span class="suggestion-text">${item}</span>
       `;
       row.addEventListener('click', () => {
@@ -2206,8 +2911,8 @@
           <div class="ms-card-title">${item.title}</div>
           <div class="ms-card-author">${item.author}</div>
           <div class="ms-card-actions">
-            <button class="ms-btn-download" title="Select Download Quality & Format">⚡ Download</button>
-            ${isVideo ? '<button class="ms-btn-trim" title="Trim Video Clip">✂️ Trim</button>' : ''}
+            <button class="ms-btn-download" title="Select Download Quality & Format"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" style="vertical-align: middle; margin-right: 3px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Download</button>
+            ${isVideo ? '<button class="ms-btn-trim" title="Trim Video Clip"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 3px;"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg> Trim</button>' : ''}
           </div>
         </div>
       `;
@@ -2268,33 +2973,40 @@
 
     const options = [];
 
+    const svgVid = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line></svg>';
+    const svgFast = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>';
+    const svgCompact = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>';
+    const svgAud = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>';
+    const svgMotion = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path></svg>';
+    const svgPic = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>';
+
     if (isVideo) {
       if (isSocialOrYt) {
         options.push(
-          { format: '1080p', label: '1080p Full HD Video', sub: 'MP4 • Highest Quality Video & Audio', badge: '1080p MP4', icon: '🎬', iconClass: '' },
-          { format: '720p', label: '720p HD Video', sub: 'MP4 • Balanced Size & Fast Download', badge: '720p MP4', icon: '⚡', iconClass: '' },
-          { format: '480p', label: '480p SD Video', sub: 'MP4 • Compact Size (Data Saver)', badge: '480p MP4', icon: '📱', iconClass: '' },
-          { format: 'mp3', label: 'Extract Audio (MP3)', sub: 'MP3 • High Bitrate Clean Audio Track', badge: '320k MP3', icon: '🎵', iconClass: 'audio-icon' }
+          { format: '1080p', label: '1080p Full HD Video', sub: 'MP4 • Highest Quality Video & Audio', badge: '1080p MP4', icon: svgVid, iconClass: '' },
+          { format: '720p', label: '720p HD Video', sub: 'MP4 • Balanced Size & Fast Download', badge: '720p MP4', icon: svgFast, iconClass: '' },
+          { format: '480p', label: '480p SD Video', sub: 'MP4 • Compact Size (Data Saver)', badge: '480p MP4', icon: svgCompact, iconClass: '' },
+          { format: 'mp3', label: 'Extract Audio (MP3)', sub: 'MP3 • High Bitrate Clean Audio Track', badge: '320k MP3', icon: svgAud, iconClass: 'audio-icon' }
         );
       } else {
         options.push(
-          { format: 'best', label: 'Original 4K / HD Video', sub: `${item.resolutionBadge || 'HD Media'} • Direct Stream`, badge: 'Full Video', icon: '🎬', iconClass: '' },
-          { format: 'mp3', label: 'Extract Audio (MP3)', sub: 'MP3 • Audio Track Only', badge: 'HQ MP3', icon: '🎵', iconClass: 'audio-icon' }
+          { format: 'best', label: 'Original 4K / HD Video', sub: `${item.resolutionBadge || 'HD Media'} • Direct Stream`, badge: 'Full Video', icon: svgVid, iconClass: '' },
+          { format: 'mp3', label: 'Extract Audio (MP3)', sub: 'MP3 • Audio Track Only', badge: 'HQ MP3', icon: svgAud, iconClass: 'audio-icon' }
         );
       }
     } else if (isAudio) {
       options.push(
-        { format: 'audio', label: 'Download HQ Audio Track', sub: `${item.durationFormatted || 'Audio'} • MP3 Master File`, badge: 'HQ MP3', icon: '🎵', iconClass: 'audio-icon' }
+        { format: 'audio', label: 'Download HQ Audio Track', sub: `${item.durationFormatted || 'Audio'} • MP3 Master File`, badge: 'HQ MP3', icon: svgAud, iconClass: 'audio-icon' }
       );
     } else if (isImage) {
       const isGifItem = item.mediaType === 'gif' || targetUrl.toLowerCase().includes('.gif') || (item.title && item.title.toLowerCase().includes('gif'));
       if (isGifItem) {
         options.push(
-          { format: 'gif', label: 'Animated GIF (Original Motion)', sub: 'Infinite Loop • High Quality GIF', badge: 'GIF Animation', icon: '✨', iconClass: 'image-icon' }
+          { format: 'gif', label: 'Animated GIF (Original Motion)', sub: 'Infinite Loop • High Quality GIF', badge: 'GIF Animation', icon: svgMotion, iconClass: 'image-icon' }
         );
       }
       options.push(
-        { format: 'image', label: isGifItem ? 'Original GIF File' : 'Download High-Res Original', sub: `${item.resolutionBadge || 'Full Resolution'} • ${isGifItem ? 'Animated GIF' : 'Original JPG/PNG'}`, badge: isGifItem ? 'GIF' : 'High Res', icon: isGifItem ? 'GIF' : '🖼️', iconClass: 'image-icon' }
+        { format: 'image', label: isGifItem ? 'Original GIF File' : 'Download High-Res Original', sub: `${item.resolutionBadge || 'Full Resolution'} • ${isGifItem ? 'Animated GIF' : 'Original JPG/PNG'}`, badge: isGifItem ? 'GIF' : 'High Res', icon: isGifItem ? 'GIF' : svgPic, iconClass: 'image-icon' }
       );
     }
 
@@ -2489,9 +3201,24 @@
     } catch (_) {}
   }
 
+  function refreshInstalledVersion() {
+    try {
+      if (window.AndroidBridge && window.AndroidBridge.getAppVersionName) {
+        const ver = window.AndroidBridge.getAppVersionName();
+        if (ver) {
+          const badge = document.getElementById('installedVersionBadge');
+          if (badge) badge.textContent = `v${ver} (Official)`;
+          const footer = document.getElementById('appVersionFooter');
+          if (footer) footer.textContent = `MediaFetch Mobile v${ver} • Built with High-Performance Android Native Core`;
+        }
+      }
+    } catch (_) {}
+  }
+
   function refreshSettingsUI() {
     refreshCacheSize();
     refreshCookiesBadge();
+    refreshInstalledVersion();
 
     if (settingsSaveDirPath) {
       try {
@@ -2519,6 +3246,23 @@
       const savedSubfolders = localStorage.getItem('mediafetch_organize_subfolders');
       if (settingsSubfoldersToggle && savedSubfolders !== null) {
         settingsSubfoldersToggle.checked = (savedSubfolders === 'true');
+      }
+
+      const toggleAnimations = document.getElementById('toggleAnimations');
+      if (toggleAnimations) {
+        toggleAnimations.checked = (localStorage.getItem('mediafetch_enable_animations') === 'true');
+        toggleAnimations.addEventListener('change', (e) => {
+          const isChecked = e.target.checked;
+          localStorage.setItem('mediafetch_enable_animations', isChecked ? 'true' : 'false');
+          applyMotionSetting(isChecked);
+          if (window.AndroidBridge && window.AndroidBridge.showToast) {
+            window.AndroidBridge.showToast(
+              isChecked
+                ? 'Fluid motion & spring animations enabled'
+                : 'Performance mode active: animations disabled for 60 FPS'
+            );
+          }
+        });
       }
 
       renderUserCustomThemes();
@@ -2556,9 +3300,9 @@
           applyVisualStyle(style);
           if (window.AndroidBridge && window.AndroidBridge.showToast) {
             const names = {
-              'solid': '⚡ Switched to Pure Solid AMOLED theme',
-              'glass': '💎 Switched to Liquid Glassmorphism theme',
-              'prism': '✨ Switched to Cyber Aurora Prism theme'
+              'solid': 'Switched to Pure Solid AMOLED theme',
+              'glass': 'Switched to Liquid Glassmorphism theme',
+              'prism': 'Switched to Cyber Aurora Prism theme'
             };
             window.AndroidBridge.showToast(names[style] || 'Theme updated');
           }
@@ -2600,67 +3344,42 @@
       });
     }
 
-    // Two-way binding for 4-color custom studio
-    function bindColorSync(pickerId, hexId) {
-      const picker = document.getElementById(pickerId);
-      const hex = document.getElementById(hexId);
-      if (!picker || !hex) return;
-
-      picker.addEventListener('input', () => {
-        hex.value = picker.value.toUpperCase();
-        applyFullTheme(getStudioInputsTheme(), false);
-      });
-
-      hex.addEventListener('input', () => {
-        let val = hex.value.trim();
-        if (!val.startsWith('#')) val = '#' + val;
-        if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
-          picker.value = val;
-          applyFullTheme(getStudioInputsTheme(), false);
-        }
-      });
-    }
-
-    bindColorSync('pickerPrimary', 'hexPrimaryInput');
-    bindColorSync('pickerSecondary', 'hexSecondaryInput');
-    bindColorSync('pickerBg', 'hexBgInput');
-    bindColorSync('pickerSurface', 'hexSurfaceInput');
+    // Initialize Modern 2D Color Picker Studio (Ae / Pr Style)
+    initColorPickerStudio();
 
     // Auto-match gradient button
     const autoMatchBtn = document.getElementById('autoMatchGradientBtn');
     if (autoMatchBtn) {
       autoMatchBtn.addEventListener('click', () => {
-        const primary = document.getElementById('pickerPrimary')?.value || '#0A84FF';
+        const primary = (currentActiveTheme && currentActiveTheme.primary) || '#0A84FF';
         const secondary = autoMatchSecondaryColor(primary);
-        const p2 = document.getElementById('pickerSecondary');
-        const h2 = document.getElementById('hexSecondaryInput');
-        if (p2) p2.value = secondary;
-        if (h2) h2.value = secondary.toUpperCase();
-        applyFullTheme(getStudioInputsTheme(), false);
+        if (!currentActiveTheme) currentActiveTheme = { ...CURATED_THEMES.blue };
+        currentActiveTheme.secondary = secondary;
+        currentActiveTheme.id = 'custom';
+        applyFullTheme(currentActiveTheme, true);
         if (window.AndroidBridge && window.AndroidBridge.showToast) {
           window.AndroidBridge.showToast('Harmonized gradient auto-matched!');
         }
       });
     }
 
-    // Quick surface & background chips
+    // Quick surface & dual background chips
     document.querySelectorAll('.quick-color-chip').forEach(chip => {
       chip.addEventListener('click', () => {
         const target = chip.dataset.target;
         const color = chip.dataset.color;
         if (!color) return;
+        if (!currentActiveTheme) currentActiveTheme = { ...CURATED_THEMES.blue };
+
         if (target === 'bg') {
-          const pb = document.getElementById('pickerBg');
-          const hb = document.getElementById('hexBgInput');
-          if (pb) pb.value = color;
-          if (hb) hb.value = color.toUpperCase();
+          currentActiveTheme.bg = color;
+          currentActiveTheme.bgEnd = chip.dataset.end || color;
         } else if (target === 'surface') {
-          const ps = document.getElementById('pickerSurface');
-          const hs = document.getElementById('hexSurfaceInput');
-          if (ps) ps.value = color;
-          if (hs) hs.value = color.toUpperCase();
+          currentActiveTheme.surface = color;
+          currentActiveTheme.card = color;
         }
-        applyFullTheme(getStudioInputsTheme(), false);
+        currentActiveTheme.id = 'custom';
+        applyFullTheme(currentActiveTheme, true);
       });
     });
 
@@ -2919,7 +3638,7 @@
       refreshCookiesBadge();
       if (cookieGuideModal) cookieGuideModal.classList.add('hidden');
       if (window.AndroidBridge && window.AndroidBridge.showToast) {
-        window.AndroidBridge.showToast('✨ Cookies auto-adjusted and applied successfully!');
+        window.AndroidBridge.showToast('Cookies auto-adjusted and applied successfully!');
       }
     }
 
@@ -3001,7 +3720,7 @@
       if (percentText) percentText.textContent = '0%';
       if (btnNow) {
         btnNow.disabled = false;
-        btnNow.innerHTML = '<span>⚡ Update Now</span>';
+        btnNow.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;vertical-align:middle;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg><span>Update Now</span>';
       }
       modal.classList.remove('hidden');
     }
@@ -3040,8 +3759,10 @@
         const progressWrap = document.getElementById('updateDownloadProgressWrap');
         if (progressWrap) progressWrap.classList.remove('hidden');
         btnUpdateNow.disabled = true;
-        btnUpdateNow.innerHTML = '<span>⏳ Starting Download...</span>';
-        if (window.AndroidBridge && window.AndroidBridge.downloadAndInstallUpdate) {
+        btnUpdateNow.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;vertical-align:middle;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg><span>Starting Download...</span>';
+        if (window.AndroidBridge && window.AndroidBridge.downloadAndInstallUpdateWithVersion) {
+          window.AndroidBridge.downloadAndInstallUpdateWithVersion(activeUpdateInfo.apkUrl, activeUpdateInfo.version || '1.0.6');
+        } else if (window.AndroidBridge && window.AndroidBridge.downloadAndInstallUpdate) {
           window.AndroidBridge.downloadAndInstallUpdate(activeUpdateInfo.apkUrl);
         }
       });
@@ -3107,7 +3828,7 @@
         showUpdateModal(info);
       } else {
         if (window.AndroidBridge && window.AndroidBridge.showToast) {
-          window.AndroidBridge.showToast('✨ You are on the latest MediaFetch build!');
+          window.AndroidBridge.showToast('You are on the latest MediaFetch build!');
         }
       }
     };
@@ -3122,22 +3843,30 @@
       }
     };
 
-    window.onUpdateDownloadProgress = function (percent) {
+    window.onUpdateDownloadProgress = function (percent, savedPath) {
       const p = Math.max(0, Math.min(100, Math.round(percent || 0)));
       const progressWrap = document.getElementById('updateDownloadProgressWrap');
       const percentText = document.getElementById('updatePercentText');
       const progressFill = document.getElementById('updateProgressFill');
       const btnNow = document.getElementById('btnUpdateNow');
+      const savedBox = document.getElementById('updateSavedLocationBox');
+      const savedPathText = document.getElementById('updateSavedPathText');
 
       if (progressWrap) progressWrap.classList.remove('hidden');
       if (percentText) percentText.textContent = `${p}%`;
       if (progressFill) progressFill.style.width = `${p}%`;
+
+      if (savedPath && savedPathText) {
+        savedPathText.textContent = `Internal Storage > ${savedPath.replace(/\//g, ' > ')}`;
+      }
+
       if (btnNow) {
         btnNow.disabled = true;
         if (p >= 100) {
-          btnNow.innerHTML = '<span>🚀 Launching Installer...</span>';
+          btnNow.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;vertical-align:middle;"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Launching Installer...</span>';
+          if (savedBox) savedBox.classList.remove('hidden');
         } else {
-          btnNow.innerHTML = `<span>⏳ Downloading... ${p}%</span>`;
+          btnNow.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;vertical-align:middle;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg><span>Downloading... ${p}%</span>`;
         }
       }
     };
@@ -3146,7 +3875,7 @@
       const btnNow = document.getElementById('btnUpdateNow');
       if (btnNow) {
         btnNow.disabled = false;
-        btnNow.innerHTML = '<span>⚡ Retry Update</span>';
+        btnNow.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;vertical-align:middle;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg><span>Retry Update</span>';
       }
       if (window.AndroidBridge && window.AndroidBridge.showToast) {
         window.AndroidBridge.showToast('Update download failed: ' + errMsg);
@@ -3157,6 +3886,15 @@
   }
 
   window.handleBackPress = function () {
+    const customColorPickerModal = document.getElementById('customColorPickerModal');
+    if (customColorPickerModal && !customColorPickerModal.classList.contains('hidden')) {
+      if (typeof cancelColorPickerSelection === 'function') {
+        cancelColorPickerSelection();
+      } else {
+        customColorPickerModal.classList.add('hidden');
+      }
+      return true;
+    }
     if (cookieGuideModal && !cookieGuideModal.classList.contains('hidden')) {
       cookieGuideModal.classList.add('hidden');
       return true;

@@ -125,7 +125,10 @@
             <span id="mediaPlatformBadge" class="platform-overlay">YouTube</span>
           </div>
           <div class="meta-content">
-            <h3 id="mediaTitle" class="meta-title">YouTube Short Title</h3>
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;">
+              <h3 id="mediaTitle" class="meta-title">YouTube Short Title</h3>
+              <span id="duplicateDownloadedBadge" class="duplicate-badge hidden"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg> <span>Downloaded</span></span>
+            </div>
             <p id="mediaAuthor" class="meta-channel">@ChannelCreator</p>
           </div>
         </div>
@@ -133,16 +136,57 @@
         <!-- Instagram & Pinterest Carousel / Multi-Slide Strip -->
         <div id="carouselSection" class="apple-card carousel-card hidden">
           <div class="carousel-header-row">
-            <div>
-              <span class="carousel-title">📸 Carousel Slides</span>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--brand-accent);"><rect x="3" y="3" width="18" height="18" rx="3" ry="3"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+              <span class="carousel-title">Carousel Slides</span>
               <span id="carouselCountBadge" class="carousel-badge">0 slides</span>
+              <span id="carouselSelectedCountBadge" class="carousel-badge selection-badge" style="margin-left: 4px;">0 selected</span>
             </div>
-            <button type="button" id="downloadAllSlidesBtn" class="download-all-slides-chip">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-              <span>Download All Slides</span>
+            <div class="carousel-action-links">
+              <button type="button" id="carouselSelectAllBtn" class="link-btn">Select All</button>
+              <button type="button" id="carouselDeselectBtn" class="link-btn">Deselect</button>
+            </div>
+          </div>
+
+          <!-- Slide Filter Chips -->
+          <div class="carousel-filter-row">
+            <button type="button" class="carousel-filter-chip active" data-filter="all">All Slides</button>
+            <button type="button" class="carousel-filter-chip" data-filter="image">Photos Only</button>
+            <button type="button" class="carousel-filter-chip" data-filter="video">Videos Only</button>
+          </div>
+
+          <!-- Carousel Packaging & Save Destination -->
+          <div class="batch-options-card">
+            <div class="batch-option-row">
+              <div class="batch-opt-text">
+                <span class="batch-opt-title">Bundle as .ZIP Archive</span>
+                <span class="batch-opt-desc">Zip all selected slides into a single archive</span>
+              </div>
+              <label class="apple-switch">
+                <input type="checkbox" id="carouselZipToggle" />
+                <span class="slider round"></span>
+              </label>
+            </div>
+            <div class="batch-folder-row">
+              <div class="batch-folder-info">
+                <span class="batch-folder-label">Save To:</span>
+                <span id="carouselSavePath" class="batch-folder-path">Default (Downloads/MediaFetch)</span>
+              </div>
+              <button type="button" id="carouselChangeFolderBtn" class="change-folder-btn">Change Folder</button>
+            </div>
+          </div>
+
+          <div id="carouselSlidesTrack" class="carousel-slides-track"></div>
+
+          <div class="carousel-footer-actions">
+            <button type="button" id="downloadSelectedSlidesBtn" class="apple-btn-primary full-w mt-2">
+              <svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              <span id="downloadSelectedSlidesBtnText">Download Selected Slides</span>
+            </button>
+            <button type="button" id="downloadAllSlidesBtn" class="link-btn mt-1" style="width: 100%; text-align: center; font-size: 11.5px; opacity: 0.85;">
+              Download All Slides Separately
             </button>
           </div>
-          <div id="carouselSlidesTrack" class="carousel-slides-track"></div>
         </div>
 
         <!-- Rename / Custom Filename Bar -->
@@ -150,7 +194,10 @@
           <div class="rename-input-wrap">
             <span class="rename-label">Save As:</span>
             <input type="text" id="renameInput" placeholder="Custom file name (or leave default)..." autocomplete="off" autocorrect="off">
-            <button type="button" id="resetRenameBtn" class="reset-rename-btn" title="Reset to original title">↺ Reset</button>
+            <button type="button" id="resetRenameBtn" class="reset-rename-btn" title="Reset to original title">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><polyline points="3 3 3 8 8 8"></polyline></svg>
+              <span>Reset</span>
+            </button>
           </div>
         </div>
 
@@ -184,7 +231,7 @@
           <div id="subtitleSelectorCard" class="apple-card subtitle-bar-card hidden" style="margin-bottom: 12px; padding: 12px 14px;">
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
               <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 16px;">💬</span>
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--brand-accent); flex-shrink: 0;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                 <div>
                   <span style="font-size: 12px; font-weight: 600; color: #fff; display: block;">Subtitles / Captions (CC)</span>
                   <span style="font-size: 10.5px; color: var(--text-tertiary);">Download .srt alongside media file</span>
@@ -217,7 +264,7 @@
           <div class="apple-card trimmer-card">
             <div class="trimmer-card-header">
               <span class="trimmer-title-text">Zero-Waste Clip Range</span>
-              <span class="data-saver-tag">⚡ 94% Data Saved</span>
+              <span class="data-saver-tag"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> <span>94% Data Saved</span></span>
             </div>
 
             <p class="trimmer-info">
@@ -230,7 +277,7 @@
                 <span class="field-label">Start Time (HH:MM:SS or MM:SS)</span>
                 <input type="text" id="trimStartInput" value="00:00:00" placeholder="00:00:00">
               </div>
-              <div class="time-arrow-icon">→</div>
+              <div class="time-arrow-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></div>
               <div class="time-field-box">
                 <span class="field-label">End Time (HH:MM:SS or MM:SS)</span>
                 <input type="text" id="trimEndInput" value="00:05:00" placeholder="00:05:00">
@@ -333,13 +380,39 @@
             </div>
           </div>
 
-          <!-- Quality Selector Segmented Control for Playlist Batch -->
+          <!-- Quality Selector Segmented Control for Playlist Batch (Horizontal Slide) -->
           <div class="playlist-quality-selector-row">
-            <span class="playlist-quality-label">Batch Format:</span>
+            <div class="playlist-quality-header">
+              <span class="playlist-quality-label">Batch Format</span>
+              <span class="playlist-quality-hint">Swipe to select <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>
+            </div>
             <div class="playlist-quality-pills">
-              <button type="button" class="pl-quality-pill active" data-quality="1080p">🎬 1080p Video</button>
-              <button type="button" class="pl-quality-pill" data-quality="720p">🎬 720p Video</button>
-              <button type="button" class="pl-quality-pill" data-quality="320k">🎵 320k MP3</button>
+              <button type="button" class="pl-quality-pill active" data-quality="1080p"><svg class="pill-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line></svg> <span>1080p Full HD</span></button>
+              <button type="button" class="pl-quality-pill" data-quality="720p"><svg class="pill-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line></svg> <span>720p HD</span></button>
+              <button type="button" class="pl-quality-pill" data-quality="480p"><svg class="pill-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line></svg> <span>480p SD</span></button>
+              <button type="button" class="pl-quality-pill" data-quality="audio_mp3_320"><svg class="pill-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> <span>320k Studio MP3</span></button>
+              <button type="button" class="pl-quality-pill" data-quality="audio_mp3_192"><svg class="pill-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> <span>192k Standard MP3</span></button>
+            </div>
+          </div>
+
+          <!-- Batch Packaging & Save Destination -->
+          <div class="batch-options-card">
+            <div class="batch-option-row">
+              <div class="batch-opt-text">
+                <span class="batch-opt-title">Bundle as .ZIP Archive</span>
+                <span class="batch-opt-desc">Package all downloaded batch files into a single .zip</span>
+              </div>
+              <label class="apple-switch">
+                <input type="checkbox" id="playlistZipToggle" />
+                <span class="slider round"></span>
+              </label>
+            </div>
+            <div class="batch-folder-row">
+              <div class="batch-folder-info">
+                <span class="batch-folder-label">Save To:</span>
+                <span id="playlistSavePath" class="batch-folder-path">Default (Downloads/MediaFetch)</span>
+              </div>
+              <button type="button" id="playlistChangeFolderBtn" class="change-folder-btn">Change Folder</button>
             </div>
           </div>
 
@@ -404,15 +477,15 @@
         <!-- Category Filter Tabs Bar (All, Videos, Photos & Wallpapers) -->
         <div class="ms-category-tabs-bar">
           <button class="ms-cat-tab active" data-category="all">
-            <span class="cat-tab-icon">✨</span>
+            <span class="cat-tab-icon"><svg class="cat-tab-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path></svg></span>
             <span class="cat-tab-label">All</span>
           </button>
           <button class="ms-cat-tab" data-category="video">
-            <span class="cat-tab-icon">🎬</span>
+            <span class="cat-tab-icon"><svg class="cat-tab-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg></span>
             <span class="cat-tab-label">Videos &amp; Shorts</span>
           </button>
           <button class="ms-cat-tab" data-category="photo">
-            <span class="cat-tab-icon">📷</span>
+            <span class="cat-tab-icon"><svg class="cat-tab-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></span>
             <span class="cat-tab-label">Photos &amp; Wallpapers</span>
           </button>
         </div>
@@ -420,19 +493,19 @@
         <!-- Platform Filter Carousel Pills -->
         <div class="platform-filter-carousel">
           <button class="ms-platform-pill active" data-platform="all">
-            <span class="pill-icon">🌐</span> All Engines
+            <span class="pill-icon"><svg class="pill-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></span> All Engines
           </button>
           <button class="ms-platform-pill" data-platform="youtube">
-            <span class="pill-icon">▶️</span> YouTube
+            <span class="pill-icon"><svg class="pill-svg" viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><polygon points="9 8 16 12 9 16 9 8"></polygon></svg></span> YouTube
           </button>
           <button class="ms-platform-pill" data-platform="wikimedia">
-            <span class="pill-icon">🏛️</span> Wikimedia 4K
+            <span class="pill-icon"><svg class="pill-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><line x1="2" y1="21" x2="22" y2="21"></line><polygon points="12 2 2 7 22 7 12 2"></polygon><line x1="6" y1="10" x2="6" y2="21"></line><line x1="10" y1="10" x2="10" y2="21"></line><line x1="14" y1="10" x2="14" y2="21"></line><line x1="18" y1="10" x2="18" y2="21"></line></svg></span> Wikimedia 4K
           </button>
           <button class="ms-platform-pill" data-platform="wallhaven">
-            <span class="pill-icon">🖼️</span> Wallhaven 4K
+            <span class="pill-icon"><svg class="pill-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></span> Wallhaven 4K
           </button>
           <button class="ms-platform-pill" data-platform="openverse">
-            <span class="pill-icon">🌍</span> Openverse (700M+)
+            <span class="pill-icon"><svg class="pill-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path></svg></span> Openverse
           </button>
         </div>
 
@@ -452,7 +525,7 @@
 
         <!-- Search Empty State -->
         <div id="msEmptyState" class="ms-empty-state">
-          <div class="ms-empty-icon">🔍</div>
+          <div class="ms-empty-icon"><svg viewBox="0 0 24 24" width="46" height="46" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></div>
           <h3 class="ms-empty-title">Search Across Millions of Media</h3>
           <p class="ms-empty-sub">Find YouTube videos &amp; shorts, 4K B-rolls, HD wallpapers, and high-res photos with 1-tap download.</p>
           <div class="ms-suggest-chips">
@@ -521,6 +594,30 @@
           </div>
         </section>
 
+        <!-- Section: Performance & Motion (Low-End Device Friendly) -->
+        <section class="apple-card settings-card">
+          <div class="settings-card-header">
+            <div class="settings-icon-badge badge-blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            </div>
+            <div class="settings-card-meta">
+              <span class="settings-group-title">Performance &amp; Fluid Motion</span>
+              <span class="settings-group-sub">60 FPS transitions &amp; low-end device optimization</span>
+            </div>
+          </div>
+
+          <div class="settings-row">
+            <div class="settings-row-text">
+              <span class="settings-item-label">Animations &amp; Fluid Motion</span>
+              <span class="settings-item-desc">Enable smooth spring transforms &amp; glowing halos (Default OFF for lowest RAM &amp; maximum speed on low-end phones)</span>
+            </div>
+            <label class="apple-switch">
+              <input type="checkbox" id="toggleAnimations" />
+              <span class="slider round"></span>
+            </label>
+          </div>
+        </section>
+
         <!-- Section 2: Theme & Color Palette Studio -->
         <section class="apple-card settings-card">
           <div class="settings-card-header">
@@ -560,30 +657,27 @@
             </div>
             <div class="visual-style-grid">
               <button type="button" class="visual-style-card active" data-style="solid">
-                <div class="visual-style-icon-preview solid-preview">⚡</div>
                 <div class="visual-style-info">
                   <span class="visual-style-name">Pure AMOLED</span>
                   <span class="visual-style-desc">Clean solid cards &amp; zero blur</span>
                 </div>
-                <span class="visual-style-check">✓</span>
+                <span class="visual-style-check"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
               </button>
 
               <button type="button" class="visual-style-card" data-style="glass">
-                <div class="visual-style-icon-preview glass-preview">💎</div>
                 <div class="visual-style-info">
                   <span class="visual-style-name">Liquid Glass</span>
                   <span class="visual-style-desc">Glossy frosted acrylic &amp; specular rim</span>
                 </div>
-                <span class="visual-style-check">✓</span>
+                <span class="visual-style-check"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
               </button>
 
               <button type="button" class="visual-style-card" data-style="prism">
-                <div class="visual-style-icon-preview prism-preview">✨</div>
                 <div class="visual-style-info">
                   <span class="visual-style-name">Cyber Aurora</span>
                   <span class="visual-style-desc">Iridescent edges &amp; holographic glow</span>
                 </div>
-                <span class="visual-style-check">✓</span>
+                <span class="visual-style-check"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
               </button>
             </div>
           </div>
@@ -601,7 +695,7 @@
                   <span class="preset-name">Sunset Flare</span>
                   <span class="preset-sub">Orange &amp; Coral</span>
                 </div>
-                <span class="preset-check">✓</span>
+                <span class="preset-check"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
               </button>
 
               <button class="theme-preset-card active" data-preset="blue">
@@ -610,7 +704,7 @@
                   <span class="preset-name">Cyber Blue</span>
                   <span class="preset-sub">Apple &amp; Cobalt</span>
                 </div>
-                <span class="preset-check">✓</span>
+                <span class="preset-check"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
               </button>
 
               <button class="theme-preset-card" data-preset="purple">
@@ -619,7 +713,7 @@
                   <span class="preset-name">Cyberpunk</span>
                   <span class="preset-sub">Violet &amp; Neon Pink</span>
                 </div>
-                <span class="preset-check">✓</span>
+                <span class="preset-check"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
               </button>
 
               <button class="theme-preset-card" data-preset="green">
@@ -628,7 +722,7 @@
                   <span class="preset-name">Emerald Matrix</span>
                   <span class="preset-sub">Mint &amp; Forest</span>
                 </div>
-                <span class="preset-check">✓</span>
+                <span class="preset-check"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
               </button>
 
               <button class="theme-preset-card" data-preset="gold">
@@ -637,7 +731,7 @@
                   <span class="preset-name">Solar Gold</span>
                   <span class="preset-sub">Gold &amp; Deep Amber</span>
                 </div>
-                <span class="preset-check">✓</span>
+                <span class="preset-check"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
               </button>
 
               <button class="theme-preset-card" data-preset="red">
@@ -646,7 +740,7 @@
                   <span class="preset-name">Crimson Fury</span>
                   <span class="preset-sub">Ruby &amp; Dark Rose</span>
                 </div>
-                <span class="preset-check">✓</span>
+                <span class="preset-check"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
               </button>
 
               <button class="theme-preset-card" data-preset="cyan">
@@ -655,7 +749,7 @@
                   <span class="preset-name">Aqua Glacier</span>
                   <span class="preset-sub">Cyan &amp; Deep Azure</span>
                 </div>
-                <span class="preset-check">✓</span>
+                <span class="preset-check"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
               </button>
 
               <button class="theme-preset-card" data-preset="titanium">
@@ -664,7 +758,7 @@
                   <span class="preset-name">Titanium</span>
                   <span class="preset-sub">Platinum &amp; Steel</span>
                 </div>
-                <span class="preset-check">✓</span>
+                <span class="preset-check"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
               </button>
             </div>
           </div>
@@ -683,70 +777,93 @@
             </label>
           </div>
 
-          <!-- Collapsible Container for 4-Color Controls -->
+          <!-- Collapsible Container for Dual Gradient & Theme Studio -->
           <div id="advancedThemeControlsContainer" class="hidden">
             <div class="settings-row-vertical" style="margin-top: 10px;">
-              <span class="settings-item-label">Custom Theme Studio (4-Color Controls)</span>
-              <span class="settings-item-desc">Full control over buttons, gradients, background &amp; card surfaces</span>
+              <span class="settings-item-label">Dual-Gradient &amp; Surface Studio</span>
+              <span class="settings-item-desc">Customize primary gradient, background colors &amp; card surfaces effortlessly</span>
             </div>
 
-            <!-- Color 1: Primary Accent -->
+            <!-- Color 1: Accent 1 (Gradient Start) -->
             <div class="color-picker-row">
               <div class="color-picker-info">
-                <span class="color-title">Accent 1 (Primary)</span>
-                <span class="color-desc">Button start, active tab, brand accent</span>
+                <span class="color-title">Accent 1 (Gradient Start)</span>
+                <span class="color-desc">Primary brand accent, button start, active tabs</span>
               </div>
               <div class="color-controls-right">
-                <input type="text" id="hexPrimaryInput" class="hex-text-input" value="#0A84FF" maxlength="7" />
-                <input type="color" id="pickerPrimary" class="color-picker-input" value="#0A84FF" />
-              </div>
-            </div>
-
-            <!-- Color 2: Gradient / Secondary Accent -->
-            <div class="color-picker-row">
-              <div class="color-picker-info">
-                <span class="color-title">Accent 2 (Gradient Shift)</span>
-                <span class="color-desc">Button end gradient &amp; glowing highlights</span>
-              </div>
-              <div class="color-controls-right">
-                <button id="autoMatchGradientBtn" class="settings-tiny-btn" title="Auto-calculate matching secondary gradient">⚡ Auto-Match</button>
-                <input type="text" id="hexSecondaryInput" class="hex-text-input" value="#0060DF" maxlength="7" />
-                <input type="color" id="pickerSecondary" class="color-picker-input" value="#0060DF" />
+                <button type="button" class="color-swatch-trigger" id="swatchTriggerPrimary" data-target="primary">
+                  <span class="color-swatch-dot" id="dotPrimary" style="background: #0A84FF;"></span>
+                  <span class="color-swatch-hex" id="labelPrimary">#0A84FF</span>
+                </button>
               </div>
             </div>
 
-            <!-- Color 3: App Background -->
+            <!-- Color 2: Accent 2 (Gradient End) -->
             <div class="color-picker-row">
               <div class="color-picker-info">
-                <span class="color-title">App Background</span>
-                <span class="color-desc">Overall app &amp; viewport backdrop</span>
+                <span class="color-title">Accent 2 (Gradient End)</span>
+                <span class="color-desc">Gradient shift, glowing rim, specular reflections</span>
               </div>
               <div class="color-controls-right">
-                <input type="text" id="hexBgInput" class="hex-text-input" value="#000000" maxlength="7" />
-                <input type="color" id="pickerBg" class="color-picker-input" value="#000000" />
+                <button type="button" id="autoMatchGradientBtn" class="settings-tiny-btn" title="Auto-calculate harmonious gradient shift"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" style="vertical-align: middle;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> <span>Auto-Match</span></button>
+                <button type="button" class="color-swatch-trigger" id="swatchTriggerSecondary" data-target="secondary">
+                  <span class="color-swatch-dot" id="dotSecondary" style="background: #0060DF;"></span>
+                  <span class="color-swatch-hex" id="labelSecondary">#0060DF</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Color 3: Background Gradient Start -->
+            <div class="color-picker-row">
+              <div class="color-picker-info">
+                <span class="color-title">Background Start</span>
+                <span class="color-desc">Top backdrop color of viewport</span>
+              </div>
+              <div class="color-controls-right">
+                <button type="button" class="color-swatch-trigger" id="swatchTriggerBg" data-target="bg">
+                  <span class="color-swatch-dot" id="dotBg" style="background: #000000;"></span>
+                  <span class="color-swatch-hex" id="labelBg">#000000</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Color 4: Background Gradient End -->
+            <div class="color-picker-row">
+              <div class="color-picker-info">
+                <span class="color-title">Background End</span>
+                <span class="color-desc">Bottom backdrop color shift</span>
+              </div>
+              <div class="color-controls-right">
+                <button type="button" class="color-swatch-trigger" id="swatchTriggerBgEnd" data-target="bgEnd">
+                  <span class="color-swatch-dot" id="dotBgEnd" style="background: #070710;"></span>
+                  <span class="color-swatch-hex" id="labelBgEnd">#070710</span>
+                </button>
               </div>
             </div>
             <div class="quick-chip-row">
-              <button class="quick-color-chip" data-target="bg" data-color="#000000">AMOLED Pitch (#000000)</button>
-              <button class="quick-color-chip" data-target="bg" data-color="#0A0F1D">Midnight Navy (#0A0F1D)</button>
-              <button class="quick-color-chip" data-target="bg" data-color="#121214">Charcoal Dark (#121214)</button>
+              <button type="button" class="quick-color-chip" data-target="bg" data-color="#000000" data-end="#070710">AMOLED Pitch</button>
+              <button type="button" class="quick-color-chip" data-target="bg" data-color="#070B19" data-end="#0D1B2A">Midnight Navy</button>
+              <button type="button" class="quick-color-chip" data-target="bg" data-color="#140711" data-end="#200A18">Cyberpunk Noir</button>
+              <button type="button" class="quick-color-chip" data-target="bg" data-color="#06120D" data-end="#0F241A">Emerald Dark</button>
             </div>
 
-            <!-- Color 4: Card & Surface Color -->
+            <!-- Color 5: Card & Surface Color -->
             <div class="color-picker-row" style="margin-top: 6px;">
               <div class="color-picker-info">
                 <span class="color-title">Card &amp; Footer Surface</span>
                 <span class="color-desc">Containers, dialogs &amp; bottom navigation</span>
               </div>
               <div class="color-controls-right">
-                <input type="text" id="hexSurfaceInput" class="hex-text-input" value="#121214" maxlength="7" />
-                <input type="color" id="pickerSurface" class="color-picker-input" value="#121214" />
+                <button type="button" class="color-swatch-trigger" id="swatchTriggerSurface" data-target="surface">
+                  <span class="color-swatch-dot" id="dotSurface" style="background: #121214;"></span>
+                  <span class="color-swatch-hex" id="labelSurface">#121214</span>
+                </button>
               </div>
             </div>
             <div class="quick-chip-row">
-              <button class="quick-color-chip" data-target="surface" data-color="#121214">Charcoal Bar (#121214)</button>
-              <button class="quick-color-chip" data-target="surface" data-color="#16161A">Dark Glass (#16161A)</button>
-              <button class="quick-color-chip" data-target="surface" data-color="#0B132B">Deep Navy (#0B132B)</button>
+              <button type="button" class="quick-color-chip" data-target="surface" data-color="#121214">Charcoal Bar (#121214)</button>
+              <button type="button" class="quick-color-chip" data-target="surface" data-color="#16161A">Dark Glass (#16161A)</button>
+              <button type="button" class="quick-color-chip" data-target="surface" data-color="#0B132B">Deep Navy (#0B132B)</button>
             </div>
 
             <div class="theme-action-buttons-row">
@@ -919,14 +1036,14 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
               <span class="settings-item-label">Netscape / Session Cookies</span>
               <div style="display: flex; gap: 6px; align-items: center;">
-                <button type="button" id="cookieGuideBtn" class="cookie-guide-chip" title="How to get cookies on Android phone">💡 Phone Cookie Guide</button>
+                <button type="button" id="cookieGuideBtn" class="cookie-guide-chip" title="How to get cookies on Android phone"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"></path><line x1="10" y1="21" x2="14" y2="21"></line></svg> <span>Cookie Guide</span></button>
                 <span id="cookiesStatusBadge" class="settings-value-pill" style="font-size: 10px;">No cookies loaded</span>
               </div>
             </div>
             <textarea id="settingsCookiesInput" rows="3" placeholder="Paste Netscape cookies.txt content or session cookies here..." style="width: 100%; font-family: monospace; font-size: 11px; border-radius: 8px; background: rgba(255,255,255,0.04); color: #fff; border: 1px solid rgba(255,255,255,0.1); padding: 8px; box-sizing: border-box; resize: vertical;"></textarea>
             <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
               <button type="button" id="saveCookiesBtn" class="apple-btn-primary" style="padding: 8px 14px; font-size: 12px; flex: 2; min-width: 140px;">Save &amp; Apply Cookies</button>
-              <button type="button" id="autoFormatCookiesBtn" class="settings-secondary-btn" style="padding: 8px 12px; font-size: 12px; flex: 1; min-width: 100px;" title="Auto-clean and adjust raw cookie text">⚡ Auto-Adjust</button>
+              <button type="button" id="autoFormatCookiesBtn" class="settings-secondary-btn" style="padding: 8px 12px; font-size: 12px; flex: 1; min-width: 100px; display: inline-flex; align-items: center; justify-content: center; gap: 5px;" title="Auto-clean and adjust raw cookie text"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> <span>Auto-Adjust</span></button>
               <button type="button" id="clearCookiesBtn" class="settings-secondary-btn danger" style="padding: 8px 12px; font-size: 12px; min-width: 55px;">Clear</button>
             </div>
           </div>
@@ -949,18 +1066,19 @@
               <span class="settings-item-label">Installed Version</span>
               <span class="settings-item-desc">Current APK build installed</span>
             </div>
-            <span class="settings-value-pill">v1.0.0 (Official)</span>
+            <span id="installedVersionBadge" class="settings-value-pill">v1.0.6 (Official)</span>
           </div>
 
           <div class="settings-action-row" style="margin-top: 8px;">
             <button type="button" id="manualCheckUpdateBtn" class="apple-btn-primary" style="width: 100%; padding: 10px 16px; font-size: 12.5px;">
-              <span>🚀 Check for Updates Now</span>
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              <span>Check for Updates Now</span>
             </button>
           </div>
         </section>
 
-        <div style="text-align:center; padding: 24px 0 16px; color: var(--text-tertiary); font-size: 11px;">
-          MediaFetch Mobile v1.0 • Built with High-Performance Android Native Core
+        <div id="appVersionFooter" style="text-align:center; padding: 24px 0 16px; color: var(--text-tertiary); font-size: 11px;">
+          MediaFetch Mobile v1.0.6 • Built with High-Performance Android Native Core
         </div>
 
       </div> <!-- End #mediaSettingsView -->
@@ -1042,6 +1160,15 @@
         </div>
       </div>
 
+      <!-- Queue Speed Banner (Idea 3: Multi-threaded queue manager) -->
+      <div id="queueSpeedBanner" class="queue-speed-banner hidden">
+        <div class="queue-speed-badge-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></div>
+        <div class="queue-speed-info">
+          <span id="queueActiveCount" class="queue-speed-title">2 Active Downloads</span>
+          <span id="queueTotalSpeed" class="queue-speed-sub">Total Speed: 0 MB/s</span>
+        </div>
+      </div>
+
       <div id="downloadsTaskList" class="drawer-scroll-body">
         <div id="emptyDownloadsState" class="empty-tray">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -1060,13 +1187,17 @@
       <div class="glass-popup-card update-dialog-card">
         <div class="glass-popup-header">
           <div class="glass-popup-title-row">
-            <div class="glass-popup-icon-badge" style="background: linear-gradient(135deg, var(--brand-accent), var(--brand-secondary));">🚀</div>
+            <div class="glass-popup-icon-badge" style="background: linear-gradient(135deg, var(--brand-accent), var(--brand-secondary));">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fff" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            </div>
             <div>
               <div class="glass-popup-title">New Update Available</div>
               <div id="updateVersionBadge" class="update-ver-tag">v1.0.2 Released</div>
             </div>
           </div>
-          <button type="button" id="closeUpdateModalBtn" class="glass-popup-close-btn" aria-label="Close">✕</button>
+          <button type="button" id="closeUpdateModalBtn" class="glass-popup-close-btn" aria-label="Close">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
         </div>
 
         <div class="glass-popup-scrollable" style="max-height: 48vh;">
@@ -1084,15 +1215,30 @@
               <div id="updateProgressFill" class="update-progress-fill" style="width: 0%;"></div>
             </div>
           </div>
+
+          <div id="updateSavedLocationBox" class="update-saved-box hidden">
+            <div class="update-saved-title">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--apple-green)" stroke-width="2.5" style="vertical-align: middle;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>APK Downloaded &amp; Saved to Storage</span>
+            </div>
+            <div id="updateSavedPathText" class="update-saved-path">Internal Storage &gt; Download &gt; MediaFetch &gt; MediaFetch_v1.0.6_Latest.apk</div>
+          </div>
         </div>
 
         <div class="update-modal-footer" style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px;">
           <button type="button" id="btnUpdateNow" class="apple-btn-primary update-btn-now" style="width: 100%; padding: 12px; font-size: 13px; font-weight: 700; justify-content: center;">
-            <span>⚡ Update Now</span>
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            <span>Update Now</span>
           </button>
           <div style="display: flex; gap: 8px; width: 100%;">
-            <button type="button" id="btnUpdateRemindLater" class="settings-secondary-btn" style="flex: 1; padding: 10px; font-size: 11.5px; border-radius: 10px;">⏰ Remind Later</button>
-            <button type="button" id="btnUpdateSkip" class="settings-secondary-btn" style="flex: 1; padding: 10px; font-size: 11.5px; border-radius: 10px;">✕ Skip Version</button>
+            <button type="button" id="btnUpdateRemindLater" class="settings-secondary-btn" style="flex: 1; padding: 10px; font-size: 11.5px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; gap: 5px;">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <span>Remind Later</span>
+            </button>
+            <button type="button" id="btnUpdateSkip" class="settings-secondary-btn" style="flex: 1; padding: 10px; font-size: 11.5px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; gap: 5px;">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              <span>Skip Version</span>
+            </button>
           </div>
         </div>
       </div>
@@ -1103,28 +1249,39 @@
       <div class="glass-popup-card">
         <div class="glass-popup-header">
           <div class="glass-popup-title-row">
-            <div class="glass-popup-icon-badge">🍪</div>
+            <div class="glass-popup-icon-badge">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fff" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
+            </div>
             <div>
               <div class="glass-popup-title">Mobile Cookie Guide</div>
               <div class="glass-popup-sub">Get &amp; auto-adjust cookies directly on Android</div>
             </div>
           </div>
-          <button type="button" id="closeCookieGuideBtn" class="glass-popup-close-btn" aria-label="Close">✕</button>
+          <button type="button" id="closeCookieGuideBtn" class="glass-popup-close-btn" aria-label="Close">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
         </div>
 
         <div class="glass-popup-scrollable" style="max-height: 54vh;">
           <!-- Quick 1-Tap Auto Adjuster Box -->
           <div class="cookie-guide-box">
-            <div class="cookie-guide-box-title">⚡ 1-Tap Cookie Auto-Adjuster</div>
+            <div class="cookie-guide-box-title" style="display: flex; align-items: center; gap: 6px;">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              <span>1-Tap Cookie Auto-Adjuster</span>
+            </div>
             <div class="cookie-guide-box-desc">Paste ANY raw text, JSON, or cookie line copied from your browser. We will automatically extract, clean, and activate your session:</div>
             <textarea id="quickAutoAdjustInput" rows="2" placeholder="Paste raw cookie text, JSON, or headers here..." style="width: 100%; font-family: monospace; font-size: 11px; border-radius: 8px; background: rgba(0,0,0,0.5); color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 8px; box-sizing: border-box;"></textarea>
             <button type="button" id="btnRunAutoAdjust" class="apple-btn-primary" style="width: 100%; margin-top: 8px; padding: 10px 14px; font-size: 12.5px; font-weight: 700; justify-content: center;">
-              <span>✨ Auto-Format &amp; Apply Now</span>
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path></svg>
+              <span>Auto-Format &amp; Apply Now</span>
             </button>
           </div>
 
           <!-- Step-by-Step Android Phone Guide -->
-          <div style="font-size: 12px; font-weight: 700; color: var(--text-primary); margin-top: 4px; margin-bottom: 2px;">📱 How to get cookies on Android phone (100% Free):</div>
+          <div style="font-size: 12px; font-weight: 700; color: var(--text-primary); margin-top: 4px; margin-bottom: 2px; display: flex; align-items: center; gap: 6px;">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+            <span>How to get cookies on Android phone (100% Free):</span>
+          </div>
           
           <div class="cookie-step-card">
             <span class="cookie-step-num">1</span>
@@ -1154,7 +1311,7 @@
             <span class="cookie-step-num">4</span>
             <div class="cookie-step-content">
               <strong>1-Tap Export Cookies</strong>
-              <span>Tap the <b>three dots (⋮)</b> menu in Kiwi ➔ scroll down to <b>Cookie-Editor</b> ➔ tap <b>Export</b> ➔ <b>Export as Header Value</b> (or Netscape). It copies to your phone clipboard!</span>
+              <span>Tap the <b>three dots (⋮)</b> menu in Kiwi &rarr; scroll down to <b>Cookie-Editor</b> &rarr; tap <b>Export</b> &rarr; <b>Export as Header Value</b> (or Netscape). It copies to your phone clipboard!</span>
             </div>
           </div>
 
@@ -1169,6 +1326,75 @@
 
         <div style="margin-top: 6px;">
           <button type="button" id="btnDoneCookieGuide" class="settings-secondary-btn" style="width: 100%; padding: 10px; font-size: 12px; font-weight: 600; border-radius: 12px;">Close Guide</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Professional 2D Color Picker Studio Modal (Ae / Pr Style) -->
+    <div id="customColorPickerModal" class="color-picker-backdrop hidden">
+      <div class="color-picker-dialog">
+        <div class="glass-popup-header">
+          <div class="color-picker-header-left">
+            <div id="pickerHeaderPreview" class="color-header-dot"></div>
+            <h3 id="colorPickerModalTitle" class="glass-popup-title">Color Studio</h3>
+          </div>
+          <button type="button" id="closeColorPickerModalBtn" class="glass-popup-close-btn" aria-label="Close">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+
+        <div class="color-picker-body">
+          <!-- 2D Saturation / Value Gradient Square -->
+          <div class="color-canvas-wrapper" id="colorSatValSquare">
+            <div class="color-canvas-white-overlay"></div>
+            <div class="color-canvas-black-overlay"></div>
+            <div class="color-picker-crosshair" id="colorSquareCrosshair"></div>
+          </div>
+
+          <!-- Rainbow Hue Spectrum Bar -->
+          <div class="color-hue-bar-wrapper">
+            <input type="range" id="colorHueSlider" class="color-hue-slider" min="0" max="360" value="210" step="1" />
+          </div>
+
+          <!-- Live Color Preview & Hex Controls -->
+          <div class="color-live-preview-row">
+            <div class="color-swatch-comparison">
+              <div class="color-swatch-box">
+                <div id="pickerInitialSwatch" class="color-swatch-circle" title="Current Color"></div>
+                <span class="color-swatch-label">Current</span>
+              </div>
+              <div class="color-swatch-arrow"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></div>
+              <div class="color-swatch-box">
+                <div id="pickerCurrentSwatch" class="color-swatch-circle active" title="Selected Color"></div>
+                <span class="color-swatch-label">New</span>
+              </div>
+            </div>
+            <div class="color-hex-input-group">
+              <span class="hex-hash">#</span>
+              <input type="text" id="colorCustomHexInput" class="color-modal-hex-input" maxlength="6" value="0A84FF" />
+            </div>
+          </div>
+
+          <!-- Quick Aesthetic Swatches -->
+          <div class="color-quick-swatches">
+            <button type="button" class="swatch-pill" style="background:#FF3B30;" data-hex="#FF3B30" title="Crimson Red"></button>
+            <button type="button" class="swatch-pill" style="background:#FF9500;" data-hex="#FF9500" title="Sunset Orange"></button>
+            <button type="button" class="swatch-pill" style="background:#FFCC00;" data-hex="#FFCC00" title="Amber Gold"></button>
+            <button type="button" class="swatch-pill" style="background:#34C759;" data-hex="#34C759" title="Matrix Green"></button>
+            <button type="button" class="swatch-pill" style="background:#00C7BE;" data-hex="#00C7BE" title="Cyber Cyan"></button>
+            <button type="button" class="swatch-pill" style="background:#0A84FF;" data-hex="#0A84FF" title="Apple Blue"></button>
+            <button type="button" class="swatch-pill" style="background:#5856D6;" data-hex="#5856D6" title="Indigo Night"></button>
+            <button type="button" class="swatch-pill" style="background:#AF52DE;" data-hex="#AF52DE" title="Neon Purple"></button>
+            <button type="button" class="swatch-pill" style="background:#FF2D55;" data-hex="#FF2D55" title="Hot Pink"></button>
+            <button type="button" class="swatch-pill" style="background:#121214;" data-hex="#121214" title="Dark Charcoal"></button>
+            <button type="button" class="swatch-pill" style="background:#FFFFFF;" data-hex="#FFFFFF" title="Snow White"></button>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="color-modal-actions">
+            <button type="button" id="cancelColorPickerBtn" class="settings-secondary-btn" style="flex:1; padding: 10px; border-radius: 12px;">Cancel</button>
+            <button type="button" id="applyColorPickerBtn" class="apple-btn-primary" style="flex:2; padding: 10px; justify-content:center;">Apply Color</button>
+          </div>
         </div>
       </div>
     </div>

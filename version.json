@@ -4,16 +4,17 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "Official MediaFetch v1.0.0 release. Apple AMOLED theme, 3-tier icon themes, Search Studio, and multi-threaded engine.",
   "mobile": {
-    "version": "1.0.17",
-    "versionCode": 18,
-    "releaseDate": "2026-09-27",
+    "version": "1.0.18",
+    "versionCode": 19,
+    "releaseDate": "2026-09-29",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": false,
     "releaseNotes": [
-      "🧹 Deep Chromium & APK Cache Purge: Auto-wipes hidden WebView HTTP/GPU caches and update APKs, bringing App Info cache down to near zero automatically.",
-      "⚡ Instant Drive Status Detection: Real-time detection of 404 deleted or 403 private Google Drive folders with clear actionable user guidance.",
-      "🔌 Auto-Clearing Analysis Error: Plugin now instantly clears stale timeouts and reconnects seamlessly with in-process background daemon.",
-      "🚀 Low-End Device RAM & Smoothness: High-efficiency RGB_565 decoding and hardware acceleration eliminate lags and device heating."
+      "Unified Obsidian Halo design language: sleek AMOLED styling with theme-adaptive vector icons.",
+      "100% vector SVG icons replace system emojis across all tabs, modals, badges, and platform pickers.",
+      "Performance & Fluid Motion architecture: default 60 FPS performance mode for low-end devices.",
+      "Optional Fluid Motion toggle in Settings with spring touch states and halo lighting.",
+      "Optimized RAM and GPU footprint with zero lag on budget Android chipsets."
     ]
   }
 }

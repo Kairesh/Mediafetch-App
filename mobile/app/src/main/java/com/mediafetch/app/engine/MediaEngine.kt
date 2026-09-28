@@ -21,6 +21,7 @@ import android.content.Context
 import android.os.Environment
 import java.io.File
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.regex.Pattern
 
 object MediaEngine {
@@ -170,6 +171,12 @@ object MediaEngine {
     fun detectPlatform(url: String): String {
         val lower = url.lowercase()
         return when {
+            lower.contains("drive.google.com") -> "Google Drive"
+            lower.contains("dropbox.com") -> "Dropbox"
+            lower.contains("1drv.ms") || lower.contains("onedrive.live.com") -> "OneDrive"
+            lower.endsWith(".mp4") || lower.endsWith(".mov") || lower.endsWith(".mkv") || lower.endsWith(".webm") -> "Direct Video"
+            lower.endsWith(".mp3") || lower.endsWith(".wav") || lower.endsWith(".m4a") || lower.endsWith(".aac") -> "Direct Audio"
+            lower.endsWith(".zip") -> "Cloud Archive"
             lower.contains("youtube.com") || lower.contains("youtu.be") -> "YouTube"
             lower.contains("instagram.com") -> "Instagram"
             lower.contains("tiktok.com") -> "TikTok"
@@ -192,7 +199,9 @@ object MediaEngine {
     fun isPlaylistUrl(url: String): Boolean {
         val lower = url.lowercase()
         return lower.contains("list=") || lower.contains("/playlist") || lower.contains("/sets/") ||
-               lower.contains("spotify.com/playlist/") || lower.contains("spotify.com/album/")
+               lower.contains("spotify.com/playlist/") || lower.contains("spotify.com/album/") ||
+               lower.contains("drive.google.com/drive/folders/") || lower.contains("drive.google.com/drive/u/") || lower.contains("drive.google.com/folderview") ||
+               (lower.contains("dropbox.com") && (lower.contains("/scl/fo/") || lower.contains("/sh/")))
     }
 
     fun isImageUrl(url: String): Boolean {
@@ -221,6 +230,7 @@ object MediaEngine {
         }
 
         return@withContext when (platform) {
+            "Google Drive", "Dropbox", "OneDrive", "Direct Video", "Direct Audio", "Cloud Archive" -> resolveCloudMedia(url, platform, context)
             "YouTube" -> resolveYouTube(url)
             "X / Twitter" -> resolveTwitter(url, context)
             "Instagram" -> resolveInstagram(url, context)
@@ -2815,6 +2825,158 @@ object MediaEngine {
         )
     }
 
+    private suspend fun resolveCloudMedia(url: String, platform: String, context: Context? = null): MediaItem {
+        var directUrl = url
+        var title = "$platform File"
+        var author = "$platform Media"
+        var thumbnail = "https://images.unsplash.com/photo-1544717305-2782549b5136?w=800"
+        var durationSec = 60L
+        var isAudioOnly = false
+        var isArchive = false
+
+        if (url.contains("/folders/") || url.contains("folderview") || (url.contains("dropbox.com") && (url.contains("/scl/fo/") || url.contains("/sh/")))) {
+            return resolvePlaylist(url, platform)
+        }
+
+        when (platform) {
+            "Google Drive" -> {
+                author = "Google Drive Cloud"
+                thumbnail = "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800"
+                var fileId = ""
+                val idMat1 = Pattern.compile("/(?:file/)?d/([a-zA-Z0-9_-]+)").matcher(url)
+                val idMat2 = Pattern.compile("[?&]id=([a-zA-Z0-9_-]+)").matcher(url)
+                if (idMat1.find()) {
+                    fileId = idMat1.group(1) ?: ""
+                } else if (idMat2.find()) {
+                    fileId = idMat2.group(1) ?: ""
+                }
+                if (fileId.isNotBlank()) {
+                    directUrl = "https://drive.google.com/uc?export=download&id=$fileId"
+                    thumbnail = "https://drive.google.com/thumbnail?id=$fileId&sz=w800"
+                    title = "Google Drive Clip ($fileId)"
+                }
+            }
+            "Dropbox" -> {
+                author = "Dropbox Cloud"
+                thumbnail = "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800"
+                directUrl = if (url.contains("dl=0")) {
+                    url.replace("dl=0", "dl=1")
+                } else if (url.contains("?")) {
+                    "$url&dl=1"
+                } else {
+                    "$url?dl=1"
+                }
+                val pathSegment = url.substringBefore("?").substringAfterLast("/")
+                if (pathSegment.isNotBlank()) {
+                    try {
+                        title = java.net.URLDecoder.decode(pathSegment, "UTF-8").replace("+", " ")
+                    } catch (_: Exception) {
+                        title = pathSegment
+                    }
+                }
+            }
+            "OneDrive" -> {
+                author = "OneDrive Cloud"
+                thumbnail = "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800"
+                directUrl = if (url.contains("?")) "$url&download=1" else "$url?download=1"
+                val pathSegment = url.substringBefore("?").substringAfterLast("/")
+                if (pathSegment.isNotBlank()) {
+                    try {
+                        title = java.net.URLDecoder.decode(pathSegment, "UTF-8").replace("+", " ")
+                    } catch (_: Exception) {
+                        title = pathSegment
+                    }
+                }
+            }
+            "Direct Audio" -> {
+                isAudioOnly = true
+                author = "Direct Audio Source"
+                val rawName = url.substringBefore("?").substringAfterLast("/")
+                try {
+                    title = java.net.URLDecoder.decode(rawName, "UTF-8").replace("+", " ")
+                } catch (_: Exception) {
+                    title = rawName
+                }
+            }
+            "Cloud Archive" -> {
+                isArchive = true
+                author = "Cloud Archive (.zip)"
+                val rawName = url.substringBefore("?").substringAfterLast("/")
+                try {
+                    title = java.net.URLDecoder.decode(rawName, "UTF-8").replace("+", " ")
+                } catch (_: Exception) {
+                    title = rawName
+                }
+            }
+            else -> {
+                author = "Direct Video Stream"
+                val rawName = url.substringBefore("?").substringAfterLast("/")
+                try {
+                    title = java.net.URLDecoder.decode(rawName, "UTF-8").replace("+", " ")
+                } catch (_: Exception) {
+                    title = rawName
+                }
+            }
+        }
+
+        try {
+            val headReq = Request.Builder()
+                .url(directUrl)
+                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
+                .header("Range", "bytes=0-1048576")
+                .build()
+            val resp = client.newCall(headReq).execute()
+            if (resp.isSuccessful) {
+                val disp = resp.header("Content-Disposition") ?: ""
+                if (disp.contains("filename=")) {
+                    val fnMat = Pattern.compile("filename=[\"']?([^\"';]+)[\"']?").matcher(disp)
+                    if (fnMat.find()) {
+                        val fn = fnMat.group(1)?.trim() ?: ""
+                        if (fn.isNotBlank()) title = fn
+                    }
+                }
+                val cType = resp.header("Content-Type")?.lowercase() ?: ""
+                if (cType.contains("audio/")) isAudioOnly = true
+            }
+        } catch (_: Exception) {}
+
+        val streamMap = mapOf(
+            "default" to directUrl,
+            "1080p" to directUrl,
+            "720p" to directUrl,
+            "audio" to directUrl
+        )
+
+        val qualities = if (isAudioOnly) {
+            generateAudioQualities(durationSec, directUrl)
+        } else if (isArchive) {
+            listOf(
+                QualityOption(
+                    id = "zip_archive",
+                    label = "ZIP Archive Package (Original)",
+                    resolution = "Archive Package",
+                    format = "Compressed ZIP",
+                    ext = "zip",
+                    directDownloadUrl = directUrl,
+                    estimatedSizeBytes = 50 * 1024 * 1024
+                )
+            )
+        } else {
+            generateVideoQualities(durationSec, url, streamMap, maxSourceRes = "1080p")
+        }
+
+        return MediaItem(
+            url = url,
+            title = title,
+            author = author,
+            durationSeconds = durationSec,
+            thumbnail = thumbnail,
+            platform = platform,
+            mediaType = if (isAudioOnly) MediaType.AUDIO else if (isArchive) MediaType.ARCHIVE else MediaType.VIDEO,
+            qualities = qualities
+        )
+    }
+
     private suspend fun resolveGeneric(url: String, platform: String, context: Context? = null): MediaItem {
         val isImg = isImageUrl(url)
         var title = "$platform Media Download"
@@ -2912,10 +3074,211 @@ object MediaEngine {
         )
     }
 
+    private fun probeDriveMp4Duration(client: OkHttpClient, fileId: String): Long {
+        if (fileId.isBlank()) return 0L
+        try {
+            val probeUrl = "https://drive.usercontent.google.com/download?id=$fileId&export=download"
+            val req = Request.Builder()
+                .url(probeUrl)
+                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
+                .header("Range", "bytes=0-262144")
+                .build()
+            val shortClient = client.newBuilder()
+                .connectTimeout(2500, TimeUnit.MILLISECONDS)
+                .readTimeout(2500, TimeUnit.MILLISECONDS)
+                .build()
+            val resp = shortClient.newCall(req).execute()
+            if (resp.isSuccessful || resp.code == 206) {
+                val bytes = resp.body?.bytes() ?: return 0L
+                if (bytes.size > 28) {
+                    val mvhd = "mvhd".toByteArray(Charsets.US_ASCII)
+                    var mvhdIdx = -1
+                    for (i in 0 until bytes.size - mvhd.size - 24) {
+                        var match = true
+                        for (j in mvhd.indices) {
+                            if (bytes[i + j] != mvhd[j]) {
+                                match = false
+                                break
+                            }
+                        }
+                        if (match) {
+                            mvhdIdx = i
+                            break
+                        }
+                    }
+                    if (mvhdIdx != -1) {
+                        val version = bytes[mvhdIdx + 4].toInt()
+                        if (version == 0 && mvhdIdx + 24 <= bytes.size) {
+                            val timescale = ((bytes[mvhdIdx + 16].toLong() and 0xFF) shl 24) or
+                                            ((bytes[mvhdIdx + 17].toLong() and 0xFF) shl 16) or
+                                            ((bytes[mvhdIdx + 18].toLong() and 0xFF) shl 8) or
+                                            (bytes[mvhdIdx + 19].toLong() and 0xFF)
+                            val duration = ((bytes[mvhdIdx + 20].toLong() and 0xFF) shl 24) or
+                                           ((bytes[mvhdIdx + 21].toLong() and 0xFF) shl 16) or
+                                           ((bytes[mvhdIdx + 22].toLong() and 0xFF) shl 8) or
+                                           (bytes[mvhdIdx + 23].toLong() and 0xFF)
+                            if (timescale > 0L && duration > 0L) {
+                                return duration / timescale
+                            }
+                        } else if (version == 1 && mvhdIdx + 36 <= bytes.size) {
+                            val timescale = ((bytes[mvhdIdx + 24].toLong() and 0xFF) shl 24) or
+                                            ((bytes[mvhdIdx + 25].toLong() and 0xFF) shl 16) or
+                                            ((bytes[mvhdIdx + 26].toLong() and 0xFF) shl 8) or
+                                            (bytes[mvhdIdx + 27].toLong() and 0xFF)
+                            val durHi = ((bytes[mvhdIdx + 28].toLong() and 0xFF) shl 24) or
+                                        ((bytes[mvhdIdx + 29].toLong() and 0xFF) shl 16) or
+                                        ((bytes[mvhdIdx + 30].toLong() and 0xFF) shl 8) or
+                                        (bytes[mvhdIdx + 31].toLong() and 0xFF)
+                            val durLo = ((bytes[mvhdIdx + 32].toLong() and 0xFF) shl 24) or
+                                        ((bytes[mvhdIdx + 33].toLong() and 0xFF) shl 16) or
+                                        ((bytes[mvhdIdx + 34].toLong() and 0xFF) shl 8) or
+                                        (bytes[mvhdIdx + 35].toLong() and 0xFF)
+                            val duration = (durHi shl 32) or durLo
+                            if (timescale > 0L && duration > 0L) {
+                                return duration / timescale
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (_: Exception) {}
+        return 0L
+    }
+
+    private fun parseGoogleDriveFolderRecursive(
+        client: OkHttpClient,
+        folderId: String,
+        folderPath: String = "",
+        depth: Int = 0,
+        maxDepth: Int = 8,
+        visited: MutableSet<String> = mutableSetOf(),
+        probedCount: AtomicInteger = AtomicInteger(0)
+    ): Pair<String, List<PlaylistItem>> {
+        if (folderId.isBlank() || depth > maxDepth || !visited.add(folderId)) {
+            return Pair(folderPath, emptyList())
+        }
+
+        val folderUrl = "https://drive.google.com/drive/folders/$folderId"
+        val req = Request.Builder()
+            .url(folderUrl)
+            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
+            .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+            .header("Accept-Language", "en-US,en;q=0.9")
+            .build()
+
+        val resp = try { client.newCall(req).execute() } catch (_: Exception) { return Pair(folderPath, emptyList()) }
+        if (!resp.isSuccessful) return Pair(folderPath, emptyList())
+
+        val html = resp.body?.string() ?: ""
+        var resolvedTitle = folderPath
+        if (resolvedTitle.isBlank()) {
+            val tMat = Pattern.compile("<title>([^<]+?)(?:\\s*–\\s*Google\\s*Drive)?</title>", Pattern.CASE_INSENSITIVE).matcher(html)
+            resolvedTitle = if (tMat.find()) tMat.group(1)?.trim() ?: "Google Drive Folder" else "Google Drive Folder"
+        }
+
+        val allItems = mutableListOf<PlaylistItem>()
+        val subFolders = mutableListOf<Pair<String, String>>()
+
+        val ivdMat = Pattern.compile("window\\['_DRIVE_ivd'\\]\\s*=\\s*'([^']+)'").matcher(html)
+        if (ivdMat.find()) {
+            val rawStr = ivdMat.group(1) ?: ""
+            val unescaped = rawStr.replace(Regex("\\\\x([0-9A-Fa-f]{2})")) { m ->
+                m.groupValues[1].toInt(16).toChar().toString()
+            }
+            val parsed = JSONArray(unescaped)
+            val rawItems = parsed.optJSONArray(0) ?: JSONArray()
+            for (i in 0 until rawItems.length()) {
+                val item = rawItems.optJSONArray(i) ?: continue
+                val id = item.optString(0)
+                if (id.isBlank()) continue
+                val name = item.optString(2, "Footage ${i + 1}")
+                val mime = item.optString(3, "video/mp4")
+
+                if (mime == "application/vnd.google-apps.folder") {
+                    subFolders.add(Pair(id, name))
+                } else {
+                    val isImg = mime.startsWith("image") ||
+                                name.endsWith(".jpg", ignoreCase = true) ||
+                                name.endsWith(".jpeg", ignoreCase = true) ||
+                                name.endsWith(".png", ignoreCase = true) ||
+                                name.endsWith(".webp", ignoreCase = true) ||
+                                name.endsWith(".gif", ignoreCase = true)
+                    val directDownload = "https://drive.google.com/uc?export=download&id=$id"
+                    val thumb = "https://drive.google.com/thumbnail?id=$id&sz=w800"
+
+                    val duration = 0L
+
+                    allItems.add(
+                        PlaylistItem(
+                            id = id,
+                            title = name,
+                            author = if (isImg) "Photo Frame" else "Video Footage",
+                            durationSeconds = duration,
+                            thumbnail = thumb,
+                            url = directDownload,
+                            isSelected = true,
+                            isImage = isImg,
+                            subFolderId = folderId,
+                            subFolderName = if (folderPath.isNotBlank()) folderPath else resolvedTitle
+                        )
+                    )
+                }
+            }
+        }
+
+        // Recurse into subfolders up to maxDepth 8
+        for ((subId, subName) in subFolders) {
+            val nextPath = if (folderPath.isNotBlank()) "$folderPath / $subName" else subName
+            val subRes = parseGoogleDriveFolderRecursive(client, subId, nextPath, depth + 1, maxDepth, visited, probedCount)
+            allItems.addAll(subRes.second)
+        }
+
+        return Pair(resolvedTitle, allItems)
+    }
+
     private fun resolvePlaylist(url: String, platform: String): MediaItem {
         var playlistTitle = "Shared Playlist ($platform)"
         var author = "$platform Creator Collection"
         val items = mutableListOf<PlaylistItem>()
+
+        // 0. Google Drive Shared Folder Scraper (Footages & Multi-Files & Subfolders)
+        if (url.contains("drive.google.com") && (url.contains("/folders/") || url.contains("folderview") || url.contains("/drive/u/"))) {
+            try {
+                val fMatch = Pattern.compile("folders/([a-zA-Z0-9_-]+)").matcher(url)
+                val folderId = if (fMatch.find()) fMatch.group(1) ?: "" else {
+                    val idMatch = Pattern.compile("id=([a-zA-Z0-9_-]+)").matcher(url)
+                    if (idMatch.find()) idMatch.group(1) ?: "" else ""
+                }
+                val (resolvedTitle, driveItems) = parseGoogleDriveFolderRecursive(client, folderId, "", 0, 8)
+                playlistTitle = resolvedTitle
+                author = "Google Drive Cloud"
+                items.addAll(driveItems)
+
+                if (items.isNotEmpty()) {
+                    val qualities = listOf(
+                        QualityOption(id = "1080p", label = "Full HD (1080p)", resolution = "1920x1080", format = "MP4", ext = "mp4", estimatedSizeBytes = items.size * 15L * 1024L * 1024L),
+                        QualityOption(id = "720p", label = "HD Standard (720p)", resolution = "1280x720", format = "MP4", ext = "mp4", estimatedSizeBytes = items.size * 8L * 1024L * 1024L),
+                        QualityOption(id = "480p", label = "SD Compact (480p)", resolution = "854x480", format = "MP4", ext = "mp4", estimatedSizeBytes = items.size * 4L * 1024L * 1024L),
+                        QualityOption(id = "320k", label = "Studio Master (320 kbps)", resolution = "320 kbps", format = "MP3", ext = "mp3", estimatedSizeBytes = items.size * 5L * 1024L * 1024L, isAudioOnly = true),
+                        QualityOption(id = "original", label = "Original Source Quality", resolution = "Direct Stream", format = "Original", ext = "mp4", estimatedSizeBytes = items.size * 10L * 1024L * 1024L)
+                    )
+                    return MediaItem(
+                        url = url,
+                        title = playlistTitle,
+                        author = author,
+                        durationSeconds = 0L,
+                        thumbnail = items.firstOrNull()?.thumbnail ?: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800",
+                        platform = "Google Drive",
+                        mediaType = MediaType.PLAYLIST,
+                        isPlaylist = true,
+                        playlistItems = items,
+                        qualities = qualities
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
 
         // 1. Spotify Live Scraper (Playlists and Albums)
         if (url.contains("spotify.com")) {

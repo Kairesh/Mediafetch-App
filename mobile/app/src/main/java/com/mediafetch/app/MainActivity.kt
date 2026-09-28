@@ -102,6 +102,9 @@ class MainActivity : AppCompatActivity() {
             settings.loadWithOverviewMode = true
             settings.useWideViewPort = true
             settings.textZoom = 100
+            isVerticalScrollBarEnabled = true
+            isScrollbarFadingEnabled = true
+            overScrollMode = View.OVER_SCROLL_IF_CONTENT_SCROLLS
             setBackgroundColor(if (isPopupShareMode) 0x00000000 else 0xFF000000.toInt())
             addJavascriptInterface(WebAppInterface(this@MainActivity), "AndroidBridge")
             webChromeClient = WebChromeClient()
@@ -183,32 +186,8 @@ class MainActivity : AppCompatActivity() {
 
         webView.loadUrl("file:///android_asset/index.html")
 
-        // Low-End Device Storage Optimization: purge legacy staging and temporary cache
-        activityScope.launch(Dispatchers.IO) {
-            try {
-                // 1. Purge legacy staging directory in getExternalFilesDir (reclaims 35+ MB)
-                val legacyDir = File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "staging")
-                if (legacyDir.exists()) {
-                    legacyDir.deleteRecursively()
-                }
-                // 2. Purge stale staging temp files (> 1 hour old or temp_*)
-                val cacheStaging = File(cacheDir, "staging")
-                if (cacheStaging.exists()) {
-                    val now = System.currentTimeMillis()
-                    cacheStaging.listFiles()?.forEach { file ->
-                        if (file.isFile && (file.name.startsWith("temp_") || (now - file.lastModified() > 3600_000L))) {
-                            file.delete()
-                        }
-                    }
-                }
-                // 3. Purge general cache files older than 12 hours
-                cacheDir?.listFiles()?.forEach { f ->
-                    if (f.name != "staging" && System.currentTimeMillis() - f.lastModified() > 12 * 3600 * 1000) {
-                        f.deleteRecursively()
-                    }
-                }
-            } catch (_: Exception) {}
-        }
+        // Auto purge app cache on launch to keep storage footprint at absolute minimum
+        autoPurgeAppCache(forceAll = false)
 
         requestRequiredPermissions()
         bindDownloadService()
@@ -447,10 +426,17 @@ class MainActivity : AppCompatActivity() {
 
         @JavascriptInterface
         fun startBatchDownload(qualityId: String, selectedIndicesJson: String) {
+            startBatchDownloadWithOptions(qualityId, selectedIndicesJson, false, "")
+        }
+
+        @JavascriptInterface
+        fun startBatchDownloadWithOptions(qualityId: String, selectedIndicesJson: String, asZip: Boolean, customFolder: String) {
             val media = currentMediaItem ?: return
             if (!media.isPlaylist) return
 
             val indices = JSONArray(selectedIndicesJson)
+            if (indices.length() == 0) return
+
             val isAudioReq = qualityId.contains("audio", ignoreCase = true) ||
                              qualityId.contains("320") ||
                              qualityId.contains("192") ||
@@ -474,24 +460,185 @@ class MainActivity : AppCompatActivity() {
                     media.qualities.find { it.id.contains("1080") } ?: media.qualities.firstOrNull { !it.isAudioOnly } ?: media.qualities.firstOrNull()
                 } ?: return
 
+            val batchId = "batch_" + System.currentTimeMillis()
+            val totalCount = indices.length()
+            val safeZipName = (media.title.replace(Regex("[^a-zA-Z0-9_.-]"), "_").take(40)) + "_Bundle.zip"
+
+            val prefs = getSharedPreferences("mediafetch_prefs", Context.MODE_PRIVATE)
+            val savedPath = prefs.getString("custom_download_folder_path", "") ?: ""
+            val resolvedCustomFolder = when {
+                customFolder.isNotBlank() && File(customFolder).isAbsolute -> customFolder
+                savedPath.isNotBlank() -> savedPath
+                customFolder.isNotBlank() -> File(Environment.getExternalStorageDirectory(), customFolder).absolutePath
+                else -> ""
+            }
+
+            if (asZip) {
+                downloadService?.registerBatchForZip(batchId, totalCount, safeZipName, resolvedCustomFolder.ifBlank { null })
+            }
+
             for (i in 0 until indices.length()) {
                 val index = indices.getInt(i)
                 if (index in media.playlistItems.indices) {
                     val item = media.playlistItems[index]
+                    val cleanExt = item.title.substringAfterLast(".", "").lowercase()
+                    val isItemImage = item.isImage || cleanExt in listOf("jpg", "jpeg", "png", "webp", "gif", "bmp", "svg", "tiff")
+                    val isItemAudio = !isItemImage && (cleanExt in listOf("mp3", "wav", "m4a", "flac", "aac", "ogg") || isAudioReq)
+
+                    val taskQuality = when {
+                        isItemImage -> {
+                            val effExt = if (cleanExt in listOf("jpg", "jpeg", "png", "webp", "gif")) cleanExt else "jpg"
+                            QualityOption(
+                                id = "img_${effExt}_$index",
+                                label = "Original Photo (${effExt.uppercase()})",
+                                resolution = "Original Photo",
+                                format = effExt.uppercase(),
+                                ext = effExt,
+                                estimatedSizeBytes = 3 * 1024 * 1024L,
+                                isAudioOnly = false,
+                                isImage = true,
+                                directDownloadUrl = item.url
+                            )
+                        }
+                        isItemAudio -> {
+                            val effExt = if (cleanExt in listOf("mp3", "wav", "m4a", "flac", "aac", "ogg")) cleanExt else "mp3"
+                            QualityOption(
+                                id = "audio_${effExt}_$index",
+                                label = "Audio (${effExt.uppercase()})",
+                                resolution = "Audio Stream",
+                                format = effExt.uppercase(),
+                                ext = effExt,
+                                estimatedSizeBytes = 5 * 1024 * 1024L,
+                                isAudioOnly = true,
+                                isImage = false,
+                                directDownloadUrl = item.url
+                            )
+                        }
+                        else -> {
+                            val effExt = if (cleanExt in listOf("mp4", "mov", "mkv", "webm", "avi")) cleanExt else quality.ext
+                            quality.copy(
+                                ext = effExt,
+                                format = effExt.uppercase(),
+                                isAudioOnly = false,
+                                isImage = false,
+                                directDownloadUrl = item.url
+                            )
+                        }
+                    }
+
                     val task = DownloadTask(
-                        id = "batch_" + System.currentTimeMillis() + "_" + i,
+                        id = "${batchId}_$i",
                         url = item.url,
                         title = item.title,
                         author = item.author,
                         thumbnail = item.thumbnail,
-                        quality = quality,
-                        totalBytes = quality.estimatedSizeBytes
+                        quality = taskQuality,
+                        totalBytes = taskQuality.estimatedSizeBytes,
+                        batchId = batchId,
+                        asZip = asZip,
+                        zipName = safeZipName,
+                        customFolder = resolvedCustomFolder.ifBlank { null },
+                        subFolderName = item.subFolderName
                     )
                     downloadService?.enqueueDownload(task)
                 }
             }
 
-            Toast.makeText(context, "Enqueued ${indices.length()} items for download (${quality.label})!", Toast.LENGTH_SHORT).show()
+            val modeMsg = if (asZip) "as single .ZIP archive" else "as separate files"
+            Toast.makeText(context, "Enqueued $totalCount items ($modeMsg)!", Toast.LENGTH_SHORT).show()
+        }
+
+        @JavascriptInterface
+        fun startCarouselDownloadWithOptions(selectedSlidesJson: String, asZip: Boolean, customFolder: String) {
+            val media = currentMediaItem ?: return
+            val slidesArray = JSONArray(selectedSlidesJson)
+            if (slidesArray.length() == 0) return
+
+            val batchId = "carousel_" + System.currentTimeMillis()
+            val totalCount = slidesArray.length()
+            val safeZipName = (media.title.replace(Regex("[^a-zA-Z0-9_.-]"), "_").take(40)) + "_Carousel.zip"
+
+            if (asZip) {
+                downloadService?.registerBatchForZip(batchId, totalCount, safeZipName, customFolder.ifBlank { null })
+            }
+
+            for (i in 0 until slidesArray.length()) {
+                val slideObj = slidesArray.getJSONObject(i)
+                val sUrl = slideObj.optString("url", "")
+                val sIndex = slideObj.optInt("slideIndex", i + 1)
+                val sType = slideObj.optString("mediaType", "image")
+                val isVid = sType == "video"
+                val sThumb = slideObj.optString("thumbnail", sUrl)
+
+                val quality = if (isVid) {
+                    media.qualities.find { !it.isAudioOnly && !it.isImage } ?: QualityOption(
+                        id = "carousel_vid_$sIndex",
+                        label = "Slide $sIndex (1080p)",
+                        resolution = "1080p",
+                        format = "Video • MP4",
+                        ext = "mp4",
+                        directDownloadUrl = sUrl,
+                        estimatedSizeBytes = 12 * 1024 * 1024
+                    )
+                } else {
+                    QualityOption(
+                        id = "carousel_img_$sIndex",
+                        label = "Slide $sIndex (Photo)",
+                        resolution = "High Res",
+                        format = "Image • JPG",
+                        ext = "jpg",
+                        isImage = true,
+                        directDownloadUrl = sUrl,
+                        estimatedSizeBytes = 2 * 1024 * 1024
+                    )
+                }
+
+                val task = DownloadTask(
+                    id = "${batchId}_$sIndex",
+                    url = sUrl,
+                    title = "${media.title} - Slide $sIndex",
+                    author = media.author,
+                    thumbnail = sThumb,
+                    quality = quality,
+                    totalBytes = quality.estimatedSizeBytes,
+                    batchId = batchId,
+                    asZip = asZip,
+                    zipName = safeZipName,
+                    customFolder = customFolder.ifBlank { null }
+                )
+                downloadService?.enqueueDownload(task)
+            }
+
+            val modeMsg = if (asZip) "as single .ZIP archive" else "as separate files"
+            Toast.makeText(context, "Enqueued $totalCount slides ($modeMsg)!", Toast.LENGTH_SHORT).show()
+        }
+
+        @JavascriptInterface
+        fun pickCustomFolder() {
+            try {
+                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+                startActivityForResult(intent, REQUEST_CODE_PICK_FOLDER)
+            } catch (e: Exception) {
+                Toast.makeText(this@MainActivity, "Folder picker unavailable: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        @JavascriptInterface
+        fun getCustomFolder(): String {
+            val prefs = getSharedPreferences("mediafetch_prefs", Context.MODE_PRIVATE)
+            return prefs.getString("custom_download_folder_name", "Download/MediaFetch") ?: "Download/MediaFetch"
+        }
+
+        @JavascriptInterface
+        fun checkAlreadyDownloaded(url: String): Boolean {
+            val s = downloadService ?: return false
+            val clean = url.trim().lowercase()
+            return s.getAllTasks().any {
+                it.status == com.mediafetch.app.model.DownloadStatus.COMPLETED &&
+                (it.url.lowercase() == clean ||
+                 (it.quality.directDownloadUrl != null && it.quality.directDownloadUrl!!.lowercase() == clean) ||
+                 (it.quality.fallbackUrl != null && it.quality.fallbackUrl!!.lowercase() == clean))
+            }
         }
 
         @JavascriptInterface
@@ -527,6 +674,11 @@ class MainActivity : AppCompatActivity() {
             chapterTitle: String
         ) {
             val media = currentMediaItem ?: return
+            if (media.isPlaylist && media.playlistItems.isNotEmpty()) {
+                val allIndices = JSONArray((0 until media.playlistItems.size).toList())
+                startBatchDownloadWithOptions(qualityId, allIndices.toString(), false, "")
+                return
+            }
             val quality = media.qualities.find { it.id == qualityId } ?: media.qualities.firstOrNull() ?: return
 
             val task = DownloadTask(
@@ -570,12 +722,19 @@ class MainActivity : AppCompatActivity() {
 
         @JavascriptInterface
         fun downloadAndInstallUpdate(apkUrl: String) {
+            downloadAndInstallUpdateWithVersion(apkUrl, "1.0.6")
+        }
+
+        @JavascriptInterface
+        fun downloadAndInstallUpdateWithVersion(apkUrl: String, version: String) {
             activityScope.launch {
                 com.mediafetch.app.update.UpdateManager.downloadAndInstall(
                     activity = this@MainActivity,
                     apkUrl = apkUrl,
-                    onProgress = { percent ->
-                        webView.evaluateJavascript("window.onUpdateDownloadProgress && window.onUpdateDownloadProgress($percent);", null)
+                    targetVersion = if (version.isNotBlank()) version else "1.0.6",
+                    onProgress = { percent, path ->
+                        val safePath = JSONObject.quote(path)
+                        webView.evaluateJavascript("window.onUpdateDownloadProgress && window.onUpdateDownloadProgress($percent, $safePath);", null)
                     },
                     onError = { err ->
                         val errSafe = JSONObject.quote(err)
@@ -665,6 +824,8 @@ class MainActivity : AppCompatActivity() {
             downloadService?.clearAllTasks()
         }
 
+
+
         @JavascriptInterface
         fun getAppCacheSize(): String {
             return try {
@@ -672,7 +833,28 @@ class MainActivity : AppCompatActivity() {
                 context.cacheDir?.walkTopDown()?.forEach { if (it.isFile) sizeBytes += it.length() }
                 context.externalCacheDir?.walkTopDown()?.forEach { if (it.isFile) sizeBytes += it.length() }
                 context.codeCacheDir?.walkTopDown()?.forEach { if (it.isFile) sizeBytes += it.length() }
-                
+
+                try {
+                    val dataDir = context.applicationInfo.dataDir
+                    if (dataDir != null) {
+                        val appWebviewDir = File(dataDir, "app_webview")
+                        if (appWebviewDir.exists()) {
+                            listOf(
+                                File(appWebviewDir, "Default/HTTP Cache"),
+                                File(appWebviewDir, "Default/GPUCache"),
+                                File(appWebviewDir, "Default/Code Cache"),
+                                File(appWebviewDir, "Default/Service Worker/CacheStorage"),
+                                File(appWebviewDir, "ShaderCache"),
+                                File(appWebviewDir, "GrShaderCache")
+                            ).forEach { dir ->
+                                if (dir.exists()) {
+                                    dir.walkTopDown().forEach { if (it.isFile) sizeBytes += it.length() }
+                                }
+                            }
+                        }
+                    }
+                } catch (_: Exception) {}
+
                 val mb = sizeBytes.toDouble() / (1024 * 1024)
                 if (mb < 0.1) "0.0 MB" else String.format(java.util.Locale.US, "%.1f MB", mb)
             } catch (e: Exception) {
@@ -683,8 +865,28 @@ class MainActivity : AppCompatActivity() {
         @JavascriptInterface
         fun clearAppCache(): String {
             try {
+                autoPurgeAppCache(forceAll = true)
                 context.cacheDir?.listFiles()?.forEach { it.deleteRecursively() }
                 context.externalCacheDir?.listFiles()?.forEach { it.deleteRecursively() }
+                context.codeCacheDir?.listFiles()?.forEach { it.deleteRecursively() }
+                try {
+                    val dataDir = context.applicationInfo.dataDir
+                    if (dataDir != null) {
+                        val appWebviewDir = File(dataDir, "app_webview")
+                        if (appWebviewDir.exists()) {
+                            listOf(
+                                File(appWebviewDir, "Default/HTTP Cache"),
+                                File(appWebviewDir, "Default/GPUCache"),
+                                File(appWebviewDir, "Default/Code Cache"),
+                                File(appWebviewDir, "Default/Service Worker/CacheStorage"),
+                                File(appWebviewDir, "ShaderCache"),
+                                File(appWebviewDir, "GrShaderCache")
+                            ).forEach { dir ->
+                                if (dir.exists()) dir.deleteRecursively()
+                            }
+                        }
+                    }
+                } catch (_: Exception) {}
                 runOnUiThread {
                     webView.clearCache(true)
                 }
@@ -921,6 +1123,21 @@ class MainActivity : AppCompatActivity() {
         }
 
         @JavascriptInterface
+        fun getAppVersionName(): String {
+            return try {
+                val pInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    context.packageManager.getPackageInfo(context.packageName, PackageManager.PackageInfoFlags.of(0))
+                } else {
+                    @Suppress("DEPRECATION")
+                    context.packageManager.getPackageInfo(context.packageName, 0)
+                }
+                pInfo.versionName ?: "1.0.5"
+            } catch (_: Exception) {
+                "1.0.5"
+            }
+        }
+
+        @JavascriptInterface
         fun checkFileExists(title: String, ext: String): Boolean {
             return MediaEngine.checkFileExistsOnDevice(context, title, ext)
         }
@@ -983,49 +1200,43 @@ class MainActivity : AppCompatActivity() {
             val hue = hsv[0] // 0..360
             val sat = hsv[1]
 
-            val targetAlias = if (sat < 0.2f) {
-                "MainActivityDefault"
+            val colorSuffix = if (sat < 0.2f) {
+                "Default"
             } else {
                 when {
-                    hue in 15f..45f -> "MainActivityOrange"
-                    hue in 45f..70f -> "MainActivityGold"
-                    hue in 70f..165f -> "MainActivityGreen"
-                    hue in 250f..315f -> "MainActivityPurple"
-                    (hue >= 335f || hue < 15f) -> "MainActivityRed"
-                    else -> "MainActivityDefault" // Blue/Cyan
+                    hue in 15f..45f -> "Orange"
+                    hue in 45f..70f -> "Gold"
+                    hue in 70f..165f -> "Green"
+                    hue in 250f..315f -> "Purple"
+                    (hue >= 335f || hue < 15f) -> "Red"
+                    else -> "Default" // Blue/Cyan
                 }
             }
 
-            val aliases = listOf(
-                "MainActivityDefault",
-                "MainActivityOrange",
-                "MainActivityGreen",
-                "MainActivityPurple",
-                "MainActivityRed",
-                "MainActivityGold"
-            )
+            val targetMainAlias = "MainActivity$colorSuffix"
+            val targetShareAlias = "ShareActivity$colorSuffix"
 
+            val suffixes = listOf("Default", "Orange", "Green", "Purple", "Red", "Gold")
             val pm = packageManager
             val pkg = packageName
 
-            val currentEnabled = aliases.firstOrNull { alias ->
-                pm.getComponentEnabledSetting(ComponentName(pkg, "$pkg.$alias")) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED
-            } ?: "MainActivityDefault"
+            for (suffix in suffixes) {
+                // Update Main Launcher Alias
+                val mainAlias = "MainActivity$suffix"
+                val shouldMain = (mainAlias == targetMainAlias)
+                val curMain = pm.getComponentEnabledSetting(ComponentName(pkg, "$pkg.$mainAlias"))
+                val targetMain = if (shouldMain) PackageManager.COMPONENT_ENABLED_STATE_ENABLED else PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+                if (curMain != targetMain) {
+                    pm.setComponentEnabledSetting(ComponentName(pkg, "$pkg.$mainAlias"), targetMain, PackageManager.DONT_KILL_APP)
+                }
 
-            if (currentEnabled != targetAlias) {
-                pm.setComponentEnabledSetting(
-                    ComponentName(pkg, "$pkg.$targetAlias"),
-                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                    PackageManager.DONT_KILL_APP
-                )
-                for (alias in aliases) {
-                    if (alias != targetAlias) {
-                        pm.setComponentEnabledSetting(
-                            ComponentName(pkg, "$pkg.$alias"),
-                            PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                            PackageManager.DONT_KILL_APP
-                        )
-                    }
+                // Update Share Sheet Alias
+                val shareAlias = "ShareActivity$suffix"
+                val shouldShare = (shareAlias == targetShareAlias)
+                val curShare = pm.getComponentEnabledSetting(ComponentName(pkg, "$pkg.$shareAlias"))
+                val targetShare = if (shouldShare) PackageManager.COMPONENT_ENABLED_STATE_ENABLED else PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+                if (curShare != targetShare) {
+                    pm.setComponentEnabledSetting(ComponentName(pkg, "$pkg.$shareAlias"), targetShare, PackageManager.DONT_KILL_APP)
                 }
             }
         } catch (e: Exception) {
@@ -1038,11 +1249,26 @@ class MainActivity : AppCompatActivity() {
             try {
                 val accentColor = Color.parseColor(accentColorHex)
                 val surfaceColor = if (isDark) Color.parseColor(surfaceColorHex) else Color.parseColor("#FFFFFF")
-                val bgColor = if (isDark) Color.parseColor(bgColorHex) else Color.parseColor("#F2F2F7")
+                val bgColor = if (isDark) Color.parseColor(bgColorHex) else Color.parseColor("#F4F6F9")
 
                 val insetsController = WindowCompat.getInsetsController(window, window.decorView)
                 insetsController.isAppearanceLightStatusBars = !isDark
                 insetsController.isAppearanceLightNavigationBars = !isDark
+
+                // Dynamic TaskDescription so Android Recents (Tabs / App Switcher) displays sleek header without blue container
+                try {
+                    val taskHeaderColor = if (isDark) Color.parseColor("#121214") else Color.parseColor("#FFFFFF")
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        val taskDesc = android.app.ActivityManager.TaskDescription.Builder()
+                            .setPrimaryColor(taskHeaderColor)
+                            .setLabel("MediaFetch")
+                            .build()
+                        setTaskDescription(taskDesc)
+                    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        @Suppress("DEPRECATION")
+                        setTaskDescription(android.app.ActivityManager.TaskDescription("MediaFetch", null, taskHeaderColor))
+                    }
+                } catch (_: Exception) {}
 
                 val bottomNav = findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.bottomNavigation)
                 bottomNav?.let { nav ->
@@ -1053,7 +1279,7 @@ class MainActivity : AppCompatActivity() {
                     )
                     val colors = intArrayOf(
                         accentColor,
-                        Color.parseColor("#8E8E93")
+                        if (isDark) Color.parseColor("#8E8E93") else Color.parseColor("#64748B")
                     )
                     val colorStateList = ColorStateList(states, colors)
                     nav.itemIconTintList = colorStateList
@@ -1075,17 +1301,111 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun autoPurgeAppCache(forceAll: Boolean = false) {
+        activityScope.launch(Dispatchers.IO) {
+            try {
+                // 1. Purge legacy staging directory if any exists
+                val legacyDir = File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "staging")
+                if (legacyDir.exists()) {
+                    legacyDir.deleteRecursively()
+                }
+
+                // 2. Purge stale update APKs from getExternalFilesDir
+                try {
+                    val extFiles = getExternalFilesDir(null)
+                    extFiles?.listFiles()?.forEach { f ->
+                        if (f.isFile && (f.name.endsWith(".apk") || f.name.endsWith(".tmp") || f.name.startsWith("temp_") || f.name.startsWith("MediaFetch_Update"))) {
+                            f.delete()
+                        }
+                    }
+                } catch (_: Exception) {}
+
+                // 3. Purge staging files that are not being actively downloaded
+                val hasActiveDownloads = downloadService?.getAllTasks()?.any {
+                    it.status == DownloadStatus.DOWNLOADING || it.status == DownloadStatus.QUEUED
+                } ?: false
+
+                val cacheStaging = File(cacheDir, "staging")
+                if (cacheStaging.exists()) {
+                    if (forceAll || !hasActiveDownloads) {
+                        cacheStaging.deleteRecursively()
+                        cacheStaging.mkdirs()
+                    } else {
+                        val now = System.currentTimeMillis()
+                        cacheStaging.listFiles()?.forEach { file ->
+                            if (file.isFile && (file.name.startsWith("temp_") || (now - file.lastModified() > 60_000L))) {
+                                file.delete()
+                            }
+                        }
+                    }
+                }
+
+                // 4. Purge general cache files (preserve staging dir itself)
+                cacheDir?.listFiles()?.forEach { f ->
+                    if (f.name != "staging") {
+                        f.deleteRecursively()
+                    }
+                }
+
+                // 5. Purge external cache
+                externalCacheDir?.listFiles()?.forEach { f ->
+                    f.deleteRecursively()
+                }
+
+                // 6. Purge codeCacheDir if forced
+                if (forceAll) {
+                    codeCacheDir?.listFiles()?.forEach { f ->
+                        f.deleteRecursively()
+                    }
+                }
+
+                // 7. Purge Chromium WebView disk caches in dataDir/app_webview
+                try {
+                    val dataDir = applicationInfo.dataDir
+                    if (dataDir != null) {
+                        val appWebviewDir = File(dataDir, "app_webview")
+                        if (appWebviewDir.exists()) {
+                            listOf(
+                                File(appWebviewDir, "Default/HTTP Cache"),
+                                File(appWebviewDir, "Default/GPUCache"),
+                                File(appWebviewDir, "Default/Code Cache"),
+                                File(appWebviewDir, "Default/Service Worker/CacheStorage"),
+                                File(appWebviewDir, "ShaderCache"),
+                                File(appWebviewDir, "GrShaderCache")
+                            ).forEach { dir ->
+                                if (dir.exists()) dir.deleteRecursively()
+                            }
+                        }
+                    }
+                } catch (_: Exception) {}
+
+                // 8. Clear WebView disk cache
+                withContext(Dispatchers.Main) {
+                    try {
+                        webView.clearCache(true)
+                    } catch (_: Exception) {}
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        autoPurgeAppCache(forceAll = false)
+    }
+
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
         if (level >= TRIM_MEMORY_RUNNING_LOW || level >= TRIM_MEMORY_MODERATE || level >= TRIM_MEMORY_UI_HIDDEN) {
+            autoPurgeAppCache(forceAll = true)
             try {
-                webView.clearCache(true)
                 System.gc()
             } catch (_: Exception) {}
         }
     }
 
     override fun onDestroy() {
+        autoPurgeAppCache(forceAll = true)
         super.onDestroy()
         if (isServiceBound) {
             unbindService(serviceConnection)
@@ -1100,5 +1420,42 @@ class MainActivity : AppCompatActivity() {
             webView.destroy()
         } catch (_: Exception) {}
         activityScope.cancel()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_PICK_FOLDER && resultCode == RESULT_OK) {
+            val treeUri = data?.data
+            if (treeUri != null) {
+                try {
+                    contentResolver.takePersistableUriPermission(
+                        treeUri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    )
+                } catch (_: Exception) {}
+
+                val path = treeUri.path ?: ""
+                val folderName = if (path.contains(":")) path.substringAfterLast(":") else "Selected Folder"
+                val resolvedDir = if (folderName.isNotBlank() && folderName != "Selected Folder") {
+                    File(Environment.getExternalStorageDirectory(), folderName)
+                } else {
+                    File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "MediaFetch")
+                }
+                val prefs = getSharedPreferences("mediafetch_prefs", Context.MODE_PRIVATE)
+                prefs.edit()
+                    .putString("custom_download_folder_uri", treeUri.toString())
+                    .putString("custom_download_folder_name", folderName)
+                    .putString("custom_download_folder_path", resolvedDir.absolutePath)
+                    .apply()
+
+                val safeName = JSONObject.quote(folderName)
+                webView.evaluateJavascript("window.onCustomFolderSelected && window.onCustomFolderSelected($safeName);", null)
+                Toast.makeText(this, "Save location set to: $folderName", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    companion object {
+        const val REQUEST_CODE_PICK_FOLDER = 9182
     }
 }

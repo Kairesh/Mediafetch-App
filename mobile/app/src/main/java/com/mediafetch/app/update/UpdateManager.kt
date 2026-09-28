@@ -249,7 +249,8 @@ object UpdateManager {
     suspend fun downloadAndInstall(
         activity: Activity,
         apkUrl: String,
-        onProgress: (Int) -> Unit,
+        targetVersion: String = "1.0.6",
+        onProgress: (Int, String) -> Unit,
         onError: (String) -> Unit
     ) = withContext(Dispatchers.IO) {
         try {
@@ -266,7 +267,7 @@ object UpdateManager {
             }
 
             val totalBytes = body.contentLength()
-            val destDir = activity.getExternalFilesDir(null) ?: activity.cacheDir
+            val destDir = activity.cacheDir
             val destFile = File(destDir, "MediaFetch_Update.apk")
             if (destFile.exists()) destFile.delete()
 
@@ -285,7 +286,7 @@ object UpdateManager {
                             if (percent != lastPercent) {
                                 lastPercent = percent
                                 withContext(Dispatchers.Main) {
-                                    onProgress(percent)
+                                    onProgress(percent, "")
                                 }
                             }
                         }
@@ -296,8 +297,23 @@ object UpdateManager {
 
             destFile.setReadable(true, false)
 
+            // Save permanent named copy to the public Downloads/MediaFetch directory
+            var savedDisplayPath = "Download/MediaFetch/MediaFetch_v${targetVersion}_Latest.apk"
+            try {
+                val publicDir = File(android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS), "MediaFetch")
+                if (!publicDir.exists()) publicDir.mkdirs()
+                val backupFile = File(publicDir, "MediaFetch_v${targetVersion}_Latest.apk")
+                destFile.copyTo(backupFile, overwrite = true)
+                savedDisplayPath = backupFile.absolutePath
+            } catch (_: Exception) {}
+
             withContext(Dispatchers.Main) {
-                onProgress(100)
+                Toast.makeText(
+                    activity,
+                    "Saved to: Internal Storage > Download > MediaFetch > MediaFetch_v${targetVersion}_Latest.apk",
+                    Toast.LENGTH_LONG
+                ).show()
+                onProgress(100, savedDisplayPath)
                 triggerApkInstall(activity, destFile)
             }
         } catch (e: Exception) {

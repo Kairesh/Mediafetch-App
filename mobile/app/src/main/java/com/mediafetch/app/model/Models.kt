@@ -17,7 +17,8 @@ enum class MediaType {
     VIDEO,
     AUDIO,
     IMAGE,
-    PLAYLIST
+    PLAYLIST,
+    ARCHIVE
 }
 
 data class QualityOption(
@@ -76,23 +77,37 @@ data class PlaylistItem(
     val durationSeconds: Long,
     val thumbnail: String,
     val url: String,
-    var isSelected: Boolean = true
+    var isSelected: Boolean = true,
+    var isImage: Boolean = false,
+    val subFolderId: String? = null,
+    val subFolderName: String? = null
 ) {
     fun toJsonObject(): JSONObject {
+        val ext = title.substringAfterLast(".", "").lowercase()
+        val img = isImage || ext in listOf("jpg", "jpeg", "png", "webp", "gif", "bmp")
+        val formatted = when {
+            img -> "IMAGE"
+            durationSeconds > 0 -> formatDuration(durationSeconds)
+            else -> "HD FOOTAGE"
+        }
         return JSONObject().apply {
             put("id", id)
             put("title", title)
             put("author", author)
             put("durationSeconds", durationSeconds)
-            put("formattedDuration", formatDuration(durationSeconds))
+            put("formattedDuration", formatted)
             put("thumbnail", thumbnail)
             put("url", url)
             put("isSelected", isSelected)
+            put("isImage", img)
+            put("subFolderId", subFolderId ?: "")
+            put("subFolderName", subFolderName ?: "")
         }
     }
 
     companion object {
         fun formatDuration(seconds: Long): String {
+            if (seconds <= 0L) return "00:00"
             val mins = seconds / 60
             val secs = seconds % 60
             return if (mins >= 60) {
@@ -161,7 +176,7 @@ data class MediaItem(
             put("title", title)
             put("author", author)
             put("durationSeconds", durationSeconds)
-            put("formattedDuration", PlaylistItem.formatDuration(durationSeconds))
+            put("formattedDuration", if (durationSeconds > 0) PlaylistItem.formatDuration(durationSeconds) else "")
             put("thumbnail", thumbnail)
             put("platform", platform)
             put("mediaType", mediaType.name)
@@ -216,7 +231,12 @@ data class DownloadTask(
     val audioFxJson: String = "{}",
     var subtitleUrl: String? = null,
     var subtitleLang: String? = null,
-    var chapterTitle: String? = null
+    var chapterTitle: String? = null,
+    var customFolder: String? = null,
+    var batchId: String? = null,
+    var asZip: Boolean = false,
+    var zipName: String? = null,
+    var subFolderName: String? = null
 ) {
     fun getProgressPercent(): Int {
         if (totalBytes <= 0) return 0

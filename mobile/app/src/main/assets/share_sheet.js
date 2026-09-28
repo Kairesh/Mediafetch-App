@@ -189,7 +189,10 @@ function renderCarouselSlides(mediaInfo) {
     const carouselSection = document.getElementById('carouselSection');
     const carouselSlidesTrack = document.getElementById('carouselSlidesTrack');
     const carouselCountBadge = document.getElementById('carouselCountBadge');
-    const downloadAllSlidesBtn = document.getElementById('downloadAllSlidesBtn');
+    const carouselSelectedCountBadge = document.getElementById('carouselSelectedCountBadge');
+    const carouselToggleAllBtn = document.getElementById('carouselToggleAllBtn');
+    const downloadSelectedSlidesBtn = document.getElementById('downloadSelectedSlidesBtn');
+    const carouselSelectedCount = document.getElementById('carouselSelectedCount');
 
     if (!carouselSection || !carouselSlidesTrack) return;
 
@@ -208,11 +211,39 @@ function renderCarouselSlides(mediaInfo) {
     carouselSlidesTrack.innerHTML = '';
     if (carouselCountBadge) carouselCountBadge.innerText = `${slides.length} slides`;
 
-    slides.forEach((slide) => {
+    // Track selected slide indices (default: all selected)
+    const selectedIndices = new Set(slides.map((_, i) => i));
+
+    function updateSelectionUI() {
+        const count = selectedIndices.size;
+        if (carouselSelectedCount) carouselSelectedCount.innerText = count;
+        if (carouselSelectedCountBadge) carouselSelectedCountBadge.innerText = `${count} selected`;
+        if (carouselToggleAllBtn) {
+            carouselToggleAllBtn.innerText = count === slides.length ? 'Deselect All' : 'Select All';
+        }
+        if (downloadSelectedSlidesBtn) {
+            downloadSelectedSlidesBtn.disabled = count === 0;
+            downloadSelectedSlidesBtn.style.opacity = count === 0 ? '0.45' : '1';
+        }
+
+        const items = carouselSlidesTrack.querySelectorAll('.carousel-slide-item');
+        items.forEach((item, idx) => {
+            const isSelected = selectedIndices.has(idx);
+            item.classList.toggle('selected', isSelected);
+            item.classList.toggle('unselected', !isSelected);
+        });
+    }
+
+    slides.forEach((slide, idx) => {
         const item = document.createElement('div');
-        item.className = 'carousel-slide-item';
+        item.className = 'carousel-slide-item selected';
         const isVid = slide.mediaType === 'video';
         item.innerHTML = `
+            <div class="slide-checkbox-pill">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
             <div class="slide-img-box">
                 <img src="${slide.thumbnail || slide.url}" alt="Slide ${slide.slideIndex}" onerror="this.src='https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800';" />
                 <span class="slide-badge">#${slide.slideIndex} ${isVid ? '🎬' : '📸'}</span>
@@ -220,6 +251,19 @@ function renderCarouselSlides(mediaInfo) {
             <button type="button" class="slide-action-btn">⬇ Get</button>
         `;
 
+        // Tap card to toggle selection
+        item.addEventListener('click', (e) => {
+            if (e.target.closest('.slide-action-btn')) return;
+            if (selectedIndices.has(idx)) {
+                selectedIndices.delete(idx);
+            } else {
+                selectedIndices.add(idx);
+            }
+            if (window.androidBridge && window.androidBridge.vibrate) window.androidBridge.vibrate();
+            updateSelectionUI();
+        });
+
+        // Individual Get button to immediately download single slide
         item.querySelector('.slide-action-btn').addEventListener('click', (e) => {
             e.stopPropagation();
             if (window.androidBridge) {
@@ -251,37 +295,60 @@ function renderCarouselSlides(mediaInfo) {
         carouselSlidesTrack.appendChild(item);
     });
 
-    if (downloadAllSlidesBtn) {
-        downloadAllSlidesBtn.onclick = () => {
-            if (window.androidBridge && window.androidBridge.downloadAllSlides) {
-                window.androidBridge.downloadAllSlides(JSON.stringify(slides), 'best');
+    // Toggle Select All / Deselect All
+    if (carouselToggleAllBtn) {
+        carouselToggleAllBtn.onclick = () => {
+            if (selectedIndices.size === slides.length) {
+                selectedIndices.clear();
             } else {
-                slides.forEach((s, idx) => {
-                    setTimeout(() => {
-                        const isVid = s.mediaType === 'video';
-                        const qObj = {
-                            id: 'slide_' + s.slideIndex,
-                            label: `Slide ${s.slideIndex} ${isVid ? 'Video' : 'Photo'}`,
-                            resolution: isVid ? 'HD Video' : 'Original Photo',
-                            format: isVid ? 'MP4' : 'JPG',
-                            ext: isVid ? 'mp4' : 'jpg',
-                            estimatedSizeBytes: isVid ? 15 * 1024 * 1024 : 3 * 1024 * 1024,
-                            isImage: !isVid,
-                            directDownloadUrl: s.url
-                        };
-                        window.androidBridge.startDownload(
-                            `Slide ${s.slideIndex}`,
-                            mediaInfo.author || 'Instagram',
-                            s.thumbnail || s.url,
-                            s.url,
-                            JSON.stringify(qObj),
-                            qObj.estimatedSizeBytes
-                        );
-                    }, idx * 300);
-                });
+                slides.forEach((_, i) => selectedIndices.add(i));
+            }
+            if (window.androidBridge && window.androidBridge.vibrate) window.androidBridge.vibrate();
+            updateSelectionUI();
+        };
+    }
+
+    // Download Selected button - directly downloads without prompt
+    if (downloadSelectedSlidesBtn) {
+        downloadSelectedSlidesBtn.onclick = () => {
+            const selectedList = slides.filter((_, i) => selectedIndices.has(i));
+            if (selectedList.length === 0) return;
+
+            if (window.androidBridge) {
+                if (window.androidBridge.downloadSelectedSlides) {
+                    window.androidBridge.downloadSelectedSlides(JSON.stringify(selectedList), 'best');
+                } else if (window.androidBridge.downloadAllSlides) {
+                    window.androidBridge.downloadAllSlides(JSON.stringify(selectedList), 'best');
+                } else {
+                    selectedList.forEach((s, sIdx) => {
+                        setTimeout(() => {
+                            const isVid = s.mediaType === 'video';
+                            const qObj = {
+                                id: 'slide_' + s.slideIndex,
+                                label: `Slide ${s.slideIndex} ${isVid ? 'Video' : 'Photo'}`,
+                                resolution: isVid ? 'HD Video' : 'Original Photo',
+                                format: isVid ? 'MP4' : 'JPG',
+                                ext: isVid ? 'mp4' : 'jpg',
+                                estimatedSizeBytes: isVid ? 15 * 1024 * 1024 : 3 * 1024 * 1024,
+                                isImage: !isVid,
+                                directDownloadUrl: s.url
+                            };
+                            window.androidBridge.startDownload(
+                                `Slide ${s.slideIndex}`,
+                                mediaInfo.author || 'Instagram',
+                                s.thumbnail || s.url,
+                                s.url,
+                                JSON.stringify(qObj),
+                                qObj.estimatedSizeBytes
+                            );
+                        }, sIdx * 300);
+                    });
+                }
             }
         };
     }
+
+    updateSelectionUI();
 }
 
 function renderQualities() {

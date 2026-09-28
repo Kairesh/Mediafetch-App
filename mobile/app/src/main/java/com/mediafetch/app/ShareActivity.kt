@@ -254,6 +254,11 @@ class ShareActivity : AppCompatActivity() {
         }
 
         @JavascriptInterface
+        fun downloadSelectedSlides(slidesJson: String, format: String) {
+            downloadAllSlides(slidesJson, format)
+        }
+
+        @JavascriptInterface
         fun downloadAllSlides(slidesJson: String, format: String) {
             try {
                 val arr = JSONArray(slidesJson)
