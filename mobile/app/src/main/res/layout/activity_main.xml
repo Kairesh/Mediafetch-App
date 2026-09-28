@@ -23,14 +23,13 @@
 
     </FrameLayout>
 
-    <!-- Native Material Bottom Navigation (Replaced with Custom Liquid Floating Dock) -->
+    <!-- Native Material Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#121214"
         android:elevation="8dp"
-        android:visibility="gone"
         app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_nav_menu" />
 

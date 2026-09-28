@@ -4,17 +4,16 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "Official MediaFetch v1.0.0 release. Apple AMOLED theme, 3-tier icon themes, Search Studio, and multi-threaded engine.",
   "mobile": {
-    "version": "1.0.19",
-    "versionCode": 20,
+    "version": "1.0.17",
+    "versionCode": 21,
     "releaseDate": "2026-09-29",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": false,
     "releaseNotes": [
-      "Aura 2026 UI Transformation: Floating Capsule Pill Dock with spring morph animations and dynamic theme lighting.",
-      "Atmospheric Ambient Mesh Glow: Soft chromatic back-illumination adapting dynamically to selected theme palette.",
-      "Signature Hero Typography: Sleek bold header 'Explore and download' with gradient accent text.",
-      "Card Architecture Overhaul: Frosted squircle bento cards with upper glass bevel highlight and corner aura.",
-      "Fluid Spring Physics: GPU-composited responsive micro-interactions across pills, chips, and buttons."
+      "Restored classic v1.0.17 optimized UI: ultra-smooth, lightweight, and blazing fast.",
+      "Deep Chromium & APK Cache Purge: Auto-wipes hidden WebView HTTP/GPU caches and update APKs.",
+      "Instant Drive Status Detection: Real-time detection of 404 deleted or 403 private Google Drive folders.",
+      "Low-End Device RAM & Smoothness: High-efficiency RGB_565 decoding and hardware acceleration."
     ]
   }
 }
