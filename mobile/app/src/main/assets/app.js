@@ -133,7 +133,7 @@
     }
   }
   const savedAnimations = localStorage.getItem('mediafetch_enable_animations');
-  const animationsEnabled = (savedAnimations === 'true'); // Default OFF
+  const animationsEnabled = (savedAnimations !== 'false'); // Default ON for fluid spring motion
   applyMotionSetting(animationsEnabled);
 
   const CURATED_THEMES = {
@@ -2632,8 +2632,31 @@
         window.AndroidBridge.onAppModeChanged(currentAppMode);
       }
     } catch (_) {}
+
+    updateFloatingDockUI(currentAppMode);
   }
   window.toggleAppMode = toggleAppMode;
+
+  function updateFloatingDockUI(mode) {
+    const dockItems = document.querySelectorAll('#floatingBottomNav .dock-item');
+    dockItems.forEach(item => {
+      const itemMode = item.getAttribute('data-mode');
+      if (itemMode === mode) {
+        item.classList.add('active');
+      } else {
+        item.classList.remove('active');
+      }
+    });
+  }
+
+  document.querySelectorAll('#floatingBottomNav .dock-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const mode = item.getAttribute('data-mode');
+      if (mode) {
+        toggleAppMode(mode);
+      }
+    });
+  });
 
   if (modeSwitchBtn) {
     modeSwitchBtn.addEventListener('click', () => {

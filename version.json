@@ -4,17 +4,17 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "Official MediaFetch v1.0.0 release. Apple AMOLED theme, 3-tier icon themes, Search Studio, and multi-threaded engine.",
   "mobile": {
-    "version": "1.0.18",
-    "versionCode": 19,
+    "version": "1.0.19",
+    "versionCode": 20,
     "releaseDate": "2026-09-29",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": false,
     "releaseNotes": [
-      "Unified Obsidian Halo design language: sleek AMOLED styling with theme-adaptive vector icons.",
-      "100% vector SVG icons replace system emojis across all tabs, modals, badges, and platform pickers.",
-      "Performance & Fluid Motion architecture: default 60 FPS performance mode for low-end devices.",
-      "Optional Fluid Motion toggle in Settings with spring touch states and halo lighting.",
-      "Optimized RAM and GPU footprint with zero lag on budget Android chipsets."
+      "Aura 2026 UI Transformation: Floating Capsule Pill Dock with spring morph animations and dynamic theme lighting.",
+      "Atmospheric Ambient Mesh Glow: Soft chromatic back-illumination adapting dynamically to selected theme palette.",
+      "Signature Hero Typography: Sleek bold header 'Explore and download' with gradient accent text.",
+      "Card Architecture Overhaul: Frosted squircle bento cards with upper glass bevel highlight and corner aura.",
+      "Fluid Spring Physics: GPU-composited responsive micro-interactions across pills, chips, and buttons."
     ]
   }
 }

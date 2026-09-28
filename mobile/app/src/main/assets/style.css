@@ -125,6 +125,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 0;
+  padding-bottom: calc(var(--safe-bottom, 20px) + 95px);
 }
 
 /* System Notch / Status Bar Spacer */
@@ -4795,3 +4796,306 @@ body:not(.perf-mode) .visual-style-card:active {
 .badge-svg {
   margin-right: 5px;
 }
+
+/* ==========================================================================
+   AURA 2026 MOBILE UI ARCHITECTURE (INSPIRED BY USER REFERENCE DESIGNS)
+   ========================================================================== */
+
+/* 1. Ambient Atmospheric Mesh Glow */
+.ambient-mesh-glow {
+  position: fixed;
+  top: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 110vw;
+  height: 420px;
+  background: radial-gradient(ellipse at 50% 25%, rgba(var(--accent-rgb, 10, 132, 255), 0.22) 0%, rgba(var(--accent-rgb, 10, 132, 255), 0.05) 55%, transparent 80%);
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(50px);
+  opacity: 0.9;
+  transition: background 0.6s ease;
+}
+
+/* 2. Hero Headline Title & Eyebrow */
+.hero-headline-wrap {
+  padding: 16px 4px 18px;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  color: var(--brand-accent);
+  margin-bottom: 6px;
+  opacity: 0.9;
+}
+
+.hero-headline {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.9px;
+  line-height: 1.15;
+  color: #ffffff;
+  margin: 0;
+}
+
+.hero-accent-text {
+  background: linear-gradient(135deg, var(--brand-accent) 0%, #ffffff 85%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* 3. Floating Capsule Pill Dock (Footer Navigation) */
+.floating-pill-dock {
+  position: fixed;
+  bottom: calc(var(--safe-bottom, 20px) + 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 16, 22, 0.88);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+  padding: 6px 8px;
+  box-shadow: 0 20px 48px -10px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  z-index: 999;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.dock-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0px;
+  background: transparent;
+  border: none;
+  border-radius: 9999px;
+  padding: 8px 12px;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.dock-item .dock-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.dock-item .dock-label {
+  max-width: 0;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: max-width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.dock-item.active {
+  background: var(--brand-accent);
+  color: #000000;
+  padding: 8px 18px 8px 14px;
+  gap: 7px;
+  box-shadow: 0 4px 20px -2px rgba(var(--accent-rgb, 10, 132, 255), 0.5);
+  transform: scale(1.02);
+}
+
+.dock-item.active .dock-label {
+  max-width: 90px;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.dock-item:active {
+  transform: scale(0.92);
+}
+
+/* 4. Fluid View Entrance Transitions */
+@keyframes viewSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.985);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+#mediaFetchView:not(.hidden),
+#mediaSearchView:not(.hidden),
+#mediaHistoryView:not(.hidden),
+#mediaSettingsView:not(.hidden) {
+  animation: viewSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 5. Refined Squircle Bento Cards with Subtle Top Bevel Highlight */
+.apple-card {
+  position: relative;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.055) 0%, rgba(255, 255, 255, 0.015) 100%), #121217 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 26px !important;
+  box-shadow: 0 20px 45px -15px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 6. Pill Search / Input Box */
+.search-input-wrapper {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  border-radius: 9999px !important;
+  padding: 4px 6px 4px 16px !important;
+  height: 52px !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.search-input-wrapper:focus-within {
+  border-color: var(--brand-accent) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb, 10, 132, 255), 0.25), 0 12px 28px -6px rgba(0, 0, 0, 0.6) !important;
+}
+
+.paste-chip {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 9999px !important;
+  padding: 7px 14px !important;
+  color: #ffffff !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.paste-chip:active {
+  transform: scale(0.92) !important;
+  background: var(--brand-accent) !important;
+  color: #000 !important;
+}
+
+.apple-btn-primary {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  height: 52px !important;
+  border-radius: 9999px !important;
+  background: var(--brand-accent) !important;
+  color: #000000 !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.3px !important;
+  border: none !important;
+  box-shadow: 0 10px 25px -4px rgba(var(--accent-rgb, 10, 132, 255), 0.45) !important;
+  cursor: pointer !important;
+  transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  margin-top: 12px !important;
+}
+
+.apple-btn-primary:active {
+  transform: scale(0.96) !important;
+  box-shadow: 0 2px 10px rgba(var(--accent-rgb, 10, 132, 255), 0.3) !important;
+}
+
+/* 7. Platform Pills */
+.platforms-scroll-row {
+  display: flex !important;
+  gap: 8px !important;
+  overflow-x: auto !important;
+  scrollbar-width: none !important;
+  padding: 12px 2px 4px !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+.platforms-scroll-row::-webkit-scrollbar {
+  display: none !important;
+}
+
+.platform-badge-pill {
+  flex: 0 0 auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 6px 14px !important;
+  border-radius: 9999px !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: rgba(255, 255, 255, 0.65) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  cursor: pointer !important;
+}
+
+.platform-badge-pill:active {
+  transform: scale(0.93) !important;
+  background: rgba(var(--accent-rgb, 10, 132, 255), 0.15) !important;
+  color: #fff !important;
+  border-color: var(--brand-accent) !important;
+}
+
+/* 8. Category Filter Segment Tabs */
+.segment-control {
+  display: flex !important;
+  gap: 8px !important;
+  overflow-x: auto !important;
+  scrollbar-width: none !important;
+  padding: 4px 2px 8px !important;
+  margin: 12px 0 !important;
+  -webkit-overflow-scrolling: touch !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+.segment-control::-webkit-scrollbar {
+  display: none !important;
+}
+
+.seg-tab {
+  flex: 0 0 auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 8px 18px !important;
+  border-radius: 9999px !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: rgba(255, 255, 255, 0.65) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.seg-tab.active {
+  background: var(--brand-accent) !important;
+  border-color: var(--brand-accent) !important;
+  color: #000000 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 16px -2px rgba(var(--accent-rgb, 10, 132, 255), 0.4) !important;
+  transform: scale(1.02) !important;
+}
+
+.seg-tab:active {
+  transform: scale(0.94) !important;
+}
+
