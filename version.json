@@ -4,16 +4,16 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "Official MediaFetch v1.0.0 release. Apple AMOLED theme, 3-tier icon themes, Search Studio, and multi-threaded engine.",
   "mobile": {
-    "version": "1.0.28",
-    "versionCode": 28,
+    "version": "1.0.29",
+    "versionCode": 29,
     "releaseDate": "2026-09-29",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": false,
     "releaseNotes": [
-      "Zero-Lag 120 FPS Fluidity: Removed 165+ translateZ hardware compositing layers and eliminated background continuous blob repaint loops. Completely smooth 60/120 FPS scrolling.",
-      "Search Suggestions Overhaul: Completely unclipped suggestions dropdown, now cleanly positioned directly under the search bar with instant dismiss and zero button interference.",
-      "Category Tabs Layout Fix: Made All, Videos, and Photos/Wallpapers responsive (flex: 1 1 0) so no tab is ever cut off or pushed off-screen.",
-      "Instant CDN Cache-Busting: Added real-time timestamp cache busting for seamless in-app update checks and downloads."
+      "Light Mode High-Contrast Overhaul: Resolved all washed-out and invisible text across Search Studio, Settings, Link Downloader, and History.",
+      "Crystal-Clear Typography: Headings, group titles, and labels rendered in deep obsidian slate (#0F172A) with descriptions in rich slate (#475569).",
+      "Interactive Controls Refinement: Re-styled Multi-Filter, category tabs, platform chips, suggestion chips, theme preset cards, and dropdown selectors for flawless readability in light mode.",
+      "Zero Dark Mode Impact: Preserved obsidian dark (#0d111a) cards, high-contrast white text, and glowing accents in AMOLED and dark themes."
     ]
   }
 }
