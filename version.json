@@ -4,17 +4,17 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "Official MediaFetch v1.0.0 release. Apple AMOLED theme, 3-tier icon themes, Search Studio, and multi-threaded engine.",
   "mobile": {
-    "version": "1.0.24",
-    "versionCode": 24,
+    "version": "1.0.25",
+    "versionCode": 25,
     "releaseDate": "2026-09-29",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": false,
     "releaseNotes": [
-      "Hardware-Accelerated 60/120 FPS Fluid Engine: Reduced heavy blurs and enabled CSS layout containment for buttery-smooth scrolling across Link Downloader and Search Studio.",
-      "Snappy Instant View Switching: Fast GPU-composited section transitions completely eliminating view-switching lag.",
-      "Global Atmospheric Fluid Mesh: Moving multi-chromatic ambient mesh drifting gracefully across the background.",
-      "Living Card & Footer Gradients: Animated abstract gradient flow inside cards and footers, with moving chromatic shimmer rims.",
-      "Fixed AMOLED Theme Selector: Restored glassmorphism and gradient animations for all dark mode users while preserving pure black for Solid AMOLED style."
+      "100% Dynamic Theme-Synchronized Gradients: Completely purged hardcoded red/purple colors. All atmospheric background meshes, cards, footers, headers, buttons, and pills dynamically derive exactly from the selected theme or custom hex color.",
+      "Hardware-Accelerated Visible Motion Everywhere: Cards, header, and floating footer dock now feature GPU-accelerated rotating and drifting gradient meshes with moving top rim shimmers.",
+      "Header Dynamic Glass & Motion: Synchronized the app header with glassmorphism and animated theme mesh drifting in the background.",
+      "Battery-Saving Solid AMOLED: Preserved pure pitch-black styling with all gradient layers disabled in Solid AMOLED mode.",
+      "Buttery Smooth 60/120 FPS Compositing: Native transform3d animations ensuring zero frame drops or lag across Link Downloader and Search Studio."
     ]
   }
 }
