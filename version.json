@@ -4,16 +4,16 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "Official MediaFetch v1.0.0 release. Apple AMOLED theme, 3-tier icon themes, Search Studio, and multi-threaded engine.",
   "mobile": {
-    "version": "1.0.27",
-    "versionCode": 27,
+    "version": "1.0.28",
+    "versionCode": 28,
     "releaseDate": "2026-09-29",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": false,
     "releaseNotes": [
-      "Zero-Lag 120 FPS Native Scrolling: Eliminated 300+ concurrent GPU card animation loops and heavy backdrop filters across Search Studio (165+ items) and History grids. Added content-visibility: auto virtualization.",
-      "Search Studio Autocomplete Unclipped: Fixed dropdown container clipping bug so search suggestions cleanly float over categories without getting chopped off.",
-      "Optimized Atmospheric Ambient Meshes: Converted background and footer glow to zero-overhead pre-computed CSS radial gradients.",
-      "Crystal-Clear Legibility: Preserved obsidian dark card contrast (#0d111a) and high-visibility white/silver typography across all views."
+      "Zero-Lag 120 FPS Fluidity: Removed 165+ translateZ hardware compositing layers and eliminated background continuous blob repaint loops. Completely smooth 60/120 FPS scrolling.",
+      "Search Suggestions Overhaul: Completely unclipped suggestions dropdown, now cleanly positioned directly under the search bar with instant dismiss and zero button interference.",
+      "Category Tabs Layout Fix: Made All, Videos, and Photos/Wallpapers responsive (flex: 1 1 0) so no tab is ever cut off or pushed off-screen.",
+      "Instant CDN Cache-Busting: Added real-time timestamp cache busting for seamless in-app update checks and downloads."
     ]
   }
 }
