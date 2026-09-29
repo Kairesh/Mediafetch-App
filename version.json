@@ -4,16 +4,16 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "Official MediaFetch v1.0.0 release. Apple AMOLED theme, 3-tier icon themes, Search Studio, and multi-threaded engine.",
   "mobile": {
-    "version": "1.0.29",
-    "versionCode": 29,
-    "releaseDate": "2026-09-29",
+    "version": "1.0.30",
+    "versionCode": 30,
+    "releaseDate": "2026-09-30",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": false,
     "releaseNotes": [
-      "Light Mode High-Contrast Overhaul: Resolved all washed-out and invisible text across Search Studio, Settings, Link Downloader, and History.",
-      "Crystal-Clear Typography: Headings, group titles, and labels rendered in deep obsidian slate (#0F172A) with descriptions in rich slate (#475569).",
-      "Interactive Controls Refinement: Re-styled Multi-Filter, category tabs, platform chips, suggestion chips, theme preset cards, and dropdown selectors for flawless readability in light mode.",
-      "Zero Dark Mode Impact: Preserved obsidian dark (#0d111a) cards, high-contrast white text, and glowing accents in AMOLED and dark themes."
+      "Rectangular Glow Fix: Fixed Skia shadow clipping on active category tabs and platform pills, restoring soft, organic pill-shaped glows.",
+      "Settings Theme Redesign: Streamlined Theme Studio by placing Amoled, Glass, and Aurora single-line buttons on top, and removed live preview box.",
+      "Sync App Icon With Theme Toggle: Added a dedicated toggle switch to dynamically sync brand logo color with the selected theme or lock previous color.",
+      "Continuous Platform Marquee: Added smooth infinite 60fps marquee animation for platform pills on homepage."
     ]
   }
 }
