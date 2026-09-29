@@ -4,17 +4,17 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "Official MediaFetch v1.0.0 release. Apple AMOLED theme, 3-tier icon themes, Search Studio, and multi-threaded engine.",
   "mobile": {
-    "version": "1.0.25",
-    "versionCode": 25,
+    "version": "1.0.26",
+    "versionCode": 26,
     "releaseDate": "2026-09-29",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": false,
     "releaseNotes": [
-      "100% Dynamic Theme-Synchronized Gradients: Completely purged hardcoded red/purple colors. All atmospheric background meshes, cards, footers, headers, buttons, and pills dynamically derive exactly from the selected theme or custom hex color.",
-      "Hardware-Accelerated Visible Motion Everywhere: Cards, header, and floating footer dock now feature GPU-accelerated rotating and drifting gradient meshes with moving top rim shimmers.",
-      "Header Dynamic Glass & Motion: Synchronized the app header with glassmorphism and animated theme mesh drifting in the background.",
-      "Battery-Saving Solid AMOLED: Preserved pure pitch-black styling with all gradient layers disabled in Solid AMOLED mode.",
-      "Buttery Smooth 60/120 FPS Compositing: Native transform3d animations ensuring zero frame drops or lag across Link Downloader and Search Studio."
+      "Crystal-Clear Text Legibility: Upgraded text contrast across all 4 sections with bright crisp white headings (#FFFFFF) and high-visibility light silver secondary text (#CBD5E1), eliminating all washed-out grey tones.",
+      "Minimal & Abstract Obsidian Glass: Refined card styling to dark, deep frosted glass (rgba(13, 17, 26, 0.88)) with subtle, minimal moving chromatic sheen (0.12 opacity) and delicate 1px specular shimmer rims.",
+      "Calibrated Background Atmosphere: Toned down ambient fluid mesh to a gentle, elegant background drift, preventing screen wash-out and preserving pitch-black contrast.",
+      "Uncluttered Native Header: Cleaned up the top app bar, removing bulky container borders so the logo and header controls float seamlessly.",
+      "Refined Ambient Footer Aura: Reduced bottom ambient aura height and opacity for a subtle, elegant glow behind the floating dock."
     ]
   }
 }
