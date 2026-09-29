@@ -4,16 +4,15 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "Official MediaFetch v1.0.0 release. Apple AMOLED theme, 3-tier icon themes, Search Studio, and multi-threaded engine.",
   "mobile": {
-    "version": "1.0.30",
-    "versionCode": 30,
+    "version": "1.0.31",
+    "versionCode": 31,
     "releaseDate": "2026-09-30",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": false,
     "releaseNotes": [
-      "Rectangular Glow Fix: Fixed Skia shadow clipping on active category tabs and platform pills, restoring soft, organic pill-shaped glows.",
-      "Settings Theme Redesign: Streamlined Theme Studio by placing Amoled, Glass, and Aurora single-line buttons on top, and removed live preview box.",
-      "Sync App Icon With Theme Toggle: Added a dedicated toggle switch to dynamically sync brand logo color with the selected theme or lock previous color.",
-      "Continuous Platform Marquee: Added smooth infinite 60fps marquee animation for platform pills on homepage."
+      "Zero-Restart Theme Switching: Switching themes no longer triggers Android launcher alias changes or app restarts when icon sync is off.",
+      "Sync App Icon With Theme: App launcher icon only syncs and updates when explicitly toggled ON; turning it off completely locks the icon and keeps the app running without any resets.",
+      "Cold-Start Guard: Ensured cold start restores theme and colors instantly without unnecessary launcher component reconfiguration."
     ]
   }
 }
