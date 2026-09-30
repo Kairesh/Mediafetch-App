@@ -4,16 +4,18 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "Official MediaFetch v1.0.0 release. Apple AMOLED theme, 3-tier icon themes, Search Studio, and multi-threaded engine.",
   "mobile": {
-    "version": "1.0.32",
-    "versionCode": 32,
+    "version": "1.0.33",
+    "versionCode": 33,
     "releaseDate": "2026-10-01",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": false,
     "releaseNotes": [
-      "Google Material 3 (Material You) Overhaul: Entire mobile interface re-engineered from scratch with official Google M3 design tokens and responsive containers.",
-      "Pure AMOLED Default: Pitch-black #000000 OLED foundation with high-contrast surfaces for maximum battery efficiency and visual punch.",
-      "Flawless Dual Themes: Pixel-perfect light mode with crisp obsidian typography alongside deep AMOLED and obsidian dark modes.",
-      "Butter-Smooth 120 FPS: Replaced heavy multi-layer blurs and buggy negative spread box shadows with clean, hardware-accelerated M3 tonal elevations."
+      "History/Downloads Sheet Fixed: Eliminated screen-freeze bug where the drawer stayed permanently open; sheet is strictly docked off-screen until opened.",
+      "Footer Navigation & Spacing: Navigation bar properly elevated with Android system inset padding; active pills and labels are never truncated or obscured.",
+      "Settings & Forms Alignment: Fixed dropdown select rows to prevent awkward multi-line text wrapping; refined cache and cookie action buttons.",
+      "Cookie Guide & Modal Scrolling: Centered dialog cards with internal scrolling, preventing step descriptions from overlapping the close button.",
+      "Glossy Glass & Aurora Themes: Full restoration of liquid glassmorphism, specular top rims, and cyber aurora glow with zero GPU rectangular clipping.",
+      "Quick Share Sheet Overhaul: Complete AMOLED and Glass redesign of the quick-share popup when sharing links from YouTube or Instagram."
     ]
   }
 }
