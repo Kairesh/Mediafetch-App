@@ -4,16 +4,17 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "Official MediaFetch v1.0.0 release. Apple AMOLED theme, 3-tier icon themes, Search Studio, and multi-threaded engine.",
   "mobile": {
-    "version": "1.0.34",
-    "versionCode": 34,
+    "version": "1.0.35",
+    "versionCode": 35,
     "releaseDate": "2026-10-01",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": false,
     "releaseNotes": [
-      "Zero Annoying Popups: Completely eliminated spammy native Android toasts when clicking empty inputs, changing themes, switching quality presets, or adjusting settings.",
-      "Sleek Inline Micro-Interactions: Replaced jarring empty-input toasts with modern Apple / Google style input shake and soft red border pulses.",
-      "Native Toast De-duplication: Cancel previous toast immediately when showing notifications so toasts never stack, linger, or freeze over the bottom navigation bar.",
-      "Silent Settings & Themes: All visual changes take effect smoothly without unnecessary system banner interruptions."
+      "Modern Floating Capsule Dock: Redesigned bottom navigation into a floating pill dock (Echo Music style) with rounded corners, proper elevation above Android 3-button system bars, and zero edge-to-edge cutoff.",
+      "Strict Zero Glow on AMOLED: Completely eliminated blurry neon glows and hazy box-shadows on buttons, inputs, and active nav tabs in AMOLED mode. Active items are now cleanly and sharply colored.",
+      "Authentic Frosted Glassmorphism: Unlocked genuine liquid glass cards with real backdrop blur (28px) and specular top gloss rims floating over dynamic luminous ambient light blooms (matching Echo Music reference).",
+      "Cosmic Cyber Aurora: Restored vibrant teal & magenta radiant aurora curtains with iridescent holographic card highlights.",
+      "Flawless Light & Dark Modes: Full contrast audit ensuring every surface, badge, card, and text is crystal clear in both bright daylight and dark environments."
     ]
   }
 }
