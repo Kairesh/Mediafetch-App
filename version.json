@@ -4,16 +4,15 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "Official MediaFetch v1.0.0 release. Apple AMOLED theme, 3-tier icon themes, Search Studio, and multi-threaded engine.",
   "mobile": {
-    "version": "1.0.36",
-    "versionCode": 36,
-    "releaseDate": "2026-10-01",
+    "version": "1.0.37",
+    "versionCode": 37,
+    "releaseDate": "2026-10-04",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": true,
     "releaseNotes": [
-      "Zero Annoying Popups: Completely eliminated spammy native Android toasts when clicking empty inputs, changing themes, switching quality presets, or adjusting settings.",
-      "Sleek Inline Micro-Interactions: Replaced jarring empty-input toasts with modern Apple / Google style input shake and soft red border pulses.",
-      "Native Toast De-duplication: Cancel previous toast immediately when showing notifications so toasts never stack, linger, or freeze over the bottom navigation bar.",
-      "Silent Settings & Themes: All visual changes take effect smoothly without unnecessary system banner interruptions."
+      "Added Pexels and Pixabay high-yield search engines to Android Search Studio.",
+      "High-throughput multi-engine search: returns abundant results matching official platform volume.",
+      "Instant responsive loading with streaming background harvest."
     ]
   }
 }
