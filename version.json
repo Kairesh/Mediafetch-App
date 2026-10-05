@@ -4,15 +4,15 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "Official MediaFetch v1.0.0 release. Apple AMOLED theme, 3-tier icon themes, Search Studio, and multi-threaded engine.",
   "mobile": {
-    "version": "1.0.37",
-    "versionCode": 37,
-    "releaseDate": "2026-10-04",
+    "version": "1.0.38",
+    "versionCode": 38,
+    "releaseDate": "2026-10-05",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": true,
     "releaseNotes": [
-      "Added Pexels and Pixabay high-yield search engines to Android Search Studio.",
-      "High-throughput multi-engine search: returns abundant results matching official platform volume.",
-      "Instant responsive loading with streaming background harvest."
+      "Fixed Pixabay HD video thumbnail preview display.",
+      "Optimized search performance and memory consumption.",
+      "Enhanced video streaming and direct playback stability."
     ]
   }
 }
