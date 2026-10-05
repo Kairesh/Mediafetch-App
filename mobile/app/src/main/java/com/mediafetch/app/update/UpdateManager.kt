@@ -82,9 +82,11 @@ object UpdateManager {
 
     suspend fun checkForUpdate(context: Context, force: Boolean = false): CheckUpdateResult = withContext(Dispatchers.IO) {
         try {
+            val urlWithBuster = if (UPDATE_URL.contains("?")) "$UPDATE_URL&_t=${System.currentTimeMillis()}" else "$UPDATE_URL?_t=${System.currentTimeMillis()}"
             val req = Request.Builder()
-                .url(UPDATE_URL)
-                .header("Cache-Control", "no-cache")
+                .url(urlWithBuster)
+                .header("Cache-Control", "no-cache, no-store, must-revalidate")
+                .header("Pragma", "no-cache")
                 .build()
 
             val resp = httpClient.newCall(req).execute()
@@ -254,7 +256,12 @@ object UpdateManager {
         onError: (String) -> Unit
     ) = withContext(Dispatchers.IO) {
         try {
-            val req = Request.Builder().url(apkUrl).build()
+            val downloadUrl = if (apkUrl.contains("?")) "$apkUrl&_t=${System.currentTimeMillis()}" else "$apkUrl?_t=${System.currentTimeMillis()}"
+            val req = Request.Builder()
+                .url(downloadUrl)
+                .header("Cache-Control", "no-cache, no-store, must-revalidate")
+                .header("Pragma", "no-cache")
+                .build()
             val resp = httpClient.newCall(req).execute()
             if (!resp.isSuccessful) {
                 withContext(Dispatchers.Main) { onError("Download failed with HTTP ${resp.code}") }
@@ -268,7 +275,7 @@ object UpdateManager {
 
             val totalBytes = body.contentLength()
             val destDir = activity.cacheDir
-            val destFile = File(destDir, "MediaFetch_Update.apk")
+            val destFile = File(destDir, "MediaFetch.apk")
             if (destFile.exists()) destFile.delete()
 
             body.byteStream().use { input ->
@@ -297,12 +304,33 @@ object UpdateManager {
 
             destFile.setReadable(true, false)
 
-            // Save permanent named copy to the public Downloads/MediaFetch directory
-            var savedDisplayPath = "Download/MediaFetch/MediaFetch_v${targetVersion}_Latest.apk"
+            // Save permanent single named copy to public Downloads/MediaFetch directory, replacing any previous versions
+            var savedDisplayPath = "Download/MediaFetch/MediaFetch.apk"
             try {
                 val publicDir = File(android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS), "MediaFetch")
-                if (!publicDir.exists()) publicDir.mkdirs()
-                val backupFile = File(publicDir, "MediaFetch_v${targetVersion}_Latest.apk")
+                if (!publicDir.exists()) {
+                    publicDir.mkdirs()
+                } else {
+                    // Purge all previous/older APKs in this directory so files never accumulate as duplicates
+                    publicDir.listFiles()?.filter {
+                        it.isFile && (it.name.endsWith(".apk", ignoreCase = true) || it.name.endsWith(".tmp", ignoreCase = true) || it.name.contains("MediaFetch", ignoreCase = true))
+                    }?.forEach { oldFile ->
+                        try { oldFile.delete() } catch (_: Exception) {}
+                    }
+                }
+
+                // Also clean up any accidental duplicate files in the root Downloads folder (e.g. MediaFetch (1).apk)
+                try {
+                    val rootDownloads = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS)
+                    rootDownloads.listFiles()?.filter {
+                        it.isFile && it.name.matches(Regex("MediaFetch.*\\([0-9]+\\)\\.apk", RegexOption.IGNORE_CASE))
+                    }?.forEach { duplicateApk ->
+                        try { duplicateApk.delete() } catch (_: Exception) {}
+                    }
+                } catch (_: Exception) {}
+
+                val backupFile = File(publicDir, "MediaFetch.apk")
+                if (backupFile.exists()) backupFile.delete()
                 destFile.copyTo(backupFile, overwrite = true)
                 savedDisplayPath = backupFile.absolutePath
             } catch (_: Exception) {}
@@ -310,7 +338,7 @@ object UpdateManager {
             withContext(Dispatchers.Main) {
                 Toast.makeText(
                     activity,
-                    "Saved to: Internal Storage > Download > MediaFetch > MediaFetch_v${targetVersion}_Latest.apk",
+                    "Saved & Replaced: Internal Storage > Download > MediaFetch > MediaFetch.apk",
                     Toast.LENGTH_LONG
                 ).show()
                 onProgress(100, savedDisplayPath)

@@ -813,30 +813,23 @@ class DownloadService : Service() {
                             }
                         }
                     } else if (task.quality.isAudioOnly) {
-                            // High-Fidelity Audio Extractor with True Bitrate Transcoding & Audio Studio FX
-                            val targetExt = if (task.quality.ext.equals("wav", ignoreCase = true)) "wav" else "m4a"
+                        // High-Speed Direct Audio Pipeline: Instant download, zero stalling, clean metadata
+                        val isWav = task.quality.ext.equals("wav", ignoreCase = true)
+                        val isTrimmed = task.isTrimmed && task.clipEndSeconds > task.clipStartSeconds
+
+                        if (!isTrimmed && !isWav) {
+                            // 1. Direct Untrimmed Download: Stream straight to targetFile at maximum network speed (0 -> 100%)
+                            val dlOk = downloadStreamToFile(resolvedUrl, task.url, targetFile, task, progressStart = 0, progressWeight = 1.0)
+                            isDownloadSuccess = dlOk && targetFile.exists() && targetFile.length() > 1024
+                        } else if (isTrimmed && !isWav) {
+                            // 2. High-Speed Trimmed Audio: Fast-mux trimming via MediaMuxer packet copying in < 300ms
                             val tempAudioIn = getStagingFile("temp_raw_audio_${System.currentTimeMillis()}.${task.quality.ext}")
                             try {
-                                val dlOk = if (task.isTrimmed && task.clipEndSeconds > task.clipStartSeconds) {
-                                    downloadTrimmedStreamToFile(resolvedUrl, tempAudioIn, task, task.clipStartSeconds, task.clipEndSeconds, task.durationSeconds, progressStart = 0, progressWeight = 0.60)
-                                } else {
-                                    downloadStreamToFile(resolvedUrl, task.url, tempAudioIn, task, progressStart = 0, progressWeight = 0.60)
-                                }
+                                val dlOk = downloadTrimmedStreamToFile(resolvedUrl, tempAudioIn, task, task.clipStartSeconds, task.clipEndSeconds, task.durationSeconds, progressStart = 0, progressWeight = 0.85)
                                 if (dlOk && tempAudioIn.exists() && tempAudioIn.length() > 1024) {
-                                    val startSec = if (task.isTrimmed) task.clipStartSeconds else 0L
-                                    val endSec = if (task.isTrimmed) task.clipEndSeconds else 0L
-
-                                    val finalTarget = if (!targetFile.name.endsWith(".$targetExt", ignoreCase = true)) {
-                                        val base = targetFile.name.substringBeforeLast(".")
-                                        File(targetFile.parentFile, "$base.$targetExt")
-                                    } else targetFile
-
-                                    updateTaskStage(task, 70, "Processing high-fidelity audio...")
-                                    val procOk = processAudioStream(tempAudioIn, finalTarget, task.quality, startSec, endSec)
-                                    if (procOk && finalTarget.exists() && finalTarget.length() > 1024) {
-                                        if (finalTarget != targetFile && targetFile.exists()) targetFile.delete()
-                                        targetFile = finalTarget
-                                        updateTaskStage(task, 95, "Finalizing audio track...")
+                                    updateTaskStage(task, 90, "Trimming audio track...")
+                                    val trimOk = trimMediaFile(tempAudioIn, targetFile, task.clipStartSeconds, task.clipEndSeconds)
+                                    if (trimOk && targetFile.exists() && targetFile.length() > 1024) {
                                         isDownloadSuccess = true
                                     } else {
                                         tempAudioIn.copyTo(targetFile, overwrite = true)
@@ -846,7 +839,27 @@ class DownloadService : Service() {
                             } finally {
                                 try { if (tempAudioIn.exists()) tempAudioIn.delete() } catch (_: Exception) {}
                             }
-                        } else if (resolvedUrl.lowercase().contains(".m3u8")) {
+                        } else {
+                            // 3. Lossless WAV conversion: Decode PCM samples to generate broadcast WAV container
+                            val tempAudioIn = getStagingFile("temp_raw_audio_${System.currentTimeMillis()}.${task.quality.ext}")
+                            try {
+                                val dlOk = if (isTrimmed) {
+                                    downloadTrimmedStreamToFile(resolvedUrl, tempAudioIn, task, task.clipStartSeconds, task.clipEndSeconds, task.durationSeconds, progressStart = 0, progressWeight = 0.70)
+                                } else {
+                                    downloadStreamToFile(resolvedUrl, task.url, tempAudioIn, task, progressStart = 0, progressWeight = 0.70)
+                                }
+                                if (dlOk && tempAudioIn.exists() && tempAudioIn.length() > 1024) {
+                                    val startSec = if (isTrimmed) task.clipStartSeconds else 0L
+                                    val endSec = if (isTrimmed) task.clipEndSeconds else 0L
+                                    updateTaskStage(task, 75, "Processing WAV audio...")
+                                    val procOk = processAudioStream(tempAudioIn, targetFile, task.quality, startSec, endSec)
+                                    isDownloadSuccess = procOk && targetFile.exists() && targetFile.length() > 1024
+                                }
+                            } finally {
+                                try { if (tempAudioIn.exists()) tempAudioIn.delete() } catch (_: Exception) {}
+                            }
+                        }
+                    } else if (resolvedUrl.lowercase().contains(".m3u8")) {
                             // HLS Stream (.m3u8 playlist) - Download segments and remux to standard MP4
                             val isTrimmed = task.isTrimmed && task.clipEndSeconds > task.clipStartSeconds && !task.quality.isImage
                             val hlsOut = if (isTrimmed) {

@@ -11,8 +11,8 @@ android {
         applicationId = "com.mediafetch.app"
         minSdk = 24
         targetSdk = 34
-        versionCode = 22
-        versionName = "1.0.22"
+        versionCode = 39
+        versionName = "1.0.39"
 
         vectorDrawables {
             useSupportLibrary = true

@@ -50,6 +50,9 @@ data class SearchResultItem(
 
 object MediaSearchEngine {
 
+    private const val PEXELS_API_KEY = "nJhYrM3NMjdfzgsR092DY9sUSpWiYU2iXmbsAwnDLJHDxxp9F6vKwBnE"
+    private const val PIXABAY_API_KEY = "10547590-561862cf80d7e34284c5268bc"
+
     private val client = OkHttpClient.Builder()
         .connectTimeout(10, TimeUnit.SECONDS)
         .readTimeout(12, TimeUnit.SECONDS)
@@ -109,22 +112,42 @@ object MediaSearchEngine {
             deferredList.add(async { searchYouTube(clean, page) })
         }
 
-        // 2. Wikimedia Commons 4K / HD Videos
+        // 2. Pexels HD / 4K Free Videos
+        if (isAll || platforms.contains("pexels") || platforms.contains("pexels_video") || platforms.contains("video")) {
+            deferredList.add(async { searchPexelsVideos(clean, page) })
+        }
+
+        // 3. Pixabay HD / 4K Stock Videos
+        if (isAll || platforms.contains("pixabay") || platforms.contains("pixabay_video") || platforms.contains("video")) {
+            deferredList.add(async { searchPixabayVideos(clean, page) })
+        }
+
+        // 4. Wikimedia Commons 4K / HD Videos
         if (isAll || platforms.contains("wikimedia") || platforms.contains("wikimedia_video") || platforms.contains("video")) {
             deferredList.add(async { searchWikimediaVideos(clean, page) })
         }
 
-        // 3. Openverse 700M+ High-Res Photos & Art
+        // 5. Pexels High-Res Photos
+        if (isAll || platforms.contains("pexels") || platforms.contains("pexels_photo") || platforms.contains("photo") || platforms.contains("image")) {
+            deferredList.add(async { searchPexelsPhotos(clean, page) })
+        }
+
+        // 6. Pixabay High-Res Photos
+        if (isAll || platforms.contains("pixabay") || platforms.contains("pixabay_photo") || platforms.contains("photo") || platforms.contains("image")) {
+            deferredList.add(async { searchPixabayPhotos(clean, page) })
+        }
+
+        // 7. Openverse 700M+ High-Res Photos & Art
         if (isAll || platforms.contains("openverse") || platforms.contains("photo") || platforms.contains("image")) {
             deferredList.add(async { searchOpenverseImages(clean, page) })
         }
 
-        // 4. Wikimedia Commons High-Res Art & Photography
+        // 8. Wikimedia Commons High-Res Art & Photography
         if (isAll || platforms.contains("wikimedia") || platforms.contains("wikimedia_photo") || platforms.contains("photo") || platforms.contains("image")) {
             deferredList.add(async { searchWikimediaPhotos(clean, page) })
         }
 
-        // 5. Wallhaven 4K Ultra-HD Wallpapers
+        // 9. Wallhaven 4K Ultra-HD Wallpapers
         if (isAll || platforms.contains("wallhaven") || platforms.contains("photo") || platforms.contains("wallpaper")) {
             deferredList.add(async { searchWallhaven(clean, page) })
         }
@@ -315,6 +338,23 @@ object MediaSearchEngine {
                             val thumbs = cvr.optJSONObject("thumbnail")?.optJSONArray("thumbnails")
                             val thumb = thumbs?.optJSONObject(thumbs.length() - 1)?.optString("url", "") ?: ""
                             addVideo(vid, title, author, dur, thumb, false)
+                        }
+                    } else if (obj.has("lockupViewModel")) {
+                        val vm = obj.optJSONObject("lockupViewModel")
+                        if (vm != null) {
+                            val vid = vm.optString("contentId", "")
+                            if (vid.isNotBlank()) {
+                                val meta = vm.optJSONObject("metadata")?.optJSONObject("lockupMetadataViewModel")
+                                val title = meta?.optJSONObject("title")?.optString("content", "") ?: ""
+                                val channel = meta?.optJSONObject("metadata")?.optJSONObject("contentMetadataViewModel")
+                                    ?.optJSONArray("metadataRows")?.optJSONObject(0)?.optJSONArray("parts")?.optJSONObject(0)?.optString("text", "") ?: ""
+                                val dur = vm.optJSONObject("contentImage")?.optJSONObject("thumbnailOverlayBadgeViewModel")
+                                    ?.optJSONObject("badge")?.optJSONObject("badgeViewModel")?.optString("label", "") ?: ""
+                                val thumbSources = vm.optJSONObject("contentImage")?.optJSONObject("collectionThumbnailViewModel")
+                                    ?.optJSONObject("primaryThumbnail")?.optJSONObject("thumbnailViewModel")?.optJSONObject("image")?.optJSONArray("sources")
+                                val thumb = if (thumbSources != null && thumbSources.length() > 0) thumbSources.optJSONObject(thumbSources.length() - 1)?.optString("url", "") ?: "" else ""
+                                addVideo(vid, title, channel, dur, thumb, false)
+                            }
                         }
                     }
 
@@ -566,6 +606,291 @@ object MediaSearchEngine {
                                 downloadUrl = fullPath,
                                 pageUrl = pageUrl,
                                 resolutionBadge = res
+                            )
+                        )
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            // Ignore
+        }
+        items
+    }
+
+    /**
+     * Pexels HD / 4K Stock Video Search (100% Free & Direct MP4 Streams)
+     */
+    suspend fun searchPexelsVideos(query: String, page: Int = 1): List<SearchResultItem> = withContext(Dispatchers.IO) {
+        val items = mutableListOf<SearchResultItem>()
+        try {
+            val url = "https://api.pexels.com/videos/search?query=" + URLEncoder.encode(query, "UTF-8") + "&per_page=30&page=$page"
+            val request = Request.Builder()
+                .url(url)
+                .header("Authorization", PEXELS_API_KEY)
+                .header("User-Agent", "Mozilla/5.0 MediaFetch/1.0")
+                .build()
+
+            val response = client.newCall(request).execute()
+            if (response.isSuccessful) {
+                val body = response.body?.string() ?: ""
+                val json = JSONObject(body)
+                val videos = json.optJSONArray("videos")
+                if (videos != null) {
+                    for (i in 0 until videos.length()) {
+                        val v = videos.optJSONObject(i) ?: continue
+                        val id = v.optLong("id", 0L)
+                        val pageUrl = v.optString("url", "")
+                        val thumb = v.optString("image", "")
+                        val dur = v.optInt("duration", 0)
+                        val userObj = v.optJSONObject("user")
+                        val author = userObj?.optString("name", "Pexels Creator") ?: "Pexels Creator"
+                        val authorUrl = userObj?.optString("url", "") ?: ""
+
+                        val videoFiles = v.optJSONArray("video_files")
+                        var bestUrl = ""
+                        var bestRes = "HD"
+                        var maxHeight = 0
+
+                        if (videoFiles != null) {
+                            for (j in 0 until videoFiles.length()) {
+                                val vf = videoFiles.optJSONObject(j) ?: continue
+                                val link = vf.optString("link", "")
+                                val height = vf.optInt("height", 0)
+                                if (link.isNotBlank() && height > maxHeight) {
+                                    maxHeight = height
+                                    bestUrl = link
+                                    bestRes = if (height >= 2160) "4K UHD" else if (height >= 1440) "2K QHD" else if (height >= 1080) "1080p FHD" else "${height}p"
+                                }
+                            }
+                        }
+
+                        if (bestUrl.isBlank() && videoFiles != null && videoFiles.length() > 0) {
+                            bestUrl = videoFiles.optJSONObject(0)?.optString("link", "") ?: ""
+                        }
+
+                        val durFormatted = if (dur > 0) formatSecondsToDuration(dur.toLong()) else "HD Video"
+
+                        items.add(
+                            SearchResultItem(
+                                id = "pexels_v_$id",
+                                title = "$query Stock Video ($bestRes)".capitalizeWords(),
+                                author = author,
+                                authorUrl = authorUrl,
+                                durationFormatted = durFormatted,
+                                durationSeconds = dur.toLong(),
+                                thumbnail = thumb,
+                                directUrl = bestUrl,
+                                platform = "Pexels 4K",
+                                mediaType = "video",
+                                downloadUrl = bestUrl,
+                                pageUrl = pageUrl,
+                                resolutionBadge = bestRes
+                            )
+                        )
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            // Ignore
+        }
+        items
+    }
+
+    /**
+     * Pexels Ultra High-Res Photos & Wallpapers
+     */
+    suspend fun searchPexelsPhotos(query: String, page: Int = 1): List<SearchResultItem> = withContext(Dispatchers.IO) {
+        val items = mutableListOf<SearchResultItem>()
+        try {
+            val url = "https://api.pexels.com/v1/search?query=" + URLEncoder.encode(query, "UTF-8") + "&per_page=30&page=$page"
+            val request = Request.Builder()
+                .url(url)
+                .header("Authorization", PEXELS_API_KEY)
+                .header("User-Agent", "Mozilla/5.0 MediaFetch/1.0")
+                .build()
+
+            val response = client.newCall(request).execute()
+            if (response.isSuccessful) {
+                val body = response.body?.string() ?: ""
+                val json = JSONObject(body)
+                val photos = json.optJSONArray("photos")
+                if (photos != null) {
+                    for (i in 0 until photos.length()) {
+                        val p = photos.optJSONObject(i) ?: continue
+                        val id = p.optLong("id", 0L)
+                        val pageUrl = p.optString("url", "")
+                        val author = p.optString("photographer", "Pexels Photographer")
+                        val authorUrl = p.optString("photographer_url", "")
+                        val width = p.optInt("width", 1920)
+                        val height = p.optInt("height", 1080)
+                        val src = p.optJSONObject("src")
+                        val original = src?.optString("original", "") ?: ""
+                        val large = src?.optString("large2x", "") ?: src?.optString("large", "") ?: original
+                        val medium = src?.optString("medium", "") ?: large
+
+                        val bestUrl = if (original.isNotBlank()) original else large
+
+                        items.add(
+                            SearchResultItem(
+                                id = "pexels_p_$id",
+                                title = "$query Photo by $author".capitalizeWords(),
+                                author = author,
+                                authorUrl = authorUrl,
+                                durationFormatted = "${width}x${height}",
+                                thumbnail = medium,
+                                directUrl = bestUrl,
+                                platform = "Pexels Photo",
+                                mediaType = "image",
+                                downloadUrl = bestUrl,
+                                pageUrl = pageUrl,
+                                resolutionBadge = "${width}x${height}"
+                            )
+                        )
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            // Ignore
+        }
+        items
+    }
+
+    /**
+     * Pixabay 4K / HD Stock Videos
+     */
+    suspend fun searchPixabayVideos(query: String, page: Int = 1): List<SearchResultItem> = withContext(Dispatchers.IO) {
+        val items = mutableListOf<SearchResultItem>()
+        try {
+            val url = "https://pixabay.com/api/videos/?key=" + PIXABAY_API_KEY +
+                    "&q=" + URLEncoder.encode(query, "UTF-8") + "&per_page=30&page=$page"
+            val request = Request.Builder()
+                .url(url)
+                .header("User-Agent", "Mozilla/5.0 MediaFetch/1.0")
+                .build()
+
+            val response = client.newCall(request).execute()
+            if (response.isSuccessful) {
+                val body = response.body?.string() ?: ""
+                val json = JSONObject(body)
+                val hits = json.optJSONArray("hits")
+                if (hits != null) {
+                    for (i in 0 until hits.length()) {
+                        val h = hits.optJSONObject(i) ?: continue
+                        val id = h.optLong("id", 0L)
+                        val pageUrl = h.optString("pageURL", "")
+                        val dur = h.optInt("duration", 0)
+                        val user = h.optString("user", "Pixabay Creator")
+                        val tags = h.optString("tags", query)
+
+                        val videosObj = h.optJSONObject("videos")
+                        var bestUrl = ""
+                        var bestRes = "HD"
+
+                        val largeObj = videosObj?.optJSONObject("large")
+                        val mediumObj = videosObj?.optJSONObject("medium")
+                        val smallObj = videosObj?.optJSONObject("small")
+                        val tinyObj = videosObj?.optJSONObject("tiny")
+
+                        if (largeObj != null && largeObj.optString("url", "").isNotBlank()) {
+                            bestUrl = largeObj.optString("url", "")
+                            val hVal = largeObj.optInt("height", 1080)
+                            bestRes = if (hVal >= 2160) "4K UHD" else "${hVal}p"
+                        } else if (mediumObj != null && mediumObj.optString("url", "").isNotBlank()) {
+                            bestUrl = mediumObj.optString("url", "")
+                            bestRes = "${mediumObj.optInt("height", 720)}p"
+                        } else if (smallObj != null && smallObj.optString("url", "").isNotBlank()) {
+                            bestUrl = smallObj.optString("url", "")
+                            bestRes = "${smallObj.optInt("height", 480)}p"
+                        } else if (tinyObj != null && tinyObj.optString("url", "").isNotBlank()) {
+                            bestUrl = tinyObj.optString("url", "")
+                            bestRes = "${tinyObj.optInt("height", 360)}p"
+                        }
+
+                        // Robust thumbnail extraction: check medium, small, tiny, large thumbnail fields first, then fallback to picture_id or userImageURL
+                        val picId = h.optString("picture_id", "")
+                        val thumb = (mediumObj?.optString("thumbnail", "")?.takeIf { it.isNotBlank() }
+                            ?: smallObj?.optString("thumbnail", "")?.takeIf { it.isNotBlank() }
+                            ?: tinyObj?.optString("thumbnail", "")?.takeIf { it.isNotBlank() }
+                            ?: largeObj?.optString("thumbnail", "")?.takeIf { it.isNotBlank() }
+                            ?: (if (picId.isNotBlank()) "https://i.vimeocdn.com/video/${picId}_640x360.jpg" else "")
+                                .takeIf { it.isNotBlank() }
+                            ?: h.optString("userImageURL", ""))
+
+                        val durFormatted = if (dur > 0) formatSecondsToDuration(dur.toLong()) else "HD Video"
+
+                        items.add(
+                            SearchResultItem(
+                                id = "pixabay_v_$id",
+                                title = "$tags ($bestRes)".capitalizeWords(),
+                                author = user,
+                                authorUrl = "https://pixabay.com/users/$user-${h.optLong("user_id", 0L)}/",
+                                durationFormatted = durFormatted,
+                                durationSeconds = dur.toLong(),
+                                thumbnail = thumb,
+                                directUrl = bestUrl,
+                                platform = "Pixabay HD",
+                                mediaType = "video",
+                                downloadUrl = bestUrl,
+                                pageUrl = pageUrl,
+                                resolutionBadge = bestRes
+                            )
+                        )
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            // Ignore
+        }
+        items
+    }
+
+    /**
+     * Pixabay High-Res Photos & Vector Art
+     */
+    suspend fun searchPixabayPhotos(query: String, page: Int = 1): List<SearchResultItem> = withContext(Dispatchers.IO) {
+        val items = mutableListOf<SearchResultItem>()
+        try {
+            val url = "https://pixabay.com/api/?key=" + PIXABAY_API_KEY +
+                    "&q=" + URLEncoder.encode(query, "UTF-8") + "&per_page=30&page=$page&image_type=photo"
+            val request = Request.Builder()
+                .url(url)
+                .header("User-Agent", "Mozilla/5.0 MediaFetch/1.0")
+                .build()
+
+            val response = client.newCall(request).execute()
+            if (response.isSuccessful) {
+                val body = response.body?.string() ?: ""
+                val json = JSONObject(body)
+                val hits = json.optJSONArray("hits")
+                if (hits != null) {
+                    for (i in 0 until hits.length()) {
+                        val h = hits.optJSONObject(i) ?: continue
+                        val id = h.optLong("id", 0L)
+                        val pageUrl = h.optString("pageURL", "")
+                        val user = h.optString("user", "Pixabay Artist")
+                        val tags = h.optString("tags", query)
+                        val width = h.optInt("imageWidth", 1920)
+                        val height = h.optInt("imageHeight", 1080)
+                        val largeImageURL = h.optString("largeImageURL", "")
+                        val webformatURL = h.optString("webformatURL", largeImageURL)
+                        val previewURL = h.optString("previewURL", webformatURL)
+
+                        val bestUrl = if (largeImageURL.isNotBlank()) largeImageURL else webformatURL
+
+                        items.add(
+                            SearchResultItem(
+                                id = "pixabay_p_$id",
+                                title = "$tags Photo".capitalizeWords(),
+                                author = user,
+                                authorUrl = "https://pixabay.com/users/$user-${h.optLong("user_id", 0L)}/",
+                                durationFormatted = "${width}x${height}",
+                                thumbnail = webformatURL.ifBlank { previewURL },
+                                directUrl = bestUrl,
+                                platform = "Pixabay Photo",
+                                mediaType = "image",
+                                downloadUrl = bestUrl,
+                                pageUrl = pageUrl,
+                                resolutionBadge = "${width}x${height}"
                             )
                         )
                     }

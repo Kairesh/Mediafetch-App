@@ -16,7 +16,28 @@
   const themeIconLight = document.getElementById('themeIconLight');
   const downloadsDrawerBtn = document.getElementById('downloadsDrawerBtn');
   const downloadsDrawer = document.getElementById('downloadsDrawer');
+  const downloadsDrawerBackdrop = document.getElementById('downloadsDrawerBackdrop');
   const closeDrawerBtn = document.getElementById('closeDrawerBtn');
+
+  function openDownloadsDrawer() {
+    if (downloadsDrawer) downloadsDrawer.classList.add('open');
+    if (downloadsDrawerBackdrop) downloadsDrawerBackdrop.classList.add('active');
+  }
+
+  function closeDownloadsDrawer() {
+    if (downloadsDrawer) downloadsDrawer.classList.remove('open');
+    if (downloadsDrawerBackdrop) downloadsDrawerBackdrop.classList.remove('active');
+  }
+
+  function triggerInputShake(inputElement) {
+    if (!inputElement) return;
+    inputElement.focus();
+    const wrap = inputElement.closest('.search-input-wrapper') || inputElement;
+    wrap.classList.remove('input-error-shake');
+    void wrap.offsetWidth;
+    wrap.classList.add('input-error-shake');
+    setTimeout(() => wrap.classList.remove('input-error-shake'), 600);
+  }
   const activeDownloadsCount = document.getElementById('activeDownloadsCount');
   const drawerItemsCount = document.getElementById('drawerItemsCount');
 
@@ -119,7 +140,7 @@
   window.setSystemInsets = function (topDp, bottomDp) {
     const topSafe = Math.max(38, topDp);
     document.documentElement.style.setProperty('--safe-top', topSafe + 'px');
-    document.documentElement.style.setProperty('--safe-bottom', Math.max(20, bottomDp) + 'px');
+    document.documentElement.style.setProperty('--safe-bottom', Math.max(28, bottomDp) + 'px');
   };
 
   const CURATED_THEMES = {
@@ -204,6 +225,13 @@
     if (c.length === 3) c = c.split('').map(x => x + x).join('');
     const num = parseInt(c, 16);
     return `rgba(${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}, ${alpha})`;
+  }
+
+  function hexToRgbValues(hex) {
+    let c = (hex || '#0A84FF').replace('#', '');
+    if (c.length === 3) c = c.split('').map(x => x + x).join('');
+    const num = parseInt(c, 16);
+    return `${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}`;
   }
 
   function autoMatchSecondaryColor(hex) {
@@ -400,10 +428,6 @@
 
     const modal = document.getElementById('customColorPickerModal');
     if (modal) modal.classList.add('hidden');
-
-    if (window.AndroidBridge && window.AndroidBridge.showToast) {
-      window.AndroidBridge.showToast('Theme updated!');
-    }
   }
 
   function cancelColorPickerSelection() {
@@ -558,9 +582,15 @@
 
     const doc = document.documentElement;
 
+    const pRgb = hexToRgbValues(primary);
+    const sRgb = hexToRgbValues(secondary);
+
     // 1. Dynamic Primary & Gradient Accents (Retained across both Light and Dark)
     doc.style.setProperty('--accent-primary', primary);
     doc.style.setProperty('--accent-secondary', secondary);
+    doc.style.setProperty('--primary-rgb', pRgb);
+    doc.style.setProperty('--secondary-rgb', sRgb);
+    doc.style.setProperty('--accent-rgb', pRgb);
     doc.style.setProperty('--accent-glow', hexToRgba(primary, 0.38));
     doc.style.setProperty('--accent-gradient', `linear-gradient(135deg, ${primary}, ${secondary})`);
     doc.style.setProperty('--card-border-active', hexToRgba(primary, 0.6));
@@ -569,6 +599,21 @@
     doc.style.setProperty('--apple-glow', hexToRgba(primary, 0.38));
     doc.style.setProperty('--brand-accent', primary);
     doc.style.setProperty('--brand-secondary', secondary);
+
+    // Material 3 Dynamic Accent Tokens
+    doc.style.setProperty('--md-sys-color-primary', primary);
+    doc.style.setProperty('--md-sys-color-primary-container', hexToRgba(primary, isDarkMode ? 0.20 : 0.12));
+    doc.style.setProperty('--md-sys-color-on-primary-container', primary);
+    doc.style.setProperty('--md-sys-color-secondary', secondary);
+    doc.style.setProperty('--md-sys-color-secondary-container', hexToRgba(secondary, isDarkMode ? 0.18 : 0.10));
+
+    // Perceived luminance for --md-sys-color-on-primary
+    const cNum = parseInt((primary || '#0A84FF').replace('#', ''), 16);
+    const cr = (cNum >> 16) & 255;
+    const cg = (cNum >> 8) & 255;
+    const cb = cNum & 255;
+    const lum = 0.299 * cr + 0.587 * cg + 0.114 * cb;
+    doc.style.setProperty('--md-sys-color-on-primary', lum > 165 ? '#000000' : '#FFFFFF');
 
     // 2. Light vs AMOLED Surface & Background Orchestration
     if (isDarkMode) {
@@ -585,32 +630,72 @@
       doc.style.setProperty('--input-bg', 'rgba(255, 255, 255, 0.07)');
       doc.style.setProperty('--input-border', 'rgba(255, 255, 255, 0.14)');
       doc.style.setProperty('--text-primary', '#FFFFFF');
-      doc.style.setProperty('--text-secondary', '#98989D');
-      doc.style.setProperty('--text-tertiary', '#636366');
+      doc.style.setProperty('--text-secondary', '#CBD5E1');
+      doc.style.setProperty('--text-tertiary', '#94A3B8');
       doc.style.setProperty('--shadow-main', '0 12px 36px rgba(0, 0, 0, 0.6)');
+
+      // Material 3 Dark/AMOLED Surface Tokens
+      doc.style.setProperty('--md-sys-color-surface', bg);
+      doc.style.setProperty('--md-sys-color-surface-dim', bg);
+      doc.style.setProperty('--md-sys-color-surface-bright', '#1E293B');
+      doc.style.setProperty('--md-sys-color-surface-container-lowest', bg);
+      doc.style.setProperty('--md-sys-color-surface-container-low', surface === '#000000' ? '#080C14' : surface);
+      doc.style.setProperty('--md-sys-color-surface-container', card);
+      doc.style.setProperty('--md-sys-color-surface-container-high', '#161D2E');
+      doc.style.setProperty('--md-sys-color-surface-container-highest', '#20293D');
+      doc.style.setProperty('--md-sys-color-on-surface', '#FFFFFF');
+      doc.style.setProperty('--md-sys-color-on-surface-variant', '#CBD5E1');
+      doc.style.setProperty('--md-sys-color-outline', 'rgba(255, 255, 255, 0.16)');
+      doc.style.setProperty('--md-sys-color-outline-variant', 'rgba(255, 255, 255, 0.08)');
+
       if (themeIconDark) themeIconDark.classList.remove('hidden');
       if (themeIconLight) themeIconLight.classList.add('hidden');
     } else {
       doc.setAttribute('data-theme', 'light');
-      doc.style.setProperty('--app-bg', '#F4F6F9');
+      doc.style.setProperty('--app-bg', '#F8FAFC');
       doc.style.setProperty('--bg-gradient-start', '#F4F6F9');
       doc.style.setProperty('--bg-gradient-end', '#EEF2F6');
       doc.style.setProperty('--app-surface', '#FFFFFF');
       doc.style.setProperty('--app-card', '#FFFFFF');
-      doc.style.setProperty('--app-card-border', 'rgba(0, 0, 0, 0.08)');
-      doc.style.setProperty('--input-bg', '#FFFFFF');
-      doc.style.setProperty('--input-border', '#D1D5DB');
-      doc.style.setProperty('--text-primary', '#111827');
-      doc.style.setProperty('--text-secondary', '#4B5563');
-      doc.style.setProperty('--text-tertiary', '#6B7280');
-      doc.style.setProperty('--shadow-main', '0 10px 30px rgba(0, 0, 0, 0.05)');
+      doc.style.setProperty('--app-card-border', 'rgba(15, 23, 42, 0.09)');
+      doc.style.setProperty('--input-bg', '#F1F5F9');
+      doc.style.setProperty('--input-border', 'rgba(15, 23, 42, 0.18)');
+      doc.style.setProperty('--text-primary', '#0F172A');
+      doc.style.setProperty('--text-secondary', '#475569');
+      doc.style.setProperty('--text-tertiary', '#64748B');
+      doc.style.setProperty('--shadow-main', '0 4px 20px rgba(0, 0, 0, 0.06)');
+
+      // Material 3 Light Surface Tokens
+      doc.style.setProperty('--md-sys-color-surface', '#F8FAFC');
+      doc.style.setProperty('--md-sys-color-surface-dim', '#EDF2F7');
+      doc.style.setProperty('--md-sys-color-surface-bright', '#FFFFFF');
+      doc.style.setProperty('--md-sys-color-surface-container-lowest', '#FFFFFF');
+      doc.style.setProperty('--md-sys-color-surface-container-low', '#F1F5F9');
+      doc.style.setProperty('--md-sys-color-surface-container', '#FFFFFF');
+      doc.style.setProperty('--md-sys-color-surface-container-high', '#F8FAFC');
+      doc.style.setProperty('--md-sys-color-surface-container-highest', '#E2E8F0');
+      doc.style.setProperty('--md-sys-color-on-surface', '#0F172A');
+      doc.style.setProperty('--md-sys-color-on-surface-variant', '#475569');
+      doc.style.setProperty('--md-sys-color-outline', 'rgba(15, 23, 42, 0.18)');
+      doc.style.setProperty('--md-sys-color-outline-variant', 'rgba(15, 23, 42, 0.09)');
+
       if (themeIconDark) themeIconDark.classList.add('hidden');
       if (themeIconLight) themeIconLight.classList.remove('hidden');
     }
 
+    const isIconSyncEnabled = (localStorage.getItem('mediafetch_sync_app_icon_theme') === 'true');
     try {
-      if (window.AndroidBridge && window.AndroidBridge.updateNativeTheme) {
-        window.AndroidBridge.updateNativeTheme(primary, surface, bg, isDarkMode);
+      if (window.AndroidBridge) {
+        if (window.AndroidBridge.setLauncherIconSync) {
+          window.AndroidBridge.setLauncherIconSync(isIconSyncEnabled);
+        }
+        if (window.AndroidBridge.updateNativeTheme) {
+          try {
+            window.AndroidBridge.updateNativeTheme(primary, surface, bg, isDarkMode, isIconSyncEnabled);
+          } catch (_) {
+            window.AndroidBridge.updateNativeTheme(primary, surface, bg, isDarkMode);
+          }
+        }
       }
     } catch (_) {}
 
@@ -660,8 +745,18 @@
   }
 
   function updateLogoThemeSync(accentHex) {
+    const isSync = (localStorage.getItem('mediafetch_sync_app_icon_theme') === 'true');
+    if (!isSync) {
+      // Toggle is OFF: do NOT update the logo color with the new theme
+      return;
+    }
+    applyLogoColor(accentHex);
+  }
+
+  function applyLogoColor(accentHex) {
     if (!accentHex || !accentHex.startsWith('#')) return;
     try {
+      localStorage.setItem('mediafetch_last_logo_color', accentHex);
       let hex = accentHex.replace('#', '');
       if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
       const r = parseInt(hex.substring(0, 2), 16) / 255;
@@ -699,6 +794,11 @@
     if (!validStyles.includes(styleKey)) styleKey = 'glass';
     currentVisualStyle = styleKey;
     document.documentElement.setAttribute('data-glass-style', styleKey);
+    document.documentElement.setAttribute('data-theme-style', styleKey);
+    if (document.body) {
+      document.body.setAttribute('data-glass-style', styleKey);
+      document.body.setAttribute('data-theme-style', styleKey);
+    }
 
     try {
       localStorage.setItem('mediafetch_visual_style', styleKey);
@@ -730,6 +830,7 @@
       if (savedConfigStr) {
         const savedConfig = JSON.parse(savedConfigStr);
         applyFullTheme(savedConfig, true);
+        checkRestoreLogoColor();
         return;
       }
       const legacyAccent = localStorage.getItem('mediafetch_accent_color');
@@ -747,24 +848,34 @@
             card: 'rgba(22, 22, 26, 0.85)'
           }, true);
         }
+        checkRestoreLogoColor();
         return;
       }
     } catch (_) {}
 
     applyFullTheme(CURATED_THEMES.blue, true);
+    checkRestoreLogoColor();
+  }
+
+  function checkRestoreLogoColor() {
+    const isSync = (localStorage.getItem('mediafetch_sync_app_icon_theme') === 'true');
+    if (!isSync) {
+      const savedLogoColor = localStorage.getItem('mediafetch_last_logo_color');
+      if (savedLogoColor) {
+        applyLogoColor(savedLogoColor);
+      }
+    }
   }
 
   themeToggleBtn.addEventListener('click', () => {
     isDarkMode = !isDarkMode;
     localStorage.setItem('mediafetch_color_mode', isDarkMode ? 'dark' : 'light');
     applyFullTheme(currentActiveTheme || CURATED_THEMES.blue, false);
-    if (window.AndroidBridge && window.AndroidBridge.showToast) {
-      window.AndroidBridge.showToast(isDarkMode ? 'Switched to AMOLED Dark mode' : 'Switched to Clean Light mode');
-    }
   });
 
-  downloadsDrawerBtn.addEventListener('click', () => downloadsDrawer.classList.add('open'));
-  closeDrawerBtn.addEventListener('click', () => downloadsDrawer.classList.remove('open'));
+  downloadsDrawerBtn.addEventListener('click', openDownloadsDrawer);
+  closeDrawerBtn.addEventListener('click', closeDownloadsDrawer);
+  if (downloadsDrawerBackdrop) downloadsDrawerBackdrop.addEventListener('click', closeDownloadsDrawer);
   dismissShareBtn.addEventListener('click', () => incomingShareBanner.classList.add('hidden'));
 
   urlInput.addEventListener('input', () => {
@@ -781,21 +892,21 @@
     try {
       if (navigator.clipboard && navigator.clipboard.readText) {
         const txt = await navigator.clipboard.readText();
-        if (txt) {
-          urlInput.value = txt;
+        if (txt && txt.trim()) {
+          urlInput.value = txt.trim();
           clearUrlBtn.classList.remove('hidden');
-          triggerAnalysis(txt);
+          triggerAnalysis(txt.trim());
+          return;
         }
       }
-    } catch (e) {
-      if (window.AndroidBridge) window.AndroidBridge.showToast('Please type or paste link');
-    }
+    } catch (_) {}
+    triggerInputShake(urlInput);
   });
 
   fetchBtn.addEventListener('click', () => {
     const val = urlInput.value.trim();
     if (!val) {
-      if (window.AndroidBridge) window.AndroidBridge.showToast('Please enter or paste a media link');
+      triggerInputShake(urlInput);
       return;
     }
     triggerAnalysis(val);
@@ -1283,9 +1394,6 @@
         `;
 
         card.addEventListener('click', () => {
-          if (is4K && window.AndroidBridge && window.AndroidBridge.showToast) {
-            window.AndroidBridge.showToast('Note: 4K Ultra HD files are larger and take a bit longer to download.');
-          }
           triggerDownload(q.id, false, 0, 0);
         });
         videoQualitiesList.appendChild(card);
@@ -2069,7 +2177,7 @@
 
     if (window.AndroidBridge && window.AndroidBridge.downloadSearchResultWithFormat) {
       window.AndroidBridge.downloadSearchResultWithFormat(JSON.stringify(slideItem), isVid ? '1080p' : 'image');
-      if (downloadsDrawer) downloadsDrawer.classList.add('open');
+      openDownloadsDrawer();
     }
   }
 
@@ -2095,7 +2203,7 @@
       if (window.AndroidBridge && window.AndroidBridge.showToast) {
         window.AndroidBridge.showToast(`Enqueued all ${slides.length} slides!`);
       }
-      if (downloadsDrawer) downloadsDrawer.classList.add('open');
+      openDownloadsDrawer();
     });
   }
 
@@ -2141,7 +2249,7 @@
         window.AndroidBridge.startDownload(qualityId, isTrimmed, startSec, endSec, customTitle, "{}");
       }
     }
-    if (downloadsDrawer) downloadsDrawer.classList.add('open');
+    openDownloadsDrawer();
   }
 
   // Feature 2: Smart Chapter-Based Splitting
@@ -2242,7 +2350,7 @@
       if (window.AndroidBridge && window.AndroidBridge.showToast) {
         window.AndroidBridge.showToast(`Enqueued all ${currentMedia.chapters.length} chapters as separate tracks!`);
       }
-      if (downloadsDrawer) downloadsDrawer.classList.add('open');
+      openDownloadsDrawer();
     });
   }
 
@@ -2339,13 +2447,10 @@
 
     const redownloadBtn = card.querySelector('.redownload-btn');
     if (redownloadBtn) redownloadBtn.addEventListener('click', () => {
-      if (downloadsDrawer) downloadsDrawer.classList.remove('open');
+      closeDownloadsDrawer();
       toggleAppMode('fetch');
       urlInput.value = task.url;
       handleFetchMedia();
-      if (window.AndroidBridge && window.AndroidBridge.showToast) {
-        window.AndroidBridge.showToast('Select resolution or format to download again');
-      }
     });
 
     return card;
@@ -2448,9 +2553,6 @@
 
   function clearAllTasksAction() {
     if (allTasks.length === 0) {
-      if (window.AndroidBridge && window.AndroidBridge.showToast) {
-        window.AndroidBridge.showToast('Download history is already empty');
-      }
       return;
     }
     const confirmClear = confirm('Are you sure you want to clear all download history?');
@@ -2473,30 +2575,24 @@
   }
 
   window.openDownloadsDrawer = function () {
-    downloadsDrawer.classList.add('open');
+    openDownloadsDrawer();
   };
 
   window.focusUrlInput = function () {
-    if (downloadsDrawer.classList.contains('open')) {
-      downloadsDrawer.classList.remove('open');
-    }
+    closeDownloadsDrawer();
     urlInput.focus();
     urlInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
 
   window.openTrimmer = function () {
-    if (downloadsDrawer.classList.contains('open')) {
-      downloadsDrawer.classList.remove('open');
-    }
+    closeDownloadsDrawer();
     const trimmerEl = document.getElementById('trimmerSection') || document.querySelector('.trim-controls');
     if (trimmerEl && !trimmerEl.classList.contains('hidden')) {
       trimmerEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
     } else {
       urlInput.focus();
       urlInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      if (window.AndroidBridge && window.AndroidBridge.showToast) {
-        window.AndroidBridge.showToast('Paste video link above to open Trimmer Studio');
-      }
+      triggerInputShake(urlInput);
     }
   };
 
@@ -2559,7 +2655,7 @@
       mediaSearchView.classList.add('hidden');
       if (mediaSettingsView) mediaSettingsView.classList.add('hidden');
       if (mediaHistoryView) mediaHistoryView.classList.remove('hidden');
-      if (downloadsDrawer) downloadsDrawer.classList.remove('open');
+      closeDownloadsDrawer();
       if (modeSwitchIcon) modeSwitchIcon.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>';
       if (modeSwitchLabel) modeSwitchLabel.textContent = 'Downloader';
       if (modeSwitchBtn) {
@@ -2690,14 +2786,6 @@
         selectedPlatforms.add(first);
         updatePlatformPillsUI();
       }
-
-      if (window.AndroidBridge && window.AndroidBridge.showToast) {
-        window.AndroidBridge.showToast(
-          isMultiSelectMode 
-            ? 'Multi-Filter ON: Tap platforms to select multiple engines!' 
-            : 'Single Mode: Tap any platform to search that engine only.'
-        );
-      }
     });
   }
 
@@ -2762,12 +2850,14 @@
         }, 220);
       } else {
         msSuggestionsDropdown.classList.add('hidden');
+        msSearchInput.closest('.search-studio-card')?.classList.remove('has-open-suggestions');
       }
     });
 
     msSearchInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         msSuggestionsDropdown.classList.add('hidden');
+        msSearchInput.closest('.search-studio-card')?.classList.remove('has-open-suggestions');
         const query = msSearchInput.value.trim();
         if (query) executeMediaSearch(query);
       }
@@ -2779,6 +2869,7 @@
       msSearchInput.value = '';
       msClearSearchBtn.classList.add('hidden');
       msSuggestionsDropdown.classList.add('hidden');
+      msSearchInput.closest('.search-studio-card')?.classList.remove('has-open-suggestions');
       msSearchInput.focus();
     });
   }
@@ -2786,8 +2877,13 @@
   if (msSearchBtn) {
     msSearchBtn.addEventListener('click', () => {
       msSuggestionsDropdown.classList.add('hidden');
+      msSearchInput.closest('.search-studio-card')?.classList.remove('has-open-suggestions');
       const query = msSearchInput.value.trim();
-      if (query) executeMediaSearch(query);
+      if (query) {
+        executeMediaSearch(query);
+      } else {
+        triggerInputShake(msSearchInput);
+      }
     });
   }
 
@@ -2805,6 +2901,7 @@
   window.onSearchSuggestionsLoaded = function (suggestions) {
     if (!suggestions || suggestions.length === 0 || !msSearchInput.value.trim()) {
       msSuggestionsDropdown.classList.add('hidden');
+      msSearchInput.closest('.search-studio-card')?.classList.remove('has-open-suggestions');
       return;
     }
 
@@ -2819,6 +2916,7 @@
       row.addEventListener('click', () => {
         msSearchInput.value = item;
         msSuggestionsDropdown.classList.add('hidden');
+        msSearchInput.closest('.search-studio-card')?.classList.remove('has-open-suggestions');
         msClearSearchBtn.classList.remove('hidden');
         executeMediaSearch(item);
       });
@@ -2826,11 +2924,13 @@
     });
 
     msSuggestionsDropdown.classList.remove('hidden');
+    msSearchInput.closest('.search-studio-card')?.classList.add('has-open-suggestions');
   };
 
   document.addEventListener('click', (ev) => {
     if (msSuggestionsDropdown && !msSuggestionsDropdown.contains(ev.target) && ev.target !== msSearchInput) {
       msSuggestionsDropdown.classList.add('hidden');
+      msSearchInput.closest('.search-studio-card')?.classList.remove('has-open-suggestions');
     }
   });
 
@@ -2840,6 +2940,7 @@
     isSearchingMedia = true;
 
     msSuggestionsDropdown.classList.add('hidden');
+    msSearchInput.closest('.search-studio-card')?.classList.remove('has-open-suggestions');
     msEmptyState.classList.add('hidden');
     msResultsGrid.classList.add('hidden');
     msLoadingSkeleton.classList.remove('hidden');
@@ -2948,16 +3049,118 @@
   }
 
   // Format & Quality Picker Bottom Sheet Modal Logic
-  if (sfmCloseBtn) {
-    sfmCloseBtn.addEventListener('click', closeSearchFormatModal);
+  const searchFormatSheet = document.getElementById('searchFormatSheet');
+  const sfmExpandBtn = document.getElementById('sfmExpandBtn');
+  const sfmDragPill = document.getElementById('sfmDragPill');
+  const sfmHeader = document.getElementById('sfmHeader');
+
+  function toggleSearchFormatFullscreen(forceState) {
+    if (!searchFormatSheet) return;
+    const shouldExpand = (forceState !== undefined) ? forceState : !searchFormatSheet.classList.contains('expanded');
+    if (shouldExpand) {
+      searchFormatSheet.classList.add('expanded');
+    } else {
+      searchFormatSheet.classList.remove('expanded');
+    }
+    searchFormatSheet.style.transform = '';
   }
+
+  if (sfmExpandBtn) {
+    sfmExpandBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleSearchFormatFullscreen();
+    });
+  }
+
+  if (sfmCloseBtn) {
+    sfmCloseBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeSearchFormatModal();
+    });
+  }
+
   if (searchFormatModal) {
     searchFormatModal.addEventListener('click', (e) => {
       if (e.target === searchFormatModal) closeSearchFormatModal();
     });
   }
 
+  // Interactive Gesture / Drag to Expand to Fullscreen or Dismiss
+  let sfmTouchStartY = 0;
+  let sfmTouchCurrentY = 0;
+  let sfmIsTouchDragging = false;
+  let sfmTouchStartTime = 0;
+
+  function onSfmTouchStart(e) {
+    if (!searchFormatSheet) return;
+    const touch = e.touches[0];
+    sfmTouchStartY = touch.clientY;
+    sfmTouchCurrentY = touch.clientY;
+    sfmTouchStartTime = Date.now();
+    sfmIsTouchDragging = true;
+    searchFormatSheet.style.transition = 'none';
+  }
+
+  function onSfmTouchMove(e) {
+    if (!sfmIsTouchDragging || !searchFormatSheet) return;
+    const touch = e.touches[0];
+    sfmTouchCurrentY = touch.clientY;
+    const deltaY = sfmTouchCurrentY - sfmTouchStartY;
+
+    if (deltaY < 0) {
+      // Swiping UP -> Pull upwards to full screen
+      if (!searchFormatSheet.classList.contains('expanded')) {
+        const pull = Math.max(-140, deltaY);
+        searchFormatSheet.style.transform = `translateY(${pull}px)`;
+      }
+    } else {
+      // Swiping DOWN -> Pull downwards to dismiss or collapse
+      searchFormatSheet.style.transform = `translateY(${deltaY}px)`;
+    }
+  }
+
+  function onSfmTouchEnd() {
+    if (!sfmIsTouchDragging || !searchFormatSheet) return;
+    sfmIsTouchDragging = false;
+    searchFormatSheet.style.transition = 'transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), max-height 0.26s cubic-bezier(0.16, 1, 0.3, 1), height 0.26s cubic-bezier(0.16, 1, 0.3, 1)';
+
+    const deltaY = sfmTouchCurrentY - sfmTouchStartY;
+    const elapsed = Date.now() - sfmTouchStartTime;
+    const velocity = deltaY / Math.max(1, elapsed);
+
+    searchFormatSheet.style.transform = '';
+
+    if (deltaY < -35 || velocity < -0.28) {
+      // Swiped UP -> Expand to fullscreen
+      toggleSearchFormatFullscreen(true);
+    } else if (deltaY > 80 || velocity > 0.38) {
+      // Swiped DOWN -> Collapse or Close
+      if (searchFormatSheet.classList.contains('expanded')) {
+        toggleSearchFormatFullscreen(false);
+      } else {
+        closeSearchFormatModal();
+      }
+    }
+  }
+
+  if (sfmDragPill) {
+    sfmDragPill.addEventListener('click', () => toggleSearchFormatFullscreen());
+    sfmDragPill.addEventListener('touchstart', onSfmTouchStart, { passive: true });
+    sfmDragPill.addEventListener('touchmove', onSfmTouchMove, { passive: true });
+    sfmDragPill.addEventListener('touchend', onSfmTouchEnd, { passive: true });
+  }
+
+  if (sfmHeader) {
+    sfmHeader.addEventListener('touchstart', onSfmTouchStart, { passive: true });
+    sfmHeader.addEventListener('touchmove', onSfmTouchMove, { passive: true });
+    sfmHeader.addEventListener('touchend', onSfmTouchEnd, { passive: true });
+  }
+
   function closeSearchFormatModal() {
+    if (searchFormatSheet) {
+      searchFormatSheet.classList.remove('expanded');
+      searchFormatSheet.style.transform = '';
+    }
     if (searchFormatModal) searchFormatModal.classList.add('hidden');
   }
 
@@ -3039,10 +3242,10 @@
   function startFormattedDownload(item, format) {
     if (window.AndroidBridge && window.AndroidBridge.downloadSearchResultWithFormat) {
       window.AndroidBridge.downloadSearchResultWithFormat(JSON.stringify(item), format);
-      downloadsDrawer.classList.add('open');
+      openDownloadsDrawer();
     } else if (window.AndroidBridge && window.AndroidBridge.downloadSearchResult) {
       window.AndroidBridge.downloadSearchResult(JSON.stringify(item));
-      downloadsDrawer.classList.add('open');
+      openDownloadsDrawer();
     }
   }
 
@@ -3065,9 +3268,6 @@
       }
     }, 600);
 
-    if (window.AndroidBridge && window.AndroidBridge.showToast) {
-      window.AndroidBridge.showToast(`Loaded "${item.title}" into Clip Trimmer!`);
-    }
   }
 
   // =========================================================================
@@ -3272,9 +3472,6 @@
     if (settingsCacheLimitSelect) {
       settingsCacheLimitSelect.addEventListener('change', (e) => {
         localStorage.setItem('mediafetch_cache_limit', e.target.value);
-        if (window.AndroidBridge && window.AndroidBridge.showToast) {
-          window.AndroidBridge.showToast(`Cache limit set to ${e.target.options[e.target.selectedIndex].text}`);
-        }
       });
     }
 
@@ -3284,17 +3481,31 @@
         const style = card.getAttribute('data-style');
         if (style) {
           applyVisualStyle(style);
-          if (window.AndroidBridge && window.AndroidBridge.showToast) {
-            const names = {
-              'solid': 'Switched to Pure Solid AMOLED theme',
-              'glass': 'Switched to Liquid Glassmorphism theme',
-              'prism': 'Switched to Cyber Aurora Prism theme'
-            };
-            window.AndroidBridge.showToast(names[style] || 'Theme updated');
-          }
         }
       });
     });
+
+    // Sync App Icon With Theme Toggle
+    const toggleSyncAppIconTheme = document.getElementById('toggleSyncAppIconTheme');
+    if (toggleSyncAppIconTheme) {
+      const isSyncEnabled = (localStorage.getItem('mediafetch_sync_app_icon_theme') === 'true');
+      toggleSyncAppIconTheme.checked = isSyncEnabled;
+
+      toggleSyncAppIconTheme.addEventListener('change', (e) => {
+        const enabled = e.target.checked;
+        localStorage.setItem('mediafetch_sync_app_icon_theme', enabled ? 'true' : 'false');
+        if (window.AndroidBridge && window.AndroidBridge.setLauncherIconSync) {
+          window.AndroidBridge.setLauncherIconSync(enabled);
+        }
+        if (enabled) {
+          const currentPrimary = (currentActiveTheme && currentActiveTheme.primary) || '#0A84FF';
+          applyLogoColor(currentPrimary);
+          if (window.AndroidBridge && window.AndroidBridge.updateAppIconToTheme) {
+            window.AndroidBridge.updateAppIconToTheme(currentPrimary);
+          }
+        }
+      });
+    }
 
     // Curated Complete Themes selection
     document.querySelectorAll('.theme-preset-card').forEach(card => {
@@ -3302,9 +3513,6 @@
         const presetKey = card.dataset.preset;
         if (presetKey && CURATED_THEMES[presetKey]) {
           applyFullTheme(CURATED_THEMES[presetKey], true);
-          if (window.AndroidBridge && window.AndroidBridge.showToast) {
-            window.AndroidBridge.showToast(`Applied ${CURATED_THEMES[presetKey].name} theme`);
-          }
         }
       });
     });
@@ -3343,9 +3551,6 @@
         currentActiveTheme.secondary = secondary;
         currentActiveTheme.id = 'custom';
         applyFullTheme(currentActiveTheme, true);
-        if (window.AndroidBridge && window.AndroidBridge.showToast) {
-          window.AndroidBridge.showToast('Harmonized gradient auto-matched!');
-        }
       });
     }
 
@@ -3381,9 +3586,6 @@
           if (list.length > 8) list.pop();
           localStorage.setItem('mediafetch_user_custom_themes', JSON.stringify(list));
           renderUserCustomThemes();
-          if (window.AndroidBridge && window.AndroidBridge.showToast) {
-            window.AndroidBridge.showToast('Custom theme preset saved!');
-          }
         } catch (_) {}
       });
     }
@@ -3393,36 +3595,24 @@
     if (resetThemeDefaultBtn) {
       resetThemeDefaultBtn.addEventListener('click', () => {
         applyFullTheme(CURATED_THEMES.blue, true);
-        if (window.AndroidBridge && window.AndroidBridge.showToast) {
-          window.AndroidBridge.showToast('Reset to Cyber Blue default');
-        }
       });
     }
 
     if (settingsDefaultVideoRes) {
       settingsDefaultVideoRes.addEventListener('change', (e) => {
         localStorage.setItem('mediafetch_default_video_res', e.target.value);
-        if (window.AndroidBridge && window.AndroidBridge.showToast) {
-          window.AndroidBridge.showToast(`Default video quality set to ${e.target.options[e.target.selectedIndex].text}`);
-        }
       });
     }
 
     if (settingsDefaultAudioFmt) {
       settingsDefaultAudioFmt.addEventListener('change', (e) => {
         localStorage.setItem('mediafetch_default_audio_fmt', e.target.value);
-        if (window.AndroidBridge && window.AndroidBridge.showToast) {
-          window.AndroidBridge.showToast(`Default audio format set to ${e.target.options[e.target.selectedIndex].text}`);
-        }
       });
     }
 
     if (settingsDefaultImgFmt) {
       settingsDefaultImgFmt.addEventListener('change', (e) => {
         localStorage.setItem('mediafetch_default_img_fmt', e.target.value);
-        if (window.AndroidBridge && window.AndroidBridge.showToast) {
-          window.AndroidBridge.showToast(`Default image export set to ${e.target.options[e.target.selectedIndex].text}`);
-        }
       });
     }
 
@@ -3443,9 +3633,6 @@
         const count = parseInt(e.target.value) || 2;
         if (window.AndroidBridge && window.AndroidBridge.saveMaxConcurrentDownloads) {
           window.AndroidBridge.saveMaxConcurrentDownloads(count);
-        }
-        if (window.AndroidBridge && window.AndroidBridge.showToast) {
-          window.AndroidBridge.showToast(`Max parallel downloads set to ${count}`);
         }
       });
     }
@@ -3890,11 +4077,16 @@
       return true;
     }
     if (searchFormatModal && !searchFormatModal.classList.contains('hidden')) {
+      if (searchFormatSheet && searchFormatSheet.classList.contains('expanded')) {
+        searchFormatSheet.classList.remove('expanded');
+        searchFormatSheet.style.transform = '';
+        return true;
+      }
       closeSearchFormatModal();
       return true;
     }
-    if (downloadsDrawer.classList.contains('open')) {
-      downloadsDrawer.classList.remove('open');
+    if (downloadsDrawer && downloadsDrawer.classList.contains('open')) {
+      closeDownloadsDrawer();
       return true;
     }
     if (currentAppMode === 'settings' || currentAppMode === 'search' || currentAppMode === 'history') {

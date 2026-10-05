@@ -56,6 +56,7 @@ function initShareSheet() {
                 document.documentElement.style.setProperty('--safe-bottom', `${data.safeBottom}px`);
             }
             if (data.accentColor) {
+                document.documentElement.style.setProperty('--brand-accent', data.accentColor);
                 document.documentElement.style.setProperty('--apple-blue', data.accentColor);
                 document.documentElement.style.setProperty('--accent-glow', `${data.accentColor}33`);
             }

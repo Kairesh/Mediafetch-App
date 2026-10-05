@@ -47,6 +47,17 @@ class MainActivity : AppCompatActivity() {
 
     private var isPopupShareMode = false
     private var currentMediaItem: MediaItem? = null
+    private var activeToast: Toast? = null
+
+    fun showAppToast(msg: String) {
+        runOnUiThread {
+            try {
+                activeToast?.cancel()
+                activeToast = Toast.makeText(applicationContext, msg, Toast.LENGTH_SHORT)
+                activeToast?.show()
+            } catch (_: Exception) {}
+        }
+    }
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -169,7 +180,10 @@ class MainActivity : AppCompatActivity() {
             val savedBg = prefs.getString("bgColor", "#000000") ?: "#000000"
             val savedIsDark = prefs.getBoolean("isDark", true)
             applyNativeThemeColors(savedAccent, savedSurface, savedBg, savedIsDark)
-            updateAppLauncherIcon(savedAccent)
+            val syncLauncherIcon = prefs.getBoolean("syncLauncherIcon", false)
+            if (syncLauncherIcon) {
+                updateAppLauncherIcon(savedAccent)
+            }
         }
 
         // Listen for status bar / navigation bar insets and forward to WebView
@@ -178,7 +192,7 @@ class MainActivity : AppCompatActivity() {
             val navBarHeight = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
             val density = resources.displayMetrics.density
             val topDp = (statusBarHeight / density).toInt().coerceAtLeast(28)
-            val bottomDp = (navBarHeight / density).toInt().coerceAtLeast(16)
+            val bottomDp = (navBarHeight / density).toInt().coerceAtLeast(24)
 
             webView.evaluateJavascript("window.setSystemInsets && window.setSystemInsets($topDp, $bottomDp);", null)
             insets
@@ -188,6 +202,19 @@ class MainActivity : AppCompatActivity() {
 
         // Auto purge app cache on launch to keep storage footprint at absolute minimum
         autoPurgeAppCache(forceAll = false)
+
+        // Setup modern onBackPressedDispatcher callback for gesture & button navigation
+        onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                webView.evaluateJavascript("window.handleBackPress ? window.handleBackPress() : false;") { result ->
+                    if (result != "true") {
+                        isEnabled = false
+                        onBackPressedDispatcher.onBackPressed()
+                        isEnabled = true
+                    }
+                }
+            }
+        })
 
         requestRequiredPermissions()
         bindDownloadService()
@@ -202,7 +229,7 @@ class MainActivity : AppCompatActivity() {
             statusBarHeight = (resources.getDimensionPixelSize(resourceId) / density).toInt()
         }
         val topDp = statusBarHeight.coerceAtLeast(32)
-        webView.evaluateJavascript("window.setSystemInsets && window.setSystemInsets($topDp, 24);", null)
+        webView.evaluateJavascript("window.setSystemInsets && window.setSystemInsets($topDp, 28);", null)
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -317,12 +344,9 @@ class MainActivity : AppCompatActivity() {
         webView.evaluateJavascript("window.onTaskListLoaded && window.onTaskListLoaded(${array});", null)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
-        webView.evaluateJavascript("window.handleBackPress ? window.handleBackPress() : false;") { result ->
-            if (result == "false" || result == null) {
-                super.onBackPressed()
-            }
-        }
+        onBackPressedDispatcher.onBackPressed()
     }
 
     inner class WebAppInterface(private val context: Context) {
@@ -401,7 +425,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             if (quality == null) {
-                Toast.makeText(context, "Please select a quality format", Toast.LENGTH_SHORT).show()
+                showAppToast("Please select a quality format")
                 return
             }
 
@@ -421,7 +445,7 @@ class MainActivity : AppCompatActivity() {
             )
 
             downloadService?.enqueueDownload(task)
-            Toast.makeText(context, "Downloading: ${quality.label}", Toast.LENGTH_SHORT).show()
+            showAppToast("Downloading: ${quality.label}")
         }
 
         @JavascriptInterface
@@ -545,7 +569,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             val modeMsg = if (asZip) "as single .ZIP archive" else "as separate files"
-            Toast.makeText(context, "Enqueued $totalCount items ($modeMsg)!", Toast.LENGTH_SHORT).show()
+            showAppToast("Enqueued $totalCount items ($modeMsg)!")
         }
 
         @JavascriptInterface
@@ -610,7 +634,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             val modeMsg = if (asZip) "as single .ZIP archive" else "as separate files"
-            Toast.makeText(context, "Enqueued $totalCount slides ($modeMsg)!", Toast.LENGTH_SHORT).show()
+            showAppToast("Enqueued $totalCount slides ($modeMsg)!")
         }
 
         @JavascriptInterface
@@ -619,7 +643,7 @@ class MainActivity : AppCompatActivity() {
                 val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
                 startActivityForResult(intent, REQUEST_CODE_PICK_FOLDER)
             } catch (e: Exception) {
-                Toast.makeText(this@MainActivity, "Folder picker unavailable: ${e.message}", Toast.LENGTH_SHORT).show()
+                showAppToast("Folder picker unavailable: ${e.message}")
             }
         }
 
@@ -700,7 +724,7 @@ class MainActivity : AppCompatActivity() {
             )
 
             downloadService?.enqueueDownload(task)
-            Toast.makeText(context, "Downloading: ${quality.label}", Toast.LENGTH_SHORT).show()
+            showAppToast("Downloading: ${quality.label}")
         }
 
         // --- In-App Update Bridge ---
@@ -767,7 +791,7 @@ class MainActivity : AppCompatActivity() {
                 cm.flush()
             } catch (_: Exception) {}
             val count = MediaEngine.getCookiesCount()
-            Toast.makeText(context, "Cookies applied ($count loaded)", Toast.LENGTH_SHORT).show()
+            showAppToast("Cookies applied ($count loaded)")
         }
 
         @JavascriptInterface
@@ -786,7 +810,7 @@ class MainActivity : AppCompatActivity() {
                 cm.removeAllCookies(null)
                 cm.flush()
             } catch (_: Exception) {}
-            Toast.makeText(context, "Cookies cleared", Toast.LENGTH_SHORT).show()
+            showAppToast("Cookies cleared")
         }
 
         @JavascriptInterface
@@ -797,7 +821,6 @@ class MainActivity : AppCompatActivity() {
         fun saveFilenameTemplate(template: String) {
             val prefs = getSharedPreferences("mediafetch_prefs", Context.MODE_PRIVATE)
             prefs.edit().putString("custom_filename_template", template.trim()).apply()
-            Toast.makeText(context, "Filename pattern saved", Toast.LENGTH_SHORT).show()
         }
 
         @JavascriptInterface
@@ -984,9 +1007,7 @@ class MainActivity : AppCompatActivity() {
                     )
 
                     if (isSocialOrYt) {
-                        withContext(Dispatchers.Main) {
-                            Toast.makeText(this@MainActivity, "Resolving $title stream...", Toast.LENGTH_SHORT).show()
-                        }
+                        showAppToast("Resolving $title stream...")
 
                         val resolved = MediaEngine.resolveMedia(targetUrl, this@MainActivity)
                         val chosenQuality = when (requestedFormat.lowercase()) {
@@ -1010,9 +1031,7 @@ class MainActivity : AppCompatActivity() {
                         downloadService?.enqueueDownload(task)
                         notifyTaskUpdatedToJs(task)
 
-                        withContext(Dispatchers.Main) {
-                            Toast.makeText(this@MainActivity, "Downloading: ${task.title} (${chosenQuality.label})", Toast.LENGTH_SHORT).show()
-                        }
+                        showAppToast("Downloading: ${task.title} (${chosenQuality.label})")
                     } else {
                         // Direct media URL (Wikimedia, Openverse, Wallhaven, Imgflip, FreeSound)
                         val ext = when {
@@ -1057,14 +1076,10 @@ class MainActivity : AppCompatActivity() {
                         downloadService?.enqueueDownload(task)
                         notifyTaskUpdatedToJs(task)
 
-                        withContext(Dispatchers.Main) {
-                            Toast.makeText(this@MainActivity, "Downloading: $title", Toast.LENGTH_SHORT).show()
-                        }
+                        showAppToast("Downloading: $title")
                     }
                 } catch (e: Exception) {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(this@MainActivity, "Download failed: ${e.message}", Toast.LENGTH_SHORT).show()
-                    }
+                    showAppToast("Download failed: ${e.message}")
                 }
             }
         }
@@ -1074,7 +1089,7 @@ class MainActivity : AppCompatActivity() {
             try {
                 val file = File(filePath)
                 if (!file.exists()) {
-                    Toast.makeText(context, "File does not exist", Toast.LENGTH_SHORT).show()
+                    showAppToast("File does not exist")
                     return
                 }
 
@@ -1093,7 +1108,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 context.startActivity(intent)
             } catch (e: Exception) {
-                Toast.makeText(context, "Cannot open file: ${e.message}", Toast.LENGTH_SHORT).show()
+                showAppToast("Cannot open file: ${e.message}")
             }
         }
 
@@ -1118,7 +1133,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 context.startActivity(Intent.createChooser(intent, "Share Media"))
             } catch (e: Exception) {
-                Toast.makeText(context, "Cannot share file: ${e.message}", Toast.LENGTH_SHORT).show()
+                showAppToast("Cannot share file: ${e.message}")
             }
         }
 
@@ -1149,7 +1164,7 @@ class MainActivity : AppCompatActivity() {
 
         @JavascriptInterface
         fun showToast(msg: String) {
-            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+            showAppToast(msg)
         }
 
         @JavascriptInterface
@@ -1158,7 +1173,24 @@ class MainActivity : AppCompatActivity() {
         }
 
         @JavascriptInterface
-        fun updateNativeTheme(accentColorHex: String, surfaceColorHex: String, bgColorHex: String, isDark: Boolean) {
+        fun setLauncherIconSync(enabled: Boolean) {
+            try {
+                val prefs = getSharedPreferences("mediafetch_prefs", Context.MODE_PRIVATE)
+                prefs.edit().putBoolean("syncLauncherIcon", enabled).apply()
+            } catch (_: Exception) {}
+        }
+
+        @JavascriptInterface
+        fun updateAppIconToTheme(accentColorHex: String) {
+            val prefs = getSharedPreferences("mediafetch_prefs", Context.MODE_PRIVATE)
+            val syncLauncherIcon = prefs.getBoolean("syncLauncherIcon", false)
+            if (syncLauncherIcon) {
+                updateAppLauncherIcon(accentColorHex)
+            }
+        }
+
+        @JavascriptInterface
+        fun updateNativeTheme(accentColorHex: String, surfaceColorHex: String, bgColorHex: String, isDark: Boolean, syncLauncherIcon: Boolean) {
             try {
                 val prefs = getSharedPreferences("mediafetch_prefs", Context.MODE_PRIVATE)
                 prefs.edit()
@@ -1166,10 +1198,20 @@ class MainActivity : AppCompatActivity() {
                     .putString("surfaceColor", surfaceColorHex)
                     .putString("bgColor", bgColorHex)
                     .putBoolean("isDark", isDark)
+                    .putBoolean("syncLauncherIcon", syncLauncherIcon)
                     .apply()
             } catch (_: Exception) {}
             applyNativeThemeColors(accentColorHex, surfaceColorHex, bgColorHex, isDark)
-            updateAppLauncherIcon(accentColorHex)
+            if (syncLauncherIcon) {
+                updateAppLauncherIcon(accentColorHex)
+            }
+        }
+
+        @JavascriptInterface
+        fun updateNativeTheme(accentColorHex: String, surfaceColorHex: String, bgColorHex: String, isDark: Boolean) {
+            val prefs = getSharedPreferences("mediafetch_prefs", Context.MODE_PRIVATE)
+            val syncLauncherIcon = prefs.getBoolean("syncLauncherIcon", false)
+            updateNativeTheme(accentColorHex, surfaceColorHex, bgColorHex, isDark, syncLauncherIcon)
         }
 
         @JavascriptInterface
@@ -1450,7 +1492,7 @@ class MainActivity : AppCompatActivity() {
 
                 val safeName = JSONObject.quote(folderName)
                 webView.evaluateJavascript("window.onCustomFolderSelected && window.onCustomFolderSelected($safeName);", null)
-                Toast.makeText(this, "Save location set to: $folderName", Toast.LENGTH_SHORT).show()
+                showAppToast("Save location set to: $folderName")
             }
         }
     }
