@@ -68,6 +68,7 @@ data class CheckUpdateResult(
 
 object UpdateManager {
 
+    private const val GITHUB_API_URL = "https://api.github.com/repos/Kairesh/Mediafetch-App/contents/version.json"
     private const val UPDATE_URL = "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/version.json"
     private const val CHANNEL_UPDATES_ID = "mediafetch_updates"
     private const val PREFS_NAME = "mediafetch_update_prefs"
@@ -82,27 +83,56 @@ object UpdateManager {
 
     suspend fun checkForUpdate(context: Context, force: Boolean = false): CheckUpdateResult = withContext(Dispatchers.IO) {
         try {
-            val urlWithBuster = if (UPDATE_URL.contains("?")) "$UPDATE_URL&_t=${System.currentTimeMillis()}" else "$UPDATE_URL?_t=${System.currentTimeMillis()}"
-            val req = Request.Builder()
-                .url(urlWithBuster)
-                .header("Cache-Control", "no-cache, no-store, must-revalidate")
-                .header("Pragma", "no-cache")
-                .build()
+            var body: String? = null
 
-            val resp = httpClient.newCall(req).execute()
-            if (resp.code == 404) {
-                return@withContext CheckUpdateResult(
-                    errorMessage = "Update server returned 404. Check that version.json exists on Kairesh/Mediafetch-App."
+            // 1. Query real-time GitHub REST API first (0-second cache delay, reflects commits immediately)
+            try {
+                val apiReq = Request.Builder()
+                    .url("$GITHUB_API_URL?_t=${System.currentTimeMillis()}")
+                    .header("User-Agent", "MediaFetch-Android")
+                    .header("Accept", "application/vnd.github.v3+json")
+                    .build()
+                val apiResp = httpClient.newCall(apiReq).execute()
+                if (apiResp.isSuccessful) {
+                    val apiBody = apiResp.body?.string()
+                    if (!apiBody.isNullOrBlank()) {
+                        val apiJson = JSONObject(apiBody)
+                        val contentB64 = apiJson.optString("content", "")
+                        if (contentB64.isNotBlank()) {
+                            val cleanB64 = contentB64.replace("\n", "").replace("\r", "").trim()
+                            val decoded = String(android.util.Base64.decode(cleanB64, android.util.Base64.DEFAULT), Charsets.UTF_8)
+                            if (decoded.contains("\"mobile\"")) {
+                                body = decoded
+                            }
+                        }
+                    }
+                }
+            } catch (_: Exception) {}
+
+            // 2. Fallback to raw CDN URL if GitHub API was unavailable or rate-limited
+            if (body == null) {
+                val urlWithBuster = if (UPDATE_URL.contains("?")) "$UPDATE_URL&_t=${System.currentTimeMillis()}" else "$UPDATE_URL?_t=${System.currentTimeMillis()}"
+                val req = Request.Builder()
+                    .url(urlWithBuster)
+                    .header("Cache-Control", "no-cache, no-store, must-revalidate")
+                    .header("Pragma", "no-cache")
+                    .build()
+
+                val resp = httpClient.newCall(req).execute()
+                if (resp.code == 404) {
+                    return@withContext CheckUpdateResult(
+                        errorMessage = "Update server returned 404. Check that version.json exists on Kairesh/Mediafetch-App."
+                    )
+                }
+                if (!resp.isSuccessful) {
+                    return@withContext CheckUpdateResult(
+                        errorMessage = "Update check failed with server status HTTP ${resp.code}"
+                    )
+                }
+                body = resp.body?.string() ?: return@withContext CheckUpdateResult(
+                    errorMessage = "Received empty response from update server"
                 )
             }
-            if (!resp.isSuccessful) {
-                return@withContext CheckUpdateResult(
-                    errorMessage = "Update check failed with server status HTTP ${resp.code}"
-                )
-            }
-            val body = resp.body?.string() ?: return@withContext CheckUpdateResult(
-                errorMessage = "Received empty response from update server"
-            )
 
             val json = JSONObject(body)
             val mobileObj = json.optJSONObject("mobile") ?: return@withContext CheckUpdateResult(
