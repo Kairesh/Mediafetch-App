@@ -4,15 +4,15 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "Official MediaFetch v1.0.0 release. Apple AMOLED theme, 3-tier icon themes, Search Studio, and multi-threaded engine.",
   "mobile": {
-    "version": "1.0.40",
-    "versionCode": 40,
-    "releaseDate": "2026-10-06",
+    "version": "1.0.41",
+    "versionCode": 41,
+    "releaseDate": "2026-10-07",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": true,
     "releaseNotes": [
-      "New custom branded app logo suite across all launcher densities and home screens.",
-      "Calibrated dynamic 6-color accent theme synchronization (Blue, Orange, Gold, Green, Purple, Red).",
-      "Deep RAM and memory optimizations for silky-smooth browsing and downloading."
+      "Refreshed brand logo design updated directly from Adobe Illustrator artwork.",
+      "High-definition launcher icon suite across all screen densities and shapes.",
+      "Full 6-accent dynamic theme color synchronization and enhanced performance."
     ]
   }
 }
