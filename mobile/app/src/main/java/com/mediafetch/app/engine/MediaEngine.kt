@@ -1306,7 +1306,13 @@ object MediaEngine {
                     }
                 }
                 if (videoUrl.isBlank()) {
+                    videoUrl = mediaObj.optString("browser_native_hd_url", "")
+                }
+                if (videoUrl.isBlank()) {
                     videoUrl = mediaObj.optString("video_url", "")
+                }
+                if (videoUrl.isBlank()) {
+                    videoUrl = mediaObj.optString("browser_native_sd_url", "")
                 }
 
                 var dash1080Url = ""
@@ -1327,7 +1333,8 @@ object MediaEngine {
                             if (base.isBlank()) continue
 
                             val isAudio = attrs.contains("mimeType=\"audio/") || attrs.contains("audioSamplingRate") || attrs.contains("dash_ln_")
-                            val isVideo = attrs.contains("mimeType=\"video/") || attrs.contains("FBQualityLabel") || attrs.contains("width=")
+                            val isVp9OrAv1 = attrs.contains("vp9") || attrs.contains("vp09") || attrs.contains("av01")
+                            val isVideo = (attrs.contains("mimeType=\"video/") || attrs.contains("FBQualityLabel") || attrs.contains("width=")) && !isVp9OrAv1
 
                             if (isAudio && dashAudioUrl.isBlank()) {
                                 dashAudioUrl = base
@@ -1472,6 +1479,7 @@ object MediaEngine {
         var thumbnail = "https://images.unsplash.com/photo-1611262588024-d12430b98920?w=800"
         var directVideoUrl = ""
         var dash1080Url = ""
+        var dash720Url = ""
         var dashAudioUrl = ""
         var directImageUrl = ""
         var durationSec = if (isReel) 30L else 15L
@@ -1507,6 +1515,7 @@ object MediaEngine {
                         if (res != null) {
                             if (res.videoUrl.isNotBlank()) directVideoUrl = res.videoUrl
                             if (res.dash1080Url.isNotBlank()) dash1080Url = res.dash1080Url
+                            if (res.dash720Url.isNotBlank()) dash720Url = res.dash720Url
                             if (res.dashAudioUrl.isNotBlank()) dashAudioUrl = res.dashAudioUrl
                             if (res.thumbnail.isNotBlank()) {
                                 thumbnail = res.thumbnail
@@ -1600,16 +1609,18 @@ object MediaEngine {
 
         val streamMap = mutableMapOf<String, String>()
         if (directVideoUrl.isNotBlank()) {
+            streamMap["1080p"] = directVideoUrl
             streamMap["720p"] = directVideoUrl
             streamMap["default"] = directVideoUrl
-        }
-        if (dash1080Url.isNotBlank()) {
-            streamMap["1080p"] = dash1080Url
-        } else if (directVideoUrl.isNotBlank()) {
-            streamMap["1080p"] = directVideoUrl
-        }
-        if (dashAudioUrl.isNotBlank()) {
-            streamMap["audio"] = dashAudioUrl
+            // directVideoUrl contains complete multiplexed video + audio, avoid separate DASH audio
+        } else if (dash1080Url.isNotBlank() || dash720Url.isNotBlank()) {
+            val dUrl = if (dash1080Url.isNotBlank()) dash1080Url else dash720Url
+            streamMap["1080p"] = dUrl
+            streamMap["720p"] = if (dash720Url.isNotBlank()) dash720Url else dUrl
+            streamMap["default"] = dUrl
+            if (dashAudioUrl.isNotBlank()) {
+                streamMap["audio"] = dashAudioUrl
+            }
         }
 
         val hasVideo = directVideoUrl.isNotBlank() || dash1080Url.isNotBlank() || carouselSlides.any { it.optString("mediaType") == "video" }
@@ -1884,26 +1895,18 @@ object MediaEngine {
 
         val hasVideo = directVideoUrl.isNotBlank() || dash1080Url.isNotBlank() || dash720Url.isNotBlank()
         val streamMap = mutableMapOf<String, String>()
-        val defaultStream = directVideoUrl.ifBlank { dash720Url.ifBlank { dash1080Url } }
-        if (defaultStream.isNotBlank()) {
-            streamMap["default"] = defaultStream
-        }
         if (directVideoUrl.isNotBlank()) {
-            streamMap["720p"] = directVideoUrl
-        } else if (dash720Url.isNotBlank()) {
-            streamMap["720p"] = dash720Url
-        } else if (dash1080Url.isNotBlank()) {
-            streamMap["720p"] = dash1080Url
-        }
-        if (dash1080Url.isNotBlank()) {
-            streamMap["1080p"] = dash1080Url
-        } else if (directVideoUrl.isNotBlank()) {
+            streamMap["default"] = directVideoUrl
             streamMap["1080p"] = directVideoUrl
-        } else if (dash720Url.isNotBlank()) {
-            streamMap["1080p"] = dash720Url
-        }
-        if (dashAudioUrl.isNotBlank()) {
-            streamMap["audio"] = dashAudioUrl
+            streamMap["720p"] = directVideoUrl
+        } else if (dash1080Url.isNotBlank() || dash720Url.isNotBlank()) {
+            val dUrl = dash1080Url.ifBlank { dash720Url }
+            streamMap["default"] = dUrl
+            streamMap["1080p"] = dUrl
+            streamMap["720p"] = dash720Url.ifBlank { dUrl }
+            if (dashAudioUrl.isNotBlank()) {
+                streamMap["audio"] = dashAudioUrl
+            }
         }
 
         val qualities = if (hasVideo) generateVideoQualities(durationSec, url, streamMap, maxSourceRes = "1080p") else generateImageQualities(if (directImageUrl.isNotBlank()) directImageUrl else thumbnail)

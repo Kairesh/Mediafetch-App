@@ -43,6 +43,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.coroutines.delay
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.File
@@ -940,6 +941,8 @@ class DownloadService : Service() {
             } catch (e: Exception) {
                 task.status = DownloadStatus.FAILED
                 task.errorMessage = e.message ?: "Download failed"
+                task.speedBytesPerSec = 0L
+                task.etaSeconds = 0L
                 checkBatchCompletionForZip(task, null)
                 onTaskUpdated?.invoke(task)
                 return@withContext
@@ -986,6 +989,8 @@ class DownloadService : Service() {
                 } else {
                     "Stream unavailable. Check network and try again."
                 }
+                task.speedBytesPerSec = 0L
+                task.etaSeconds = 0L
                 try { if (targetFile.exists()) targetFile.delete() } catch (_: Exception) {}
                 checkBatchCompletionForZip(task, null)
                 onTaskUpdated?.invoke(task)
@@ -1408,11 +1413,7 @@ class DownloadService : Service() {
                 // 8. MPEG-TS sync byte: 0x47
                 val isTs = header[0] == 0x47.toByte()
 
-                if (file.name.endsWith(".mp4", ignoreCase = true)) {
-                    isMp4
-                } else {
-                    isMp4 || isMatroska || isTs || file.length() > 500 * 1024
-                }
+                isMp4 || isMatroska || isTs || file.length() > 500 * 1024
             } else {
                 true
             }
@@ -1483,60 +1484,100 @@ class DownloadService : Service() {
             val isYouTube = streamUrl.contains("googlevideo.com")
 
             // 2. Direct high-speed streaming for non-YouTube platforms (Instagram, TikTok, Twitter/X, Reddit, Facebook, Pinterest)
-            // Bypasses Range-chunking connection overhead, eliminates CDN chunking corruption/stutter, and delivers pure, uncorrupted MP4 files at maximum network speed.
+            // Includes automatic retry and Range resume if mobile TCP connection drops midway
             if (!isYouTube) {
-                try {
-                    val directReq = Request.Builder()
-                        .url(streamUrl)
-                        .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-                        .header("Accept", "*/*")
-                        .header("Referer", effectiveReferer)
-                        .build()
+                var attempt = 0
+                val maxAttempts = 3
+                var streamDownloaded = if (destFile.exists()) destFile.length() else 0L
 
-                    val directResp = httpClient.newCall(directReq).execute()
-                    if (directResp.isSuccessful && directResp.body != null) {
-                        val body = directResp.body!!
-                        val len = body.contentLength()
-                        val streamTotal = if (len > 0L) len else (if (totalLength > 0L) totalLength else task.totalBytes)
-                        val buffer = ByteArray(64 * 1024)
-                        var streamDownloaded = 0L
-                        var lastUpdate = System.currentTimeMillis()
-                        var bytesSinceLastUpdate = 0L
+                while (attempt < maxAttempts && isTaskActive(task.id)) {
+                    attempt++
+                    try {
+                        val reqBuilder = Request.Builder()
+                            .url(streamUrl)
+                            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                            .header("Accept", "*/*")
+                            .header("Referer", effectiveReferer)
 
-                        FileOutputStream(destFile).use { output ->
-                            body.byteStream().use { input ->
-                                var read: Int
-                                while (input.read(buffer).also { read = it } != -1 && isTaskActive(task.id)) {
-                                    output.write(buffer, 0, read)
-                                    streamDownloaded += read
-                                    bytesSinceLastUpdate += read
+                        val isResuming = streamDownloaded > 0L
+                        if (isResuming) {
+                            reqBuilder.header("Range", "bytes=$streamDownloaded-")
+                        }
 
-                                    val now = System.currentTimeMillis()
-                                    val delta = now - lastUpdate
-                                    if (delta >= 200) {
-                                        task.speedBytesPerSec = ((bytesSinceLastUpdate.toDouble() / delta.toDouble()) * 1000.0).toLong()
-                                        val ratio = if (streamTotal > 0L) (streamDownloaded.toDouble() / streamTotal.toDouble()).coerceIn(0.0, 1.0) else 0.5
-                                        val overallPct = (progressStart + (ratio * progressWeight * 100.0)).toInt().coerceIn(0, 99)
-                                        task.downloadedBytes = (task.totalBytes * (overallPct / 100.0)).toLong()
+                        val directResp = httpClient.newCall(reqBuilder.build()).execute()
+                        val isPartial = directResp.code == 206
+                        val isOk = directResp.code == 200
 
-                                        val rem = (streamTotal - streamDownloaded).coerceAtLeast(0)
-                                        task.etaSeconds = if (task.speedBytesPerSec > 0L) (rem / task.speedBytesPerSec) else 0L
+                        if ((isPartial || isOk) && directResp.body != null) {
+                            val body = directResp.body!!
+                            val append = isPartial && isResuming
+                            if (!append) {
+                                streamDownloaded = 0L
+                            }
 
-                                        bytesSinceLastUpdate = 0L
-                                        lastUpdate = now
-                                        updateNotification(task)
-                                        onTaskUpdated?.invoke(task)
+                            val clen = body.contentLength()
+                            val streamTotal = if (isPartial && clen > 0L) (streamDownloaded + clen)
+                                else if (clen > 0L) clen
+                                else (if (totalLength > 0L) totalLength else task.totalBytes)
+
+                            val buffer = ByteArray(64 * 1024)
+                            var lastUpdate = System.currentTimeMillis()
+                            var bytesSinceLastUpdate = 0L
+
+                            FileOutputStream(destFile, append).use { output ->
+                                body.byteStream().use { input ->
+                                    var read: Int
+                                    while (input.read(buffer).also { read = it } != -1 && isTaskActive(task.id)) {
+                                        output.write(buffer, 0, read)
+                                        streamDownloaded += read
+                                        bytesSinceLastUpdate += read
+
+                                        val now = System.currentTimeMillis()
+                                        val delta = now - lastUpdate
+                                        if (delta >= 200) {
+                                            task.speedBytesPerSec = ((bytesSinceLastUpdate.toDouble() / delta.toDouble()) * 1000.0).toLong()
+                                            val ratio = if (streamTotal > 0L) (streamDownloaded.toDouble() / streamTotal.toDouble()).coerceIn(0.0, 1.0) else 0.5
+                                            val overallPct = (progressStart + (ratio * progressWeight * 100.0)).toInt().coerceIn(0, 99)
+                                            task.downloadedBytes = (task.totalBytes * (overallPct / 100.0)).toLong()
+
+                                            val rem = (streamTotal - streamDownloaded).coerceAtLeast(0)
+                                            task.etaSeconds = if (task.speedBytesPerSec > 0L) (rem / task.speedBytesPerSec) else 0L
+
+                                            bytesSinceLastUpdate = 0L
+                                            lastUpdate = now
+                                            updateNotification(task)
+                                            onTaskUpdated?.invoke(task)
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        if (destFile.exists() && destFile.length() > 1024 && isTaskActive(task.id)) {
-                            return true
+                            val fileLen = destFile.length()
+                            val isComplete = if (streamTotal > 0L) (fileLen >= streamTotal * 0.98) else (fileLen > 1024)
+                            if (destFile.exists() && isComplete && isTaskActive(task.id)) {
+                                return true
+                            }
+                        } else {
+                            directResp.close()
+                            if (isResuming && directResp.code == 416) {
+                                if (destFile.exists() && destFile.length() > 1024) {
+                                    return true
+                                }
+                            }
                         }
+                    } catch (e: Exception) {
+                        streamDownloaded = if (destFile.exists()) destFile.length() else 0L
+                        if (attempt >= maxAttempts) {
+                            if (!destFile.exists() || destFile.length() < 1024) {
+                                try { if (destFile.exists()) destFile.delete() } catch (_: Exception) {}
+                            }
+                        }
+                        delay(500)
                     }
-                } catch (_: Exception) {
-                    try { if (destFile.exists()) destFile.delete() } catch (_: Exception) {}
+                }
+
+                if (destFile.exists() && destFile.length() > 1024 && isTaskActive(task.id)) {
+                    return true
                 }
             }
 

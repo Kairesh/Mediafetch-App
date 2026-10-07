@@ -261,7 +261,8 @@ object StreamExtractor {
 
                         // 2. Identify authentic VIDEO streams
                         val isInstagramVideo = (reqLower.contains("cdninstagram.com") || reqLower.contains("fbcdn.net")) &&
-                            (reqLower.contains(".mp4") || reqLower.contains("/v/t50.") || reqLower.contains("video_url") || reqLower.contains("/bytestart/") || reqLower.contains("mime_type=video_mp4") || reqLower.contains("_nc_cat") || (accept.contains("video/") && !accept.contains("image/")))
+                            (reqLower.contains(".mp4") || reqLower.contains("/v/t50.") || reqLower.contains("/v/t2/f2/m") || reqLower.contains("mime_type=video_mp4") || (accept.contains("video/") && !accept.contains("image/"))) &&
+                            !reqLower.contains(".jpg") && !reqLower.contains(".png") && !reqLower.contains(".webp") && !reqLower.contains("/bytestart/")
 
                         val isTwitterVideo = reqLower.contains("video.twimg.com") && (reqLower.contains(".mp4") || reqLower.contains(".m3u8"))
 
