@@ -189,16 +189,18 @@ class ShareActivity : AppCompatActivity() {
                 runOnUiThread {
                     Toast.makeText(
                         this@ShareActivity,
-                        "Downloading in background...",
+                        "Download started! Tracking in notifications.",
                         Toast.LENGTH_SHORT
                     ).show()
 
                     vibratePhone()
 
+                    webView.evaluateJavascript("window.onDownloadStarted && window.onDownloadStarted();", null)
+
                     webView.postDelayed({
                         finish()
                         overridePendingTransition(0, R.anim.slide_down)
-                    }, 400)
+                    }, 600)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

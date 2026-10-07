@@ -505,3 +505,24 @@ function dismiss() {
         window.androidBridge.dismiss();
     }
 }
+
+window.onDownloadStarted = function() {
+    const banner = document.createElement('div');
+    banner.style.position = 'fixed';
+    banner.style.bottom = '20px';
+    banner.style.left = '50%';
+    banner.style.transform = 'translateX(-50%)';
+    banner.style.background = 'rgba(10, 132, 255, 0.95)';
+    banner.style.color = '#fff';
+    banner.style.padding = '10px 18px';
+    banner.style.borderRadius = '24px';
+    banner.style.fontWeight = '600';
+    banner.style.fontSize = '13px';
+    banner.style.boxShadow = '0 8px 24px rgba(0,0,0,0.4)';
+    banner.style.zIndex = '9999';
+    banner.style.display = 'flex';
+    banner.style.alignItems = 'center';
+    banner.style.gap = '8px';
+    banner.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Download Started';
+    document.body.appendChild(banner);
+};

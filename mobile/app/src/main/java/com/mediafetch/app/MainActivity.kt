@@ -180,10 +180,6 @@ class MainActivity : AppCompatActivity() {
             val savedBg = prefs.getString("bgColor", "#000000") ?: "#000000"
             val savedIsDark = prefs.getBoolean("isDark", true)
             applyNativeThemeColors(savedAccent, savedSurface, savedBg, savedIsDark)
-            val syncLauncherIcon = prefs.getBoolean("syncLauncherIcon", false)
-            if (syncLauncherIcon) {
-                updateAppLauncherIcon(savedAccent)
-            }
         }
 
         // Listen for status bar / navigation bar insets and forward to WebView
@@ -219,6 +215,11 @@ class MainActivity : AppCompatActivity() {
         requestRequiredPermissions()
         bindDownloadService()
         com.mediafetch.app.update.UpdateCheckReceiver.schedulePeriodicCheck(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshTasksToJs()
     }
 
     private fun passWindowInsetsToJs() {
@@ -1174,19 +1175,12 @@ class MainActivity : AppCompatActivity() {
 
         @JavascriptInterface
         fun setLauncherIconSync(enabled: Boolean) {
-            try {
-                val prefs = getSharedPreferences("mediafetch_prefs", Context.MODE_PRIVATE)
-                prefs.edit().putBoolean("syncLauncherIcon", enabled).apply()
-            } catch (_: Exception) {}
+            // Disabled: Themed icon switching removed to prevent launcher reloads and app restarts
         }
 
         @JavascriptInterface
         fun updateAppIconToTheme(accentColorHex: String) {
-            val prefs = getSharedPreferences("mediafetch_prefs", Context.MODE_PRIVATE)
-            val syncLauncherIcon = prefs.getBoolean("syncLauncherIcon", false)
-            if (syncLauncherIcon) {
-                updateAppLauncherIcon(accentColorHex)
-            }
+            // Disabled: Themed icon switching removed
         }
 
         @JavascriptInterface
@@ -1198,20 +1192,14 @@ class MainActivity : AppCompatActivity() {
                     .putString("surfaceColor", surfaceColorHex)
                     .putString("bgColor", bgColorHex)
                     .putBoolean("isDark", isDark)
-                    .putBoolean("syncLauncherIcon", syncLauncherIcon)
                     .apply()
             } catch (_: Exception) {}
             applyNativeThemeColors(accentColorHex, surfaceColorHex, bgColorHex, isDark)
-            if (syncLauncherIcon) {
-                updateAppLauncherIcon(accentColorHex)
-            }
         }
 
         @JavascriptInterface
         fun updateNativeTheme(accentColorHex: String, surfaceColorHex: String, bgColorHex: String, isDark: Boolean) {
-            val prefs = getSharedPreferences("mediafetch_prefs", Context.MODE_PRIVATE)
-            val syncLauncherIcon = prefs.getBoolean("syncLauncherIcon", false)
-            updateNativeTheme(accentColorHex, surfaceColorHex, bgColorHex, isDark, syncLauncherIcon)
+            updateNativeTheme(accentColorHex, surfaceColorHex, bgColorHex, isDark, false)
         }
 
         @JavascriptInterface
@@ -1235,55 +1223,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun updateAppLauncherIcon(accentColorHex: String) {
-        try {
-            val color = Color.parseColor(accentColorHex.trim())
-            val hsv = FloatArray(3)
-            Color.colorToHSV(color, hsv)
-            val hue = hsv[0] // 0..360
-            val sat = hsv[1]
-
-            val colorSuffix = if (sat < 0.2f) {
-                "Default"
-            } else {
-                when {
-                    hue in 15f..45f -> "Orange"
-                    hue in 45f..70f -> "Gold"
-                    hue in 70f..165f -> "Green"
-                    hue in 250f..315f -> "Purple"
-                    (hue >= 335f || hue < 15f) -> "Red"
-                    else -> "Default" // Blue/Cyan
-                }
-            }
-
-            val targetMainAlias = "MainActivity$colorSuffix"
-            val targetShareAlias = "ShareActivity$colorSuffix"
-
-            val suffixes = listOf("Default", "Orange", "Green", "Purple", "Red", "Gold")
-            val pm = packageManager
-            val pkg = packageName
-
-            for (suffix in suffixes) {
-                // Update Main Launcher Alias
-                val mainAlias = "MainActivity$suffix"
-                val shouldMain = (mainAlias == targetMainAlias)
-                val curMain = pm.getComponentEnabledSetting(ComponentName(pkg, "$pkg.$mainAlias"))
-                val targetMain = if (shouldMain) PackageManager.COMPONENT_ENABLED_STATE_ENABLED else PackageManager.COMPONENT_ENABLED_STATE_DISABLED
-                if (curMain != targetMain) {
-                    pm.setComponentEnabledSetting(ComponentName(pkg, "$pkg.$mainAlias"), targetMain, PackageManager.DONT_KILL_APP)
-                }
-
-                // Update Share Sheet Alias
-                val shareAlias = "ShareActivity$suffix"
-                val shouldShare = (shareAlias == targetShareAlias)
-                val curShare = pm.getComponentEnabledSetting(ComponentName(pkg, "$pkg.$shareAlias"))
-                val targetShare = if (shouldShare) PackageManager.COMPONENT_ENABLED_STATE_ENABLED else PackageManager.COMPONENT_ENABLED_STATE_DISABLED
-                if (curShare != targetShare) {
-                    pm.setComponentEnabledSetting(ComponentName(pkg, "$pkg.$shareAlias"), targetShare, PackageManager.DONT_KILL_APP)
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        // Disabled: Themed icon switching removed to guarantee seamless zero-restart theme transitions
     }
 
     fun applyNativeThemeColors(accentColorHex: String, surfaceColorHex: String, bgColorHex: String, isDark: Boolean = true) {

@@ -1478,7 +1478,7 @@ object MediaEngine {
         var carouselSlides = mutableListOf<JSONObject>()
 
         var shortcode = ""
-        val scPattern = Pattern.compile("instagram\\.com/(?:p|reel|reels|tv|share/reel|share/p)/([a-zA-Z0-9_-]+)", Pattern.CASE_INSENSITIVE)
+        val scPattern = Pattern.compile("instagram\\.com/(?:[a-zA-Z0-9_.-]+/)?(?:p|reel|reels|tv|share/reel|share/r|share/p)/([a-zA-Z0-9_-]+)", Pattern.CASE_INSENSITIVE)
         val scMatcher = scPattern.matcher(url)
         if (scMatcher.find()) {
             shortcode = scMatcher.group(1) ?: ""
@@ -1577,7 +1577,8 @@ object MediaEngine {
         // 3. Fallback: Headless WebView Sniffer (if direct stream is still missing or for carousels)
         if (directVideoUrl.isBlank() && dash1080Url.isBlank() && context != null) {
             try {
-                val sniff = StreamExtractor.sniffStream(context, url, timeoutMs = 12000L)
+                val sniffTarget = if (shortcode.isNotBlank()) "https://www.instagram.com/reel/$shortcode/" else url
+                val sniff = StreamExtractor.sniffStream(context, sniffTarget, timeoutMs = 12000L)
                 if (sniff.streamUrl.isNotBlank()) {
                     directVideoUrl = sniff.streamUrl
                 }
@@ -1616,11 +1617,12 @@ object MediaEngine {
         val isImageOnly = !hasVideo && hasImage
 
         val resolvedDirectImg = if (directImageUrl.isNotBlank()) directImageUrl else thumbnail
+        val directCandidate = if (directVideoUrl.isNotBlank()) directVideoUrl else ""
 
         val qualities = when {
             hasVideo && hasImage -> {
                 // Both video and images exist (e.g. mixed carousel or video with cover/stills)
-                val vQualities = generateVideoQualities(durationSec, url, streamMap, maxSourceRes = "1080p")
+                val vQualities = generateVideoQualities(durationSec, directCandidate, streamMap, maxSourceRes = "1080p")
                 val imgQualities = generateImageQualities(resolvedDirectImg)
                 vQualities + imgQualities
             }
@@ -1628,7 +1630,7 @@ object MediaEngine {
                 generateImageQualities(resolvedDirectImg)
             }
             else -> {
-                generateVideoQualities(durationSec, url, streamMap, maxSourceRes = "1080p")
+                generateVideoQualities(durationSec, directCandidate, streamMap, maxSourceRes = "1080p")
             }
         }
 

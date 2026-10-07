@@ -32,7 +32,7 @@ object StreamExtractor {
 
     private val mainHandler = Handler(Looper.getMainLooper())
     private val ytPattern = Pattern.compile("(?:v=|shorts/|youtu\\.be/|embed/|live/|/v/)([a-zA-Z0-9_-]{11})")
-    private val igPattern = Pattern.compile("instagram\\.com/(?:p|reel|reels|tv)/([a-zA-Z0-9_-]+)", Pattern.CASE_INSENSITIVE)
+    private val igPattern = Pattern.compile("instagram\\.com/(?:[a-zA-Z0-9_.-]+/)?(?:p|reel|reels|tv|share/reel|share/r|share/p)/([a-zA-Z0-9_-]+)", Pattern.CASE_INSENSITIVE)
 
     fun extractYouTubeId(url: String): String {
         val clean = url.trim()
@@ -81,6 +81,8 @@ object StreamExtractor {
                 } catch (_: Exception) {}
 
                 val desktopUa = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+                val mobileUa = "Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36"
+                val activeUa = if (platform == "Instagram" || platform == "TikTok") mobileUa else desktopUa
 
                 webView.settings.apply {
                     javaScriptEnabled = true
@@ -89,7 +91,7 @@ object StreamExtractor {
                     databaseEnabled = true
                     allowContentAccess = true
                     allowFileAccess = true
-                    userAgentString = desktopUa
+                    userAgentString = activeUa
                     cacheMode = WebSettings.LOAD_DEFAULT
                     mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
                 }
@@ -160,6 +162,13 @@ object StreamExtractor {
                 mainHandler.postDelayed(timeoutRunnable, timeoutMs)
 
                 class SnifferBridge {
+                    @JavascriptInterface
+                    fun onStreamDetected(streamUrl: String) {
+                        if (streamUrl.isNotBlank() && (streamUrl.startsWith("http://") || streamUrl.startsWith("https://")) && !streamUrl.startsWith("blob:")) {
+                            finishWith(streamUrl)
+                        }
+                    }
+
                     @JavascriptInterface
                     fun onMetadata(metaJson: String) {
                         try {
@@ -252,7 +261,7 @@ object StreamExtractor {
 
                         // 2. Identify authentic VIDEO streams
                         val isInstagramVideo = (reqLower.contains("cdninstagram.com") || reqLower.contains("fbcdn.net")) &&
-                            (reqLower.contains(".mp4") || reqLower.contains("/v/t50.") || reqLower.contains("video_url") || reqLower.contains("/bytestart/"))
+                            (reqLower.contains(".mp4") || reqLower.contains("/v/t50.") || reqLower.contains("video_url") || reqLower.contains("/bytestart/") || reqLower.contains("mime_type=video_mp4") || reqLower.contains("_nc_cat") || (accept.contains("video/") && !accept.contains("image/")))
 
                         val isTwitterVideo = reqLower.contains("video.twimg.com") && (reqLower.contains(".mp4") || reqLower.contains(".m3u8"))
 
@@ -519,11 +528,7 @@ object StreamExtractor {
                     platform == "Instagram" -> {
                         val sc = extractInstagramShortcode(url)
                         if (sc.isNotBlank()) {
-                            if (url.contains("/reel/") || url.contains("/reels/")) {
-                                "https://www.instagram.com/reel/$sc/embed/captioned/"
-                            } else {
-                                "https://www.instagram.com/p/$sc/embed/captioned/"
-                            }
+                            "https://www.instagram.com/reel/$sc/"
                         } else url
                     }
                     else -> url
@@ -537,7 +542,7 @@ object StreamExtractor {
                     "X / Twitter" -> "https://x.com/"
                     else -> url
                 }
-                headers["User-Agent"] = desktopUa
+                headers["User-Agent"] = activeUa
 
                 webView.loadUrl(targetUrl, headers)
 

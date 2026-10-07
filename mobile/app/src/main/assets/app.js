@@ -683,19 +683,9 @@
       if (themeIconLight) themeIconLight.classList.remove('hidden');
     }
 
-    const isIconSyncEnabled = (localStorage.getItem('mediafetch_sync_app_icon_theme') === 'true');
     try {
-      if (window.AndroidBridge) {
-        if (window.AndroidBridge.setLauncherIconSync) {
-          window.AndroidBridge.setLauncherIconSync(isIconSyncEnabled);
-        }
-        if (window.AndroidBridge.updateNativeTheme) {
-          try {
-            window.AndroidBridge.updateNativeTheme(primary, surface, bg, isDarkMode, isIconSyncEnabled);
-          } catch (_) {
-            window.AndroidBridge.updateNativeTheme(primary, surface, bg, isDarkMode);
-          }
-        }
+      if (window.AndroidBridge && window.AndroidBridge.updateNativeTheme) {
+        window.AndroidBridge.updateNativeTheme(primary, surface, bg, isDarkMode);
       }
     } catch (_) {}
 
@@ -740,49 +730,19 @@
       cardEl.classList.toggle('active', isCardActive);
     });
 
-    updateLogoThemeSync(primary);
     updateThemeLivePreview(primary, secondary, bg, surface);
   }
 
   function updateLogoThemeSync(accentHex) {
-    const isSync = (localStorage.getItem('mediafetch_sync_app_icon_theme') === 'true');
-    if (!isSync) {
-      // Toggle is OFF: do NOT update the logo color with the new theme
-      return;
-    }
-    applyLogoColor(accentHex);
+    // Disabled: Logo preserves pristine glassmorphism colors
   }
 
   function applyLogoColor(accentHex) {
-    if (!accentHex || !accentHex.startsWith('#')) return;
     try {
-      localStorage.setItem('mediafetch_last_logo_color', accentHex);
-      let hex = accentHex.replace('#', '');
-      if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
-      const r = parseInt(hex.substring(0, 2), 16) / 255;
-      const g = parseInt(hex.substring(2, 4), 16) / 255;
-      const b = parseInt(hex.substring(4, 6), 16) / 255;
-
-      const max = Math.max(r, g, b);
-      const min = Math.min(r, g, b);
-      let h = 0;
-      if (max !== min) {
-        const d = max - min;
-        switch (max) {
-          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-          case g: h = (b - r) / d + 2; break;
-          case b: h = (r - g) / d + 4; break;
-        }
-        h /= 6;
-      }
-      const targetHue = Math.round(h * 360);
-      const baseHue = 210; // Original logo cyan-blue base hue
-      const shift = ((targetHue - baseHue) % 360 + 360) % 360;
-
       const logoEl = document.querySelector('.brand-app-logo');
-      if (logoEl) {
-        logoEl.style.filter = (shift === 0) ? 'none' : `hue-rotate(${shift}deg) saturate(1.2)`;
-      }
+      if (logoEl) logoEl.style.filter = 'none';
+      const sheetLogo = document.querySelector('.app-logo-badge');
+      if (sheetLogo) sheetLogo.style.filter = 'none';
     } catch (_) {}
   }
 
@@ -858,13 +818,7 @@
   }
 
   function checkRestoreLogoColor() {
-    const isSync = (localStorage.getItem('mediafetch_sync_app_icon_theme') === 'true');
-    if (!isSync) {
-      const savedLogoColor = localStorage.getItem('mediafetch_last_logo_color');
-      if (savedLogoColor) {
-        applyLogoColor(savedLogoColor);
-      }
-    }
+    applyLogoColor('');
   }
 
   themeToggleBtn.addEventListener('click', () => {
@@ -3485,27 +3439,7 @@
       });
     });
 
-    // Sync App Icon With Theme Toggle
-    const toggleSyncAppIconTheme = document.getElementById('toggleSyncAppIconTheme');
-    if (toggleSyncAppIconTheme) {
-      const isSyncEnabled = (localStorage.getItem('mediafetch_sync_app_icon_theme') === 'true');
-      toggleSyncAppIconTheme.checked = isSyncEnabled;
 
-      toggleSyncAppIconTheme.addEventListener('change', (e) => {
-        const enabled = e.target.checked;
-        localStorage.setItem('mediafetch_sync_app_icon_theme', enabled ? 'true' : 'false');
-        if (window.AndroidBridge && window.AndroidBridge.setLauncherIconSync) {
-          window.AndroidBridge.setLauncherIconSync(enabled);
-        }
-        if (enabled) {
-          const currentPrimary = (currentActiveTheme && currentActiveTheme.primary) || '#0A84FF';
-          applyLogoColor(currentPrimary);
-          if (window.AndroidBridge && window.AndroidBridge.updateAppIconToTheme) {
-            window.AndroidBridge.updateAppIconToTheme(currentPrimary);
-          }
-        }
-      });
-    }
 
     // Curated Complete Themes selection
     document.querySelectorAll('.theme-preset-card').forEach(card => {
