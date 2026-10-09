@@ -1744,11 +1744,11 @@ class DownloadService : Service() {
         return try {
             val referer = if (streamUrl.contains("googlevideo.com")) "https://www.youtube.com/" else task.url
 
-            // 1. Probe first 128 KB to find sidx
+            // 1. Probe first 512 KB to find sidx (sufficient for multi-hour streams)
             val probeReq = Request.Builder()
                 .url(streamUrl)
                 .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-                .header("Range", "bytes=0-131071")
+                .header("Range", "bytes=0-524287")
                 .header("Referer", referer)
                 .build()
 

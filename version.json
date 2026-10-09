@@ -4,12 +4,13 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "Official MediaFetch v1.0.0 release. Apple AMOLED theme, 3-tier icon themes, Search Studio, and multi-threaded engine.",
   "mobile": {
-    "version": "1.0.43",
-    "versionCode": 43,
-    "releaseDate": "2026-10-07",
+    "version": "1.0.44",
+    "versionCode": 44,
+    "releaseDate": "2026-10-09",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": true,
     "releaseNotes": [
+      "Optimized trimmed stream downloading for long multi-hour live streams with expanded 512KB probe window and fast keyframe extraction.",
       "Fixed Instagram Reel and video download failure: now streams full multiplexed high-definition MP4 directly without corrupt container issues.",
       "Bulletproof download engine with automatic Range-based connection resume and retry if mobile networks stutter.",
       "Universal video validation: safely accepts all valid progressive MP4, WebM, and TS formats without false negative failures.",
