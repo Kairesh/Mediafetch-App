@@ -1,7 +1,7 @@
 {
   "version": "1.0.1",
   "name": "MediaFetch Pro Adobe CEP",
-  "packageUrl": "https://raw.githubusercontent.com/Kairesh/MediafetchPlugin/main/MediaFetch%20Pro/Personal%20ver/MediaFetch_Pro_Update.zip",
+  "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "Auto-sliding platform pills for narrow panels, smooth horizontal mouse wheel scroll, and performance enhancements.",
   "mobile": {
