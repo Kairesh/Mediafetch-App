@@ -1,10 +1,10 @@
 {
-  "version": "1.0.1",
+  "version": "1.0.2",
   "name": "MediaFetch Adobe CEP Suite",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "Auto-sliding platform pills for narrow panels, smooth horizontal mouse wheel scroll, and performance enhancements.",
+  "releaseNotes": "Auto-select single playing video in YouTube playlist links, Pause All downloads button, Timeline playhead placement on dedicated new layer, and installation engine detection.",
   "mobile": {
     "version": "1.0.47",
     "versionCode": 47,
