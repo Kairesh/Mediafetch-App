@@ -1,8 +1,9 @@
 {
-  "version": "1.0.0",
-  "name": "MediaFetch Adobe CEP",
+  "version": "1.0.1",
+  "name": "MediaFetch Pro Adobe CEP",
+  "packageUrl": "https://raw.githubusercontent.com/Kairesh/MediafetchPlugin/main/MediaFetch%20Pro/Personal%20ver/MediaFetch_Pro_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "Official MediaFetch v1.0.0 release. Apple AMOLED theme, 3-tier icon themes, Search Studio, and multi-threaded engine.",
+  "releaseNotes": "Auto-sliding platform pills for narrow panels, smooth horizontal mouse wheel scroll, and performance enhancements.",
   "mobile": {
     "version": "1.0.47",
     "versionCode": 47,
