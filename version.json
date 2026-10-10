@@ -1,12 +1,12 @@
 {
-  "version": "1.0.3",
+  "version": "1.0.4",
   "name": "MediaFetch Adobe CEP Suite",
   "packageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "Enhanced Spotify track extraction with resilient SSR scraper, lightning-fast YouTube Radio mix analysis (1:50 items) with single-video auto-selection, and robust error classification.",
+  "releaseNotes": "v1.0.4: Resilient in-app updater with permanent version tracking & automatic service daemon reboot, plus enhanced Spotify SSR scraper & YouTube Radio mix speedups.",
   "mobile": {
     "version": "1.0.47",
     "versionCode": 47,
