@@ -1,12 +1,12 @@
 {
-  "version": "1.1.0",
+  "version": "1.1.1",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.1.0: Fixed Paste button with multi-tier native clipboard bridge for Adobe CEP panels, resolved preview player for Behance, Fiverr, ArtStation and Dribbble (eliminated 00:00 audio misclassification and added embed iframe player), and updated server with native clipboard API.",
+  "releaseNotes": "v1.1.1: Aggressive RAM optimization & lean memory footprint (V8 dynamic heap compaction, card limits, automatic stream cache trimming), accelerated download speeds (eliminated remote component connection delay, instant direct stream buffering, 5-channel concurrent fragment downloads, and live network progress stages).",
   "mobile": {
     "version": "1.0.49",
     "versionCode": 49,
