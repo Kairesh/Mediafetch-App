@@ -1,12 +1,12 @@
 {
-  "version": "1.1.7",
+  "version": "1.1.8",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.1.7: Fixed true quality 1440p/1080p extraction for YouTube streams, resolved trim range import into Premiere/AE project panels, synchronized optimized trimmed file sizes across Standard and Pro, fixed Standard download queue disappearing bug, and enhanced in-app update popup notifications.",
+  "releaseNotes": "v1.1.8: Fixed After Effects video layer import (guaranteed H.264 video track with audio, no more audio-only imports), solved Standard offline connection (locked to port 48923), resolved download queue disappearing on click, synchronized compact clip sizing (~11MB) across Standard & Pro, and fixed cache clear background notices.",
   "mobile": {
     "version": "1.0.49",
     "versionCode": 49,
