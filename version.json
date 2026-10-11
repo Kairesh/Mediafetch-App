@@ -1,12 +1,12 @@
 {
-  "version": "1.0.9",
+  "version": "1.1.0",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.0.9: Fixed Behance challenge 429/403 bypass with full embedded Vimeo/YouTube stream extraction, resolved audio player preview for Apple Music/iTunes links, removed redundant Songs category pills in Search Studio, and verified link downloader across Behance, Dribbble, Fiverr, ArtStation and all creative platforms.",
+  "releaseNotes": "v1.1.0: Fixed Paste button with multi-tier native clipboard bridge for Adobe CEP panels, resolved preview player for Behance, Fiverr, ArtStation and Dribbble (eliminated 00:00 audio misclassification and added embed iframe player), and updated server with native clipboard API.",
   "mobile": {
     "version": "1.0.49",
     "versionCode": 49,
