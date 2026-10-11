@@ -1,12 +1,12 @@
 {
-  "version": "1.0.5",
+  "version": "1.0.6",
   "name": "MediaFetch Adobe CEP Suite",
   "packageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.0.5: Added Songs Studio search with dynamic filters (All, Songs, Albums, Artists, Playlists) powered by a 100M+ zero-auth music catalog, Spotify API Key integration in Settings, 320k/WAV studio audio extraction, and fixed duplicate tab opening in API guides.",
+  "releaseNotes": "v1.0.6: Moved Songs inside Music & SFX with interactive sub-filter pills and format dropdown (All, Songs, Albums, Artists, Playlists), native Apple Music song & album analyzer/downloader via zero-auth iTunes lookup, robust 1-click clipboard Paste button fallback, and resolved single-track playlist false detection.",
   "mobile": {
     "version": "1.0.48",
     "versionCode": 48,
