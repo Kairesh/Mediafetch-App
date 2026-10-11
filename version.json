@@ -1,12 +1,12 @@
 {
-  "version": "1.1.2",
+  "version": "1.1.3",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.1.2: Cache clearing & RAM footprint stability: unconditional log & disk cache zeroing (0.00 MB), dual-cycle V8 heap compaction, persistent baseline locking (no RAM increase on repeated clearing), and instant single-trip UI updates.",
+  "releaseNotes": "v1.1.3: Search Studio interactive playlist drawer integration for artist discographies and albums, native Apple Music single-track vs artist playlist routing, authentic resolution profiles (no fake resolutions, high-fidelity audio presets), and direct Cloudinary/universal mp4 video player streaming for Fiverr gigs and creative showcase platforms.",
   "mobile": {
     "version": "1.0.49",
     "versionCode": 49,
