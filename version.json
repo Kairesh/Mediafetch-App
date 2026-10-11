@@ -1,12 +1,12 @@
 {
-  "version": "1.1.4",
+  "version": "1.1.5",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.1.4: Full 1440p (2K) and 4K resolution support for YouTube live streams and VODs (bypassing mobile SABR restrictions), 16-thread accelerated fragment download engine with 10MB chunking, and prominent in-app update popup dialog.",
+  "releaseNotes": "v1.1.5: Fixed trim range clipping on YouTube livestreams & VODs, eliminated window shell flicker during paste/download, optimized 1440p Quad HD stream extraction, and enhanced automatic in-app launch update dialog.",
   "mobile": {
     "version": "1.0.49",
     "versionCode": 49,
