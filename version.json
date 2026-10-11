@@ -1,12 +1,12 @@
 {
-  "version": "1.1.9",
+  "version": "1.2.0",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.1.9: Fixed YouTube stream resolution to guarantee true 1080p Full HD (resolved 360p fallback), restored in-plugin direct player video streaming without black screens or freezes, fixed After Effects trimmed video import with forced keyframes (instant video frame rendering from 00:00), and fixed Standard edition connection status.",
+  "releaseNotes": "v1.2.0: Guaranteed 100% Adobe Premiere Pro & After Effects compatibility for 4K video downloads — strictly eliminated unsupported AV1 (av01) codec downloads and enabled studio-master H.264 optimization with hardware acceleration, preserving pristine 4K fidelity without unsupported codec errors.",
   "mobile": {
     "version": "1.0.49",
     "versionCode": 49,
