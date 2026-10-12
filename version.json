@@ -1,12 +1,12 @@
 {
-  "version": "1.2.2",
+  "version": "1.2.3",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.2.2: Accelerated YouTube analysis to 2s, resolved false timeouts and hung downloads on unavailable or private videos, unified Project and Timeline checkboxes for Search Studio (uncheck both for download-only; check Timeline for sequence placement), and rock-solid in-process service startup.",
+  "releaseNotes": "v1.2.3: Ultra-fast 2s in-process link analysis, fixed queue stalls on private/unavailable videos, direct Timeline insertion for Search Studio, bidirectional Project & Timeline checkbox synchronization, and robust After Effects audio import.",
   "mobile": {
     "version": "1.0.49",
     "versionCode": 49,
