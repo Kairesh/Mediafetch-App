@@ -1,12 +1,12 @@
 {
-  "version": "1.2.6",
+  "version": "1.2.7",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.2.6: Fixed true quality master resolution selection for vertical videos (YouTube Shorts, Reels, TikTok 1080x1920) across Link Downloader and Search Studio; optimized trim stream download with multi-threaded seeking and live progress feedback; added CopyPasta clipboard paste button next to History for instant image/media paste and project import.",
+  "releaseNotes": "v1.2.7: Fixed Apple Music single-track download crash; replaced completed queue import button with Retry / Re-download icon; completely removed all UI emojis with clean open-source SVG icons across Pro and Standard editions; optimized stream trimming speed with multi-threaded ffmpeg seek, m3u8 format priority, and guaranteed true 1080p/4K resolution; enlarged and styled IMG PASTE button synced with theme.",
   "mobile": {
     "version": "1.0.49",
     "versionCode": 49,
