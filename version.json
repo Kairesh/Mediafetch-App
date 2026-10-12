@@ -1,12 +1,12 @@
 {
-  "version": "1.2.9",
+  "version": "1.3.0",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.2.9: Removed all blocking JavaScript alert dialogs across Search Studio with native in-UI toasts; unlocked 4K/1080p true quality streams with persistent YouTube visitor authorization; eliminated remote 403 byte-range errors with instantaneous 0.01s local stream-copy trimming (-c copy); fixed clipboard saving folder to route directly into active Adobe project path ([Project]/MediaFetch/Clipboard); maximized clipboard image clarity by extracting original web master images in true uncompressed resolution.",
+  "releaseNotes": "v1.3.0: Fixed Paste Image clipboard capture across all platforms and browsers; reliable Windows Forms STA image stream capture directly into active project directory ([Project]/MediaFetch/Clipboard); seamless extraction of high-resolution original master images with lossless PNG fallback; ultra-fast trimming and true quality stream downloads.",
   "mobile": {
     "version": "1.0.49",
     "versionCode": 49,
