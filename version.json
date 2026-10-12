@@ -1,12 +1,12 @@
 {
-  "version": "1.2.0",
+  "version": "1.2.1",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.2.0: Guaranteed 100% Adobe Premiere Pro & After Effects compatibility for 4K video downloads — strictly eliminated unsupported AV1 (av01) codec downloads and enabled studio-master H.264 optimization with hardware acceleration, preserving pristine 4K fidelity without unsupported codec errors.",
+  "releaseNotes": "v1.2.1: Fixed FFmpeg/FFprobe binary detection with auto-healing, resolved Search Studio true video downloads (preventing .m4a audio-only saves), enabled automatic Audio-Only mode selection for Apple Music/Spotify links, optimized fast video trimming with remote seekable range streaming, and fixed After Effects audio bin import.",
   "mobile": {
     "version": "1.0.49",
     "versionCode": 49,
