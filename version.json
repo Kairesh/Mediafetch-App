@@ -1,12 +1,12 @@
 {
-  "version": "1.3.2",
+  "version": "1.3.3",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.3.2: Universal TikTok support with instant unblocked preview & downloads; Customizable IMG Paste format (PNG, JPG, WebP) with true lossless master quality.",
+  "releaseNotes": "v1.3.3: Fixed TikTok links analysis & direct video preview in restricted regions; Added IMG Paste custom format selector (PNG, JPG, WebP) with lossless master quality.",
   "mobile": {
     "version": "1.0.49",
     "versionCode": 49,
