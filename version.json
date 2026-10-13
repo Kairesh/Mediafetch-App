@@ -1,12 +1,12 @@
 {
-  "version": "1.3.6",
+  "version": "1.3.7",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.3.6: Full Pinterest multi-media support: extracts multi-video and multi-image carousel pins, authentic animated GIFs, and master-resolution photos; resolved preview player black screen with direct HTML5 and theater rendering.",
+  "releaseNotes": "v1.3.7: Removed CopyPasta branding and prevented any copypasta folder creation; disabled Video+Audio and Video Only mode selections for audio-only links while allowing Photo/Cover; fixed Pinterest video player black screen with local proxy streaming.",
   "mobile": {
     "version": "1.0.49",
     "versionCode": 49,
