@@ -1,12 +1,12 @@
 {
-  "version": "1.4.2",
+  "version": "1.4.3",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.4.2: Critical stability update. Fixes 4K/2K resolution downloads in Search Studio, locks audio-only platform downloads, accelerates trim range downloads, fixes Premiere Pro timeline image pasting, and resolves YouTube playback and bot checks.",
+  "releaseNotes": "v1.4.3: Fixed YouTube resolution detection (restored 4K, 1440p, 1080p, 720p format selection) and resolved Search Studio video+audio stream downloading.",
   "mobile": {
     "version": "1.0.49",
     "versionCode": 49,
