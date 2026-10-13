@@ -1,12 +1,12 @@
 {
-  "version": "1.3.9",
+  "version": "1.4.0",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.3.9: Fixed YouTube bot-check and 'Sign in to confirm you\\'re not a bot' authentication roadblocks using mobile client rotation fallback, fixed PC Cookie Guide modal visibility in Settings and error popups, and enhanced direct Netscape cookie ingestion.",
+  "releaseNotes": "v1.4.0: Restored rock-solid, fully stable 1.3.6 golden release. Complete stability across all platforms (YouTube, TikTok, Pinterest, Instagram, etc.), instant stream downloads, media search studio, and zero playback or trim errors.",
   "mobile": {
     "version": "1.0.49",
     "versionCode": 49,
