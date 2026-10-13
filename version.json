@@ -1,12 +1,12 @@
 {
-  "version": "1.4.0",
+  "version": "1.4.1",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.4.0: Restored rock-solid, fully stable 1.3.6 golden release. Complete stability across all platforms (YouTube, TikTok, Pinterest, Instagram, etc.), instant stream downloads, media search studio, and zero playback or trim errors.",
+  "releaseNotes": "v1.4.1: License activation stability update. Restores instant license activation popup on reinstall, responsive license entry in Settings, and dismissable dialog.",
   "mobile": {
     "version": "1.0.49",
     "versionCode": 49,
