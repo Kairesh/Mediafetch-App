@@ -1,12 +1,12 @@
 {
-  "version": "1.4.4",
+  "version": "1.4.5",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.4.4: Resolved YouTube bot/DRM verification check with dynamic visitor tokens, fixed Premiere Pro auto-import and timeline placement for media & clipboard images, and synchronized Project/Timeline options.",
+  "releaseNotes": "v1.4.5: Fixed YouTube Link Downloader bot/DRM check — videos now download correctly with true quality. Fixed clipboard Paste Image — images now properly appear in project panel (Clipboard bin) and are added to the timeline.",
   "mobile": {
     "version": "1.0.49",
     "versionCode": 49,
