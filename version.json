@@ -1,12 +1,12 @@
 {
-  "version": "1.3.4",
+  "version": "1.3.5",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.3.4: Fixed TikTok video auto-selection mode (Video + Audio default, 1080p Full HD) and resolved theater preview player video playback; enhanced routing for TikTok video, photo carousels, and audio tracks.",
+  "releaseNotes": "v1.3.5: Resolved TikTok theater preview player video playback with native H.264 rendering; fixed download pipeline timeouts, preserved stream metadata, and added support for photo slide carousels and playlists.",
   "mobile": {
     "version": "1.0.49",
     "versionCode": 49,
