@@ -8,16 +8,18 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "v1.4.7: Fixed Theme Accent Color across all modes and buttons; Fixed Simple Project Path routing in Premiere Pro & After Effects project panel; Added YouTube 18+ Age Restriction detection with 1-click Cookie Guide helper.",
   "mobile": {
-    "version": "1.0.49",
-    "versionCode": 49,
-    "releaseDate": "2026-10-11",
-    "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch.apk",
+    "version": "1.0.50",
+    "versionCode": 50,
+    "releaseDate": "2026-10-14",
+    "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": true,
     "releaseNotes": [
-      "Added support for Dribbble video shots, Fiverr gig portfolios, ArtStation demo reels, Apple Music preview audio & artwork, and Behance project media.",
-      "Smart universal link extractor: downloads video and audio from any website or creative showcase.",
-      "Authentic platform badges and enhanced direct media preview player.",
-      "Optimized headless WebView sniffing for challenge-protected creative platforms."
+      "Fixed links across all platforms: LinkedIn, TikTok, Behance, Fiverr, Dribbble, Apple Music, and universal web media.",
+      "Multi-Image & Carousel support: full extraction of all slides, images, and video portfolios with batch and zip download options.",
+      "Added Songs feature matching the plugin: search and download high-res tracks via Apple Music / iTunes and Jamendo 320kbps MP3.",
+      "New Orientation filters: 16:9 Landscape and 9:16 Portrait / Shorts for Videos and Photos.",
+      "New Songs sub-filters: All, Songs, Playlists, Artists, and Albums.",
+      "Massively increased search results volume across all search engines."
     ]
   }
 }
