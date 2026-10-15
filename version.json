@@ -1,12 +1,12 @@
 {
-  "version": "1.4.9",
+  "version": "1.5.0",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.4.9: Added Spotify song audio previews (30s high-fidelity preview stream); Fixed Instagram player playback (synced video frames + audio, preventing audio-only playback); Fixed Threads video & photo multi-media carousel detection; Added sharp [IMG], [VID], [AUD] playlist badges with instant player preview.",
+  "releaseNotes": "v1.5.0: Threads carousel multi-media detection (exact clean slides without duplicates or avatars); Real video duration probing (fixes 00:00 on LinkedIn, Instagram, Threads, Behance); Authentic titles & author extraction (fixes 'Video by username' and LinkedIn uploader); Photo indicator badge.",
   "mobile": {
     "version": "1.0.50",
     "versionCode": 50,
