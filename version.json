@@ -1,12 +1,12 @@
 {
-  "version": "1.4.7",
+  "version": "1.4.8",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.4.7: Fixed Theme Accent Color across all modes and buttons; Fixed Simple Project Path routing in Premiere Pro & After Effects project panel; Added YouTube 18+ Age Restriction detection with 1-click Cookie Guide helper.",
+  "releaseNotes": "v1.4.8: Fixed Behance project media & Vimeo extraction; Fixed X (Twitter), Threads, Instagram & LinkedIn video player playback and direct download streams; Added multi-media item badges ([VIDEO], [IMAGE], [AUDIO]) with instant player preview buttons.",
   "mobile": {
     "version": "1.0.50",
     "versionCode": 50,
