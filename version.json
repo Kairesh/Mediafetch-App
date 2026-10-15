@@ -1,12 +1,12 @@
 {
-  "version": "1.5.1",
+  "version": "1.5.2",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.5.1: Added 1440p (2K) and 4K (2160p) stream detection & downloading via expanded client profile extraction; Fixed thumbnail card display with automatic high-resolution fallback; Restored media card metadata and stream resolution dropdown.",
+  "releaseNotes": "v1.5.2: Fixed Behance multi-media extraction extracting all high-res photos and videos with selection modal; Fixed Instagram download analyze loop ensuring direct download queues immediately; Fixed Instagram preview player audio restoring full unmuted sound.",
   "mobile": {
     "version": "1.0.50",
     "versionCode": 50,
