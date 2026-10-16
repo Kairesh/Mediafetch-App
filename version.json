@@ -1,12 +1,12 @@
 {
-  "version": "1.6.1",
+  "version": "1.6.2",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.6.1: Fixed Link Downloader state reset when sending links from Search Studio and Theater preview; resolved Premiere Pro auto-import on project restart with resilient project readiness detection, retry loop, and fallback; enhanced in-app video preview player with instant embed fallback and unthrottled streaming.",
+  "releaseNotes": "v1.6.2: Critical fix for After Effects & Premiere Pro ExtendScript syntax error at line 334; resolved project panel auto-import; fixed Link Downloader stale state; and optimized in-app instant video preview player.",
   "mobile": {
     "version": "1.0.53",
     "versionCode": 53,
