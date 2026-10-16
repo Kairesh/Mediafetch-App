@@ -1,12 +1,12 @@
 {
-  "version": "1.6.0",
+  "version": "1.6.1",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.6.0: Fixed clipboard image paste in Premiere Pro and After Effects to reliably import into the project bin (MediaFetch > Clipboard > Images) and auto-insert onto sequence/composition timeline; improved ExtendScript native 1/0 argument handling; enhanced Project panel item detection across sub-bins.",
+  "releaseNotes": "v1.6.1: Fixed Link Downloader state reset when sending links from Search Studio and Theater preview; resolved Premiere Pro auto-import on project restart with resilient project readiness detection, retry loop, and fallback; enhanced in-app video preview player with instant embed fallback and unthrottled streaming.",
   "mobile": {
     "version": "1.0.53",
     "versionCode": 53,
