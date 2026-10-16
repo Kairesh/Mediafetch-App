@@ -1,25 +1,23 @@
 {
-  "version": "1.5.2",
+  "version": "1.5.3",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.5.2: Fixed Behance multi-media extraction extracting all high-res photos and videos with selection modal; Fixed Instagram download analyze loop ensuring direct download queues immediately; Fixed Instagram preview player audio restoring full unmuted sound.",
+  "releaseNotes": "v1.5.3: Fixed Instagram reel and video preview audio playback selecting progressive audio+video stream; Fixed Instagram download trigger loop; Full multi-media extraction for Behance and carousels across desktop and mobile APK.",
   "mobile": {
-    "version": "1.0.50",
-    "versionCode": 50,
-    "releaseDate": "2026-10-14",
+    "version": "1.0.51",
+    "versionCode": 51,
+    "releaseDate": "2026-10-16",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": true,
     "releaseNotes": [
-      "Fixed links across all platforms: LinkedIn, TikTok, Behance, Fiverr, Dribbble, Apple Music, and universal web media.",
-      "Multi-Image & Carousel support: full extraction of all slides, images, and video portfolios with batch and zip download options.",
-      "Added Songs feature matching the plugin: search and download high-res tracks via Apple Music / iTunes and Jamendo 320kbps MP3.",
-      "New Orientation filters: 16:9 Landscape and 9:16 Portrait / Shorts for Videos and Photos.",
-      "New Songs sub-filters: All, Songs, Playlists, Artists, and Albums.",
-      "Massively increased search results volume across all search engines."
+      "Full multi-media extraction for Behance projects via Behance v2 Project API with support for all high-res images, video modules, and multi-image collections.",
+      "Fixed Instagram audio and video stream extraction prioritizing progressive streams with AAC audio.",
+      "Carousel and playlist multi-media batch and zip download improvements.",
+      "Fixed links and download handling across all platforms without failure."
     ]
   }
 }
