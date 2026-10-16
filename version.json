@@ -8,11 +8,11 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "v1.5.3: Fixed Instagram reel and video preview audio playback selecting progressive audio+video stream; Fixed Instagram download trigger loop; Full multi-media extraction for Behance and carousels across desktop and mobile APK.",
   "mobile": {
-    "version": "1.0.51",
-    "versionCode": 51,
+    "version": "1.0.52",
+    "versionCode": 52,
     "releaseDate": "2026-10-16",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
-    "mandatory": true,
+    "mandatory": false,
     "releaseNotes": [
       "Full multi-media extraction for Behance projects via Behance v2 Project API with support for all high-res images, video modules, and multi-image collections.",
       "Fixed Instagram audio and video stream extraction prioritizing progressive streams with AAC audio.",
