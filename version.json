@@ -1,12 +1,12 @@
 {
-  "version": "1.5.9",
+  "version": "1.6.0",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.5.9: Fixed ExtendScript line 567 syntax error (missing catch/finally) resolving After Effects execution error; fixed Search Studio and Clipboard Image auto-import into Premiere Pro and After Effects project bin and timeline; removed strict mode from JSON polyfill; enhanced composition timeline placement.",
+  "releaseNotes": "v1.6.0: Fixed clipboard image paste in Premiere Pro and After Effects to reliably import into the project bin (MediaFetch > Clipboard > Images) and auto-insert onto sequence/composition timeline; improved ExtendScript native 1/0 argument handling; enhanced Project panel item detection across sub-bins.",
   "mobile": {
     "version": "1.0.53",
     "versionCode": 53,
