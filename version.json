@@ -1,12 +1,12 @@
 {
-  "version": "1.5.4",
+  "version": "1.5.5",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.5.4: YouTube premiere and upcoming livestream handling with high-res cover photo download; Behance, Threads, and multi-media project extraction; Mobile APK update sync fix (v1.0.53).",
+  "releaseNotes": "v1.5.5: Fixed false upcoming live stream label on published YouTube videos; ensured resolution stream selector and metadata load cleanly; full media extraction stability across all platforms.",
   "mobile": {
     "version": "1.0.53",
     "versionCode": 53,
