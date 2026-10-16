@@ -1,22 +1,22 @@
 {
-  "version": "1.5.3",
+  "version": "1.5.4",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.5.3: Fixed Instagram reel and video preview audio playback selecting progressive audio+video stream; Fixed Instagram download trigger loop; Full multi-media extraction for Behance and carousels across desktop and mobile APK.",
+  "releaseNotes": "v1.5.4: YouTube premiere and upcoming livestream handling with high-res cover photo download; Behance, Threads, and multi-media project extraction; Mobile APK update sync fix (v1.0.53).",
   "mobile": {
-    "version": "1.0.52",
-    "versionCode": 52,
+    "version": "1.0.53",
+    "versionCode": 53,
     "releaseDate": "2026-10-16",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": false,
     "releaseNotes": [
-      "Full multi-media extraction for Behance projects via Behance v2 Project API with support for all high-res images, video modules, and multi-image collections.",
-      "Fixed Instagram audio and video stream extraction prioritizing progressive streams with AAC audio.",
-      "Carousel and playlist multi-media batch and zip download improvements.",
+      "Fixed YouTube premieres and upcoming live stream metadata detection with cover download.",
+      "Resolved continuous update alert popup by synchronizing build version code.",
+      "Full multi-media extraction for Behance projects and carousels across desktop and mobile APK.",
       "Fixed links and download handling across all platforms without failure."
     ]
   }
