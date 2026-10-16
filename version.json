@@ -1,12 +1,12 @@
 {
-  "version": "1.5.6",
+  "version": "1.5.7",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.5.6: Fixed Search Studio stream restriction fallback; real-time settings and theme synchronization across Premiere Pro and After Effects; isolated downloads per active host app; fixed clipboard paste image project bin routing and timeline toggle in Premiere Pro.",
+  "releaseNotes": "v1.5.7: Resolved ExtendScript reference error in Premiere Pro and After Effects auto-import; fixed Paste Image clipboard bin routing to MediaFetch -> Clipboard -> Images; fully synchronized theme and settings across concurrent Premiere Pro and After Effects panels; fortified host application isolation.",
   "mobile": {
     "version": "1.0.53",
     "versionCode": 53,
