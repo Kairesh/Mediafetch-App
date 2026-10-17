@@ -1,12 +1,12 @@
 {
-  "version": "1.7.2",
+  "version": "1.7.3",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.7.2: Instant live real-time theme & style synchronization between Premiere Pro & After Effects (Glass Material, Accent Colors, Ambient Glow gradients); full restoration of prior themes when toggling Low-RAM mode off; custom gradient builder with + save preset; and direct flat folder downloads.",
+  "releaseNotes": "v1.7.3: Major Performance & Smoothness Optimization! Silky 60fps lag-free glass themes (Frosted, Clear, Blur) across both low-end (8GB RAM) and high-end PCs by eliminating nested backdrop blurs and adding GPU paint containment; optimized Chromium CEF memory flags; live PR/AE theme sync; and low-RAM backup/restore.",
   "mobile": {
     "version": "1.0.53",
     "versionCode": 53,
