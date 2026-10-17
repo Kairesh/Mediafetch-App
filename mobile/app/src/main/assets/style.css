@@ -3201,8 +3201,8 @@ body {
 /* Visual Surface & Glassmorphism Style Grid */
 .visual-style-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
   margin-top: 6px;
 }
 
@@ -3211,8 +3211,8 @@ body {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 10px 8px;
-  min-height: 42px;
+  padding: 8px 4px;
+  min-height: 38px;
   background: var(--input-bg);
   border: 1px solid var(--app-card-border);
   border-radius: var(--radius-md);
@@ -3233,37 +3233,48 @@ body {
 }
 
 .visual-style-icon-preview {
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 19px;
-  margin-bottom: 8px;
+  font-size: 16px;
+  margin-bottom: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
   transition: all 0.2s ease;
 }
 
+.amoled-preview,
 .solid-preview {
-  background: linear-gradient(135deg, #1c1c24, #0d0d12);
+  background: #000000;
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
+.frosted-preview,
 .glass-preview {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 4px 14px rgba(0, 0, 0, 0.35);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4), 0 4px 12px rgba(0, 0, 0, 0.35);
 }
 
+.clear-preview,
 .prism-preview {
-  background: linear-gradient(135deg, rgba(191, 90, 242, 0.35), rgba(10, 132, 255, 0.35));
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.6), 0 0 14px rgba(10, 132, 255, 0.4);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  box-shadow: inset 0 1.5px 1px rgba(255, 255, 255, 0.55), 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.blur-preview {
+  background: rgba(18, 16, 22, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 4px 14px rgba(0, 0, 0, 0.45);
 }
 
 .visual-style-info {
@@ -3987,248 +3998,505 @@ body {
    WHOLE-APP VISUAL DESIGN SYSTEM: LIQUID GLASSMORPHY & CYBER AURORA
    ========================================================================== */
 
+/* ==========================================================================
+   WHOLE-APP VISUAL DESIGN SYSTEM: 3 TRUE GLASSMORPHIC THEMES + AMOLED
+   Ported directly from MediaFetch Pro CEP Plugin:
+   1. Amoled: Pure OLED Pitch Black, 0% blur, maximum battery saving
+   2. Frosted: Apple VisionOS / Concept style, tactile micro-specular rim + 8px blur
+   3. Clear: iOS Liquid Acrylic Refraction, light 3px blur + double specular prismatic borders
+   4. Blur: Samsung One UI style, silky continuous Gaussian diffusion + 8px blur
+   ========================================================================== */
+
 /* --------------------------------------------------------------------------
-/* --------------------------------------------------------------------------
-   THEME STYLE 2: 💎 LIQUID GLASSMORPHY (Dark & Light)
+   THEME 1: FROSTED GLASS ("Concept" Style - High Performance Optimized)
    -------------------------------------------------------------------------- */
-html[data-glass-style="glass"]:not([data-theme="light"]) {
-  --app-bg: #06060a !important;
+[data-glass-style="frosted"],
+[data-glass-style="glass"],
+[data-theme-style="frosted"],
+[data-theme-style="glass"],
+body.theme-glass-frosted {
+  --app-card-bg: rgba(255, 255, 255, 0.08);
+  --app-card-border: rgba(255, 255, 255, 0.16);
 }
 
-html[data-glass-style="glass"]:not([data-theme="light"]) .app-viewport {
+html[data-glass-style="frosted"]:not([data-theme="light"]),
+html[data-glass-style="glass"]:not([data-theme="light"]),
+body.theme-glass-frosted:not([data-theme="light"]) {
+  --app-bg: #07090e !important;
+}
+
+html[data-glass-style="frosted"]:not([data-theme="light"]) .app-viewport,
+html[data-glass-style="glass"]:not([data-theme="light"]) .app-viewport,
+body.theme-glass-frosted:not([data-theme="light"]) .app-viewport {
   background: radial-gradient(circle at 50% 0%, var(--accent-glow) 0%, transparent 45%);
 }
 
-html[data-glass-style="glass"]:not([data-theme="light"]) .apple-card,
-html[data-glass-style="glass"]:not([data-theme="light"]) .settings-card,
-html[data-glass-style="glass"]:not([data-theme="light"]) .media-analysis-workspace,
-html[data-glass-style="glass"]:not([data-theme="light"]) .format-modal-content,
-html[data-glass-style="glass"]:not([data-theme="light"]) .search-card,
-html[data-glass-style="glass"]:not([data-theme="light"]) .media-item-card,
-html[data-glass-style="glass"]:not([data-theme="light"]) .history-empty-card,
-html[data-glass-style="glass"]:not([data-theme="light"]) .settings-preset-box,
-html[data-glass-style="glass"]:not([data-theme="light"]) .theme-live-preview-box,
-html[data-glass-style="glass"]:not([data-theme="light"]) .incoming-share-banner,
-html[data-glass-style="glass"]:not([data-theme="light"]) .loading-card,
-html[data-glass-style="glass"]:not([data-theme="light"]) .cookie-guide-box,
-html[data-glass-style="glass"]:not([data-theme="light"]) .cookie-step-card,
-html[data-glass-style="glass"]:not([data-theme="light"]) .queue-item,
-html[data-glass-style="glass"]:not([data-theme="light"]) .color-picker-dialog {
-  background: rgba(22, 22, 32, 0.72) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
+[data-glass-style="frosted"] .apple-card,
+[data-glass-style="frosted"] .settings-card,
+[data-glass-style="frosted"] .media-analysis-workspace,
+[data-glass-style="frosted"] .format-modal-content,
+[data-glass-style="frosted"] .search-card,
+[data-glass-style="frosted"] .media-item-card,
+[data-glass-style="frosted"] .history-empty-card,
+[data-glass-style="frosted"] .settings-preset-box,
+[data-glass-style="frosted"] .theme-live-preview-box,
+[data-glass-style="frosted"] .incoming-share-banner,
+[data-glass-style="frosted"] .loading-card,
+[data-glass-style="frosted"] .cookie-guide-box,
+[data-glass-style="frosted"] .cookie-step-card,
+[data-glass-style="frosted"] .queue-item,
+[data-glass-style="frosted"] .color-picker-dialog,
+[data-glass-style="frosted"] .ms-card,
+[data-glass-style="frosted"] .history-card,
+[data-glass-style="glass"] .apple-card,
+[data-glass-style="glass"] .settings-card,
+[data-glass-style="glass"] .media-analysis-workspace,
+[data-glass-style="glass"] .format-modal-content,
+[data-glass-style="glass"] .search-card,
+[data-glass-style="glass"] .media-item-card,
+[data-glass-style="glass"] .ms-card,
+[data-glass-style="glass"] .history-card,
+body.theme-glass-frosted .apple-card,
+body.theme-glass-frosted .settings-card,
+body.theme-glass-frosted .ms-card,
+body.theme-glass-frosted .history-card {
+  position: relative !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(8px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(130%) !important;
   border: 1px solid rgba(255, 255, 255, 0.16) !important;
-  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.6), inset 0 1px 1.5px rgba(255, 255, 255, 0.38) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 8px 24px rgba(0, 0, 0, 0.45) !important;
+  contain: paint;
+  transform: translateZ(0);
 }
 
-html[data-glass-style="glass"]:not([data-theme="light"]) .bottom-sheet-drawer {
-  background: rgba(18, 18, 26, 0.94) !important;
-  backdrop-filter: blur(14px) !important;
-  -webkit-backdrop-filter: blur(14px) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.16) !important;
-  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.7) !important;
+[data-glass-style="frosted"] .bottom-sheet-drawer,
+[data-glass-style="glass"] .bottom-sheet-drawer,
+body.theme-glass-frosted .bottom-sheet-drawer {
+  background: rgba(18, 20, 30, 0.92) !important;
+  backdrop-filter: blur(10px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(130%) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.20) !important;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.28) !important;
 }
 
-/* Liquid Glass in Light Mode */
-html[data-glass-style="glass"][data-theme="light"] {
-  --app-bg: #EEF2F6 !important;
-}
-
-html[data-glass-style="glass"][data-theme="light"] .app-viewport {
-  background: radial-gradient(circle at 50% 0%, var(--accent-glow) 0%, transparent 50%) !important;
-}
-
-html[data-glass-style="glass"][data-theme="light"] .apple-card,
-html[data-glass-style="glass"][data-theme="light"] .settings-card,
-html[data-glass-style="glass"][data-theme="light"] .media-analysis-workspace,
-html[data-glass-style="glass"][data-theme="light"] .format-modal-content,
-html[data-glass-style="glass"][data-theme="light"] .search-card,
-html[data-glass-style="glass"][data-theme="light"] .media-item-card,
-html[data-glass-style="glass"][data-theme="light"] .history-empty-card,
-html[data-glass-style="glass"][data-theme="light"] .settings-preset-box,
-html[data-glass-style="glass"][data-theme="light"] .theme-live-preview-box,
-html[data-glass-style="glass"][data-theme="light"] .color-picker-dialog {
-  background: rgba(255, 255, 255, 0.82) !important;
-  backdrop-filter: blur(28px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.9) !important;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06), inset 0 1px 2px rgba(255, 255, 255, 0.95) !important;
-  color: #111827 !important;
-}
-
-html[data-glass-style="glass"][data-theme="light"] .bottom-sheet-drawer {
-  background: rgba(255, 255, 255, 0.96) !important;
-  backdrop-filter: blur(30px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
-  border-top: 1px solid rgba(0, 0, 0, 0.10) !important;
-  color: #111827 !important;
-}
-
-/* Glass Inputs & Search Wrappers */
-html[data-glass-style="glass"]:not([data-theme="light"]) .search-input-wrapper,
-html[data-glass-style="glass"]:not([data-theme="light"]) .select-input,
-html[data-glass-style="glass"]:not([data-theme="light"]) .apple-input,
-html[data-glass-style="glass"]:not([data-theme="light"]) .studio-search-bar,
-html[data-glass-style="glass"]:not([data-theme="light"]) .color-hex-field input,
-html[data-glass-style="glass"]:not([data-theme="light"]) .template-builder-box {
-  background: rgba(255, 255, 255, 0.06) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
+/* Frosted Controls & Inputs (Translucent fill, NO nested blur for max battery life) */
+[data-glass-style="frosted"] .search-input-wrapper,
+[data-glass-style="frosted"] .select-input,
+[data-glass-style="frosted"] .apple-input,
+[data-glass-style="frosted"] .studio-search-bar,
+[data-glass-style="frosted"] .color-hex-field input,
+[data-glass-style="frosted"] .template-builder-box,
+[data-glass-style="frosted"] .settings-secondary-btn,
+[data-glass-style="frosted"] .seg-tab,
+[data-glass-style="frosted"] .filter-chip,
+[data-glass-style="frosted"] .quick-action-chip,
+[data-glass-style="frosted"] .history-action-btn,
+[data-glass-style="frosted"] .quality-chip,
+[data-glass-style="frosted"] .filename-tag-chip,
+[data-glass-style="frosted"] .paste-chip,
+[data-glass-style="glass"] .search-input-wrapper,
+[data-glass-style="glass"] .select-input,
+[data-glass-style="glass"] .apple-input,
+[data-glass-style="glass"] .settings-secondary-btn,
+[data-glass-style="glass"] .seg-tab,
+[data-glass-style="glass"] .filter-chip,
+[data-glass-style="glass"] .quality-chip,
+body.theme-glass-frosted .search-input-wrapper,
+body.theme-glass-frosted .select-input,
+body.theme-glass-frosted .apple-input,
+body.theme-glass-frosted .settings-secondary-btn,
+body.theme-glass-frosted .seg-tab,
+body.theme-glass-frosted .filter-chip {
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
   border: 1px solid rgba(255, 255, 255, 0.16) !important;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(255, 255, 255, 0.08) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.20), 0 2px 6px rgba(0, 0, 0, 0.25) !important;
+  color: #f5f5f7 !important;
 }
 
-/* Glass Buttons with Specular Sheen */
-html[data-glass-style="glass"] .apple-btn-primary,
-html[data-glass-style="glass"] .fetch-submit-btn,
-html[data-glass-style="glass"] .theme-preview-btn,
-html[data-glass-style="glass"] .update-btn-now {
+[data-glass-style="frosted"] .seg-tab.active,
+[data-glass-style="frosted"] .filter-chip.active,
+[data-glass-style="frosted"] .quality-chip.selected,
+[data-glass-style="glass"] .seg-tab.active,
+[data-glass-style="glass"] .filter-chip.active,
+[data-glass-style="glass"] .quality-chip.selected {
   background: var(--accent-gradient) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.32) !important;
-  box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.55), 0 8px 24px var(--accent-glow) !important;
-}
-
-html[data-glass-style="glass"]:not([data-theme="light"]) .settings-secondary-btn,
-html[data-glass-style="glass"]:not([data-theme="light"]) .seg-tab,
-html[data-glass-style="glass"]:not([data-theme="light"]) .filter-chip,
-html[data-glass-style="glass"]:not([data-theme="light"]) .quick-action-chip,
-html[data-glass-style="glass"]:not([data-theme="light"]) .history-action-btn,
-html[data-glass-style="glass"]:not([data-theme="light"]) .quality-chip,
-html[data-glass-style="glass"]:not([data-theme="light"]) .filename-tag-chip,
-html[data-glass-style="glass"]:not([data-theme="light"]) .paste-chip {
-  background: rgba(255, 255, 255, 0.07) !important;
-  backdrop-filter: blur(14px) !important;
-  -webkit-backdrop-filter: blur(14px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.22), 0 2px 8px rgba(0, 0, 0, 0.25) !important;
-}
-
-html[data-glass-style="glass"] .seg-tab.active,
-html[data-glass-style="glass"] .filter-chip.active,
-html[data-glass-style="glass"] .quality-chip.selected {
-  background: var(--accent-gradient) !important;
-  border-color: rgba(255, 255, 255, 0.45) !important;
-  box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.6), 0 6px 20px var(--accent-glow) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 4px 14px var(--accent-glow) !important;
+  color: #ffffff !important;
 }
 
 /* --------------------------------------------------------------------------
-   THEME STYLE 3: ✨ CYBER AURORA PRISM (Dark & Light)
+   THEME 2: CLEAR GLASS ("iOS" Style - High Performance Optimized)
    -------------------------------------------------------------------------- */
-html[data-glass-style="prism"]:not([data-theme="light"]) {
-  --app-bg: #070710 !important;
+[data-glass-style="clear"],
+[data-glass-style="prism"],
+[data-theme-style="clear"],
+[data-theme-style="prism"],
+body.theme-glass-clear {
+  --app-card-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 40%, rgba(255, 255, 255, 0.05) 100%);
+  --app-card-border: rgba(255, 255, 255, 0.28);
 }
 
-html[data-glass-style="prism"]:not([data-theme="light"]) .app-viewport {
-  background: radial-gradient(circle at 20% 0%, var(--accent-glow) 0%, transparent 40%),
-              radial-gradient(circle at 80% 15%, rgba(191, 90, 242, 0.25) 0%, transparent 35%);
+html[data-glass-style="clear"]:not([data-theme="light"]),
+html[data-glass-style="prism"]:not([data-theme="light"]),
+body.theme-glass-clear:not([data-theme="light"]) {
+  --app-bg: #06080e !important;
 }
 
-html[data-glass-style="prism"]:not([data-theme="light"]) .apple-card,
-html[data-glass-style="prism"]:not([data-theme="light"]) .settings-card,
-html[data-glass-style="prism"]:not([data-theme="light"]) .media-analysis-workspace,
-html[data-glass-style="prism"]:not([data-theme="light"]) .format-modal-content,
-html[data-glass-style="prism"]:not([data-theme="light"]) .search-card,
-html[data-glass-style="prism"]:not([data-theme="light"]) .media-item-card,
-html[data-glass-style="prism"]:not([data-theme="light"]) .history-empty-card,
-html[data-glass-style="prism"]:not([data-theme="light"]) .settings-preset-box,
-html[data-glass-style="prism"]:not([data-theme="light"]) .theme-live-preview-box,
-html[data-glass-style="prism"]:not([data-theme="light"]) .incoming-share-banner,
-html[data-glass-style="prism"]:not([data-theme="light"]) .loading-card,
-html[data-glass-style="prism"]:not([data-theme="light"]) .cookie-guide-box,
-html[data-glass-style="prism"]:not([data-theme="light"]) .cookie-step-card,
-html[data-glass-style="prism"]:not([data-theme="light"]) .queue-item,
-html[data-glass-style="prism"]:not([data-theme="light"]) .color-picker-dialog {
-  background: linear-gradient(145deg, rgba(22, 18, 36, 0.80), rgba(10, 12, 24, 0.88)) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.22) !important;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 24px var(--accent-glow), inset 0 1px 2px rgba(255, 255, 255, 0.5) !important;
-  position: relative;
+html[data-glass-style="clear"]:not([data-theme="light"]) .app-viewport,
+html[data-glass-style="prism"]:not([data-theme="light"]) .app-viewport,
+body.theme-glass-clear:not([data-theme="light"]) .app-viewport {
+  background: radial-gradient(circle at 50% 0%, var(--accent-glow) 0%, transparent 45%);
 }
 
-html[data-glass-style="prism"]:not([data-theme="light"]) .bottom-sheet-drawer {
-  background: linear-gradient(145deg, rgba(22, 18, 36, 0.96), rgba(12, 12, 24, 0.98)) !important;
-  backdrop-filter: blur(14px) !important;
-  -webkit-backdrop-filter: blur(14px) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.22) !important;
-  box-shadow: 0 -12px 50px rgba(0, 0, 0, 0.8), 0 0 24px var(--accent-glow) !important;
+[data-glass-style="clear"] .apple-card,
+[data-glass-style="clear"] .settings-card,
+[data-glass-style="clear"] .media-analysis-workspace,
+[data-glass-style="clear"] .format-modal-content,
+[data-glass-style="clear"] .search-card,
+[data-glass-style="clear"] .media-item-card,
+[data-glass-style="clear"] .history-empty-card,
+[data-glass-style="clear"] .settings-preset-box,
+[data-glass-style="clear"] .theme-live-preview-box,
+[data-glass-style="clear"] .incoming-share-banner,
+[data-glass-style="clear"] .loading-card,
+[data-glass-style="clear"] .cookie-guide-box,
+[data-glass-style="clear"] .cookie-step-card,
+[data-glass-style="clear"] .queue-item,
+[data-glass-style="clear"] .color-picker-dialog,
+[data-glass-style="clear"] .ms-card,
+[data-glass-style="clear"] .history-card,
+[data-glass-style="prism"] .apple-card,
+[data-glass-style="prism"] .settings-card,
+[data-glass-style="prism"] .media-analysis-workspace,
+[data-glass-style="prism"] .format-modal-content,
+[data-glass-style="prism"] .search-card,
+[data-glass-style="prism"] .media-item-card,
+[data-glass-style="prism"] .ms-card,
+[data-glass-style="prism"] .history-card,
+body.theme-glass-clear .apple-card,
+body.theme-glass-clear .settings-card,
+body.theme-glass-clear .ms-card,
+body.theme-glass-clear .history-card {
+  position: relative !important;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 40%, rgba(255, 255, 255, 0.05) 100%) !important;
+  backdrop-filter: blur(3px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(3px) saturate(140%) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.28) !important;
+  box-shadow: 
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.55),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.2),
+    0 8px 22px rgba(0, 0, 0, 0.35) !important;
+  contain: paint;
+  transform: translateZ(0);
 }
 
-/* Cyber Aurora Prism in Light Mode */
-html[data-glass-style="prism"][data-theme="light"] {
-  --app-bg: #F0F4F9 !important;
-}
-
-html[data-glass-style="prism"][data-theme="light"] .app-viewport {
-  background: radial-gradient(circle at 15% 0%, var(--accent-glow) 0%, transparent 45%),
-              radial-gradient(circle at 85% 15%, rgba(191, 90, 242, 0.14) 0%, transparent 40%) !important;
-}
-
-html[data-glass-style="prism"][data-theme="light"] .apple-card,
-html[data-glass-style="prism"][data-theme="light"] .settings-card,
-html[data-glass-style="prism"][data-theme="light"] .media-analysis-workspace,
-html[data-glass-style="prism"][data-theme="light"] .format-modal-content,
-html[data-glass-style="prism"][data-theme="light"] .search-card,
-html[data-glass-style="prism"][data-theme="light"] .media-item-card,
-html[data-glass-style="prism"][data-theme="light"] .history-empty-card,
-html[data-glass-style="prism"][data-theme="light"] .settings-preset-box,
-html[data-glass-style="prism"][data-theme="light"] .theme-live-preview-box,
-html[data-glass-style="prism"][data-theme="light"] .color-picker-dialog {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.90), rgba(245, 248, 255, 0.82)) !important;
-  backdrop-filter: blur(32px) saturate(190%) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(190%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.95) !important;
-  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.06), 0 0 20px var(--accent-glow), inset 0 1px 2px rgba(255, 255, 255, 0.98) !important;
-  color: #111827 !important;
-}
-
-/* Iridescent Chromatic Top Rim */
-html[data-glass-style="prism"] .apple-card::before,
-html[data-glass-style="prism"] .settings-card::before,
-html[data-glass-style="prism"] .media-analysis-workspace::before {
-  content: "";
+[data-glass-style="clear"] .apple-card::after,
+[data-glass-style="clear"] .settings-card::after,
+[data-glass-style="prism"] .apple-card::after,
+[data-glass-style="prism"] .settings-card::after,
+body.theme-glass-clear .apple-card::after,
+body.theme-glass-clear .settings-card::after {
+  content: '';
   position: absolute;
   top: 0;
-  left: 0;
-  right: 0;
-  height: 1.5px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.85), var(--brand-accent), transparent);
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  left: 8%;
+  right: 8%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.65), transparent);
   pointer-events: none;
 }
 
-html[data-glass-style="prism"] .apple-btn-primary,
-html[data-glass-style="prism"] .fetch-submit-btn,
-html[data-glass-style="prism"] .theme-preview-btn,
-html[data-glass-style="prism"] .update-btn-now {
+[data-glass-style="clear"] .bottom-sheet-drawer,
+[data-glass-style="prism"] .bottom-sheet-drawer,
+body.theme-glass-clear .bottom-sheet-drawer {
+  background: rgba(18, 20, 32, 0.90) !important;
+  backdrop-filter: blur(4px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(4px) saturate(140%) !important;
+  border-top: 1.5px solid rgba(255, 255, 255, 0.32) !important;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.75), inset 0 1.5px 1px rgba(255, 255, 255, 0.55) !important;
+}
+
+/* Clear Controls & Inputs (Translucent fill, NO nested blur) */
+[data-glass-style="clear"] .search-input-wrapper,
+[data-glass-style="clear"] .select-input,
+[data-glass-style="clear"] .apple-input,
+[data-glass-style="clear"] .studio-search-bar,
+[data-glass-style="clear"] .color-hex-field input,
+[data-glass-style="clear"] .template-builder-box,
+[data-glass-style="clear"] .settings-secondary-btn,
+[data-glass-style="clear"] .seg-tab,
+[data-glass-style="clear"] .filter-chip,
+[data-glass-style="clear"] .quick-action-chip,
+[data-glass-style="clear"] .history-action-btn,
+[data-glass-style="clear"] .quality-chip,
+[data-glass-style="clear"] .filename-tag-chip,
+[data-glass-style="clear"] .paste-chip,
+[data-glass-style="prism"] .search-input-wrapper,
+[data-glass-style="prism"] .select-input,
+[data-glass-style="prism"] .apple-input,
+[data-glass-style="prism"] .settings-secondary-btn,
+[data-glass-style="prism"] .seg-tab,
+[data-glass-style="prism"] .filter-chip,
+[data-glass-style="prism"] .quality-chip,
+body.theme-glass-clear .search-input-wrapper,
+body.theme-glass-clear .select-input,
+body.theme-glass-clear .apple-input,
+body.theme-glass-clear .settings-secondary-btn,
+body.theme-glass-clear .seg-tab,
+body.theme-glass-clear .filter-chip {
+  background: rgba(255, 255, 255, 0.06) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  box-shadow: inset 0 1px 0.5px rgba(255, 255, 255, 0.35), 0 2px 4px rgba(0, 0, 0, 0.18) !important;
+  color: #f5f5f7 !important;
+}
+
+[data-glass-style="clear"] .seg-tab.active,
+[data-glass-style="clear"] .filter-chip.active,
+[data-glass-style="clear"] .quality-chip.selected,
+[data-glass-style="prism"] .seg-tab.active,
+[data-glass-style="prism"] .filter-chip.active,
+[data-glass-style="prism"] .quality-chip.selected {
   background: var(--accent-gradient) !important;
-  border: 1px solid rgba(255, 255, 255, 0.45) !important;
-  box-shadow: inset 0 1.5px 2px rgba(255, 255, 255, 0.7), 0 10px 28px var(--accent-glow) !important;
-  backdrop-filter: blur(18px) !important;
-  -webkit-backdrop-filter: blur(18px) !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  box-shadow: inset 0 1.5px 1px rgba(255, 255, 255, 0.55), 0 4px 16px var(--accent-glow) !important;
+  color: #ffffff !important;
 }
 
-html[data-glass-style="prism"]:not([data-theme="light"]) .settings-secondary-btn,
-html[data-glass-style="prism"]:not([data-theme="light"]) .seg-tab,
-html[data-glass-style="prism"]:not([data-theme="light"]) .filter-chip,
-html[data-glass-style="prism"]:not([data-theme="light"]) .quick-action-chip,
-html[data-glass-style="prism"]:not([data-theme="light"]) .quality-chip,
-html[data-glass-style="prism"]:not([data-theme="light"]) .filename-tag-chip,
-html[data-glass-style="prism"]:not([data-theme="light"]) .paste-chip {
-  background: rgba(255, 255, 255, 0.08) !important;
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
-  backdrop-filter: blur(16px) !important;
-  box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.28), 0 4px 14px rgba(0, 0, 0, 0.3) !important;
+/* --------------------------------------------------------------------------
+   THEME 3: BLUR GLASS ("One UI" Style - High Performance Optimized)
+   -------------------------------------------------------------------------- */
+[data-glass-style="blur"],
+[data-theme-style="blur"],
+body.theme-glass-blur {
+  --app-card-bg: rgba(18, 16, 22, 0.78);
+  --app-card-border: rgba(255, 255, 255, 0.10);
 }
 
-html[data-glass-style="prism"] .seg-tab.active,
-html[data-glass-style="prism"] .filter-chip.active,
-html[data-glass-style="prism"] .quality-chip.selected {
-  background: linear-gradient(135deg, var(--brand-accent), var(--brand-secondary)) !important;
-  border-color: rgba(255, 255, 255, 0.6) !important;
-  box-shadow: inset 0 1.5px 2px rgba(255, 255, 255, 0.8), 0 6px 24px var(--accent-glow) !important;
+html[data-glass-style="blur"]:not([data-theme="light"]),
+body.theme-glass-blur:not([data-theme="light"]) {
+  --app-bg: #08060a !important;
+}
+
+html[data-glass-style="blur"]:not([data-theme="light"]) .app-viewport,
+body.theme-glass-blur:not([data-theme="light"]) .app-viewport {
+  background: radial-gradient(circle at 50% 0%, var(--accent-glow) 0%, transparent 45%);
+}
+
+[data-glass-style="blur"] .apple-card,
+[data-glass-style="blur"] .settings-card,
+[data-glass-style="blur"] .media-analysis-workspace,
+[data-glass-style="blur"] .format-modal-content,
+[data-glass-style="blur"] .search-card,
+[data-glass-style="blur"] .media-item-card,
+[data-glass-style="blur"] .history-empty-card,
+[data-glass-style="blur"] .settings-preset-box,
+[data-glass-style="blur"] .theme-live-preview-box,
+[data-glass-style="blur"] .incoming-share-banner,
+[data-glass-style="blur"] .loading-card,
+[data-glass-style="blur"] .cookie-guide-box,
+[data-glass-style="blur"] .cookie-step-card,
+[data-glass-style="blur"] .queue-item,
+[data-glass-style="blur"] .color-picker-dialog,
+[data-glass-style="blur"] .ms-card,
+[data-glass-style="blur"] .history-card,
+body.theme-glass-blur .apple-card,
+body.theme-glass-blur .settings-card,
+body.theme-glass-blur .ms-card,
+body.theme-glass-blur .history-card {
+  position: relative !important;
+  background: rgba(18, 16, 22, 0.78) !important;
+  backdrop-filter: blur(8px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(120%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 8px 24px rgba(0, 0, 0, 0.55) !important;
+  contain: paint;
+  transform: translateZ(0);
+}
+
+[data-glass-style="blur"] .bottom-sheet-drawer,
+body.theme-glass-blur .bottom-sheet-drawer {
+  background: rgba(16, 14, 20, 0.94) !important;
+  backdrop-filter: blur(10px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(120%) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.14) !important;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.16) !important;
+}
+
+/* Blur Controls & Inputs (Translucent fill, NO nested blur) */
+[data-glass-style="blur"] .search-input-wrapper,
+[data-glass-style="blur"] .select-input,
+[data-glass-style="blur"] .apple-input,
+[data-glass-style="blur"] .studio-search-bar,
+[data-glass-style="blur"] .color-hex-field input,
+[data-glass-style="blur"] .template-builder-box,
+[data-glass-style="blur"] .settings-secondary-btn,
+[data-glass-style="blur"] .seg-tab,
+[data-glass-style="blur"] .filter-chip,
+[data-glass-style="blur"] .quick-action-chip,
+[data-glass-style="blur"] .history-action-btn,
+[data-glass-style="blur"] .quality-chip,
+[data-glass-style="blur"] .filename-tag-chip,
+[data-glass-style="blur"] .paste-chip,
+body.theme-glass-blur .search-input-wrapper,
+body.theme-glass-blur .select-input,
+body.theme-glass-blur .apple-input,
+body.theme-glass-blur .settings-secondary-btn,
+body.theme-glass-blur .seg-tab,
+body.theme-glass-blur .filter-chip {
+  background: rgba(255, 255, 255, 0.06) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 2px 5px rgba(0, 0, 0, 0.3) !important;
+  color: #e5e5ea !important;
+}
+
+[data-glass-style="blur"] .seg-tab.active,
+[data-glass-style="blur"] .filter-chip.active,
+[data-glass-style="blur"] .quality-chip.selected {
+  background: var(--accent-gradient) !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.30), 0 4px 14px var(--accent-glow) !important;
+  color: #ffffff !important;
+}
+
+/* --------------------------------------------------------------------------
+   THEME 4: AMOLED THEME (Pure Deep Pitch Black for Maximum Battery Life)
+   -------------------------------------------------------------------------- */
+[data-glass-style="amoled"],
+[data-glass-style="solid"],
+[data-theme-style="amoled"],
+[data-theme-style="solid"],
+body.theme-glass-amoled,
+body.theme-icons-core {
+  --app-card-bg: #000000;
+  --app-card-border: rgba(255, 255, 255, 0.08);
+}
+
+html[data-glass-style="amoled"]:not([data-theme="light"]),
+html[data-glass-style="solid"]:not([data-theme="light"]),
+body.theme-glass-amoled:not([data-theme="light"]),
+body.theme-icons-core:not([data-theme="light"]) {
+  --app-bg: #000000 !important;
+}
+
+[data-glass-style="amoled"] .apple-card,
+[data-glass-style="amoled"] .settings-card,
+[data-glass-style="amoled"] .media-analysis-workspace,
+[data-glass-style="amoled"] .format-modal-content,
+[data-glass-style="amoled"] .search-card,
+[data-glass-style="amoled"] .media-item-card,
+[data-glass-style="amoled"] .history-empty-card,
+[data-glass-style="amoled"] .settings-preset-box,
+[data-glass-style="amoled"] .theme-live-preview-box,
+[data-glass-style="amoled"] .incoming-share-banner,
+[data-glass-style="amoled"] .loading-card,
+[data-glass-style="amoled"] .cookie-guide-box,
+[data-glass-style="amoled"] .cookie-step-card,
+[data-glass-style="amoled"] .queue-item,
+[data-glass-style="amoled"] .color-picker-dialog,
+[data-glass-style="amoled"] .ms-card,
+[data-glass-style="amoled"] .history-card,
+body.theme-glass-amoled .apple-card,
+body.theme-glass-amoled .settings-card,
+body.theme-glass-amoled .ms-card,
+body.theme-glass-amoled .history-card {
+  position: relative !important;
+  background: #000000 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8) !important;
+}
+
+[data-glass-style="amoled"] .search-input-wrapper,
+[data-glass-style="amoled"] .select-input,
+[data-glass-style="amoled"] .apple-input,
+[data-glass-style="amoled"] .studio-search-bar,
+[data-glass-style="amoled"] .color-hex-field input,
+[data-glass-style="amoled"] .template-builder-box,
+[data-glass-style="amoled"] .settings-secondary-btn,
+[data-glass-style="amoled"] .seg-tab,
+[data-glass-style="amoled"] .filter-chip,
+[data-glass-style="amoled"] .quick-action-chip,
+[data-glass-style="amoled"] .history-action-btn,
+[data-glass-style="amoled"] .quality-chip,
+[data-glass-style="amoled"] .filename-tag-chip,
+[data-glass-style="amoled"] .paste-chip,
+body.theme-glass-amoled .search-input-wrapper,
+body.theme-glass-amoled .select-input,
+body.theme-glass-amoled .apple-input,
+body.theme-glass-amoled .settings-secondary-btn,
+body.theme-glass-amoled .seg-tab,
+body.theme-glass-amoled .filter-chip {
+  background: #121217 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  box-shadow: none !important;
+  color: #f5f5f7 !important;
+}
+
+[data-glass-style="amoled"] .seg-tab.active,
+[data-glass-style="amoled"] .filter-chip.active,
+[data-glass-style="amoled"] .quality-chip.selected {
+  background: var(--brand-accent) !important;
+  border: none !important;
+  color: #000000 !important;
+  font-weight: 700 !important;
+}
+
+/* Light Mode Overrides for All 4 Themes */
+html[data-theme="light"][data-glass-style="frosted"] .apple-card,
+html[data-theme="light"][data-glass-style="frosted"] .settings-card,
+html[data-theme="light"][data-glass-style="frosted"] .ms-card,
+html[data-theme="light"][data-glass-style="frosted"] .history-card {
+  background: rgba(255, 255, 255, 0.82) !important;
+  backdrop-filter: blur(8px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(140%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06), inset 0 1px 2px rgba(255, 255, 255, 0.95) !important;
+}
+
+html[data-theme="light"][data-glass-style="clear"] .apple-card,
+html[data-theme="light"][data-theme-style="clear"] .settings-card,
+html[data-theme="light"][data-glass-style="clear"] .ms-card,
+html[data-theme="light"][data-glass-style="clear"] .history-card {
+  background: rgba(255, 255, 255, 0.70) !important;
+  backdrop-filter: blur(3px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(3px) saturate(140%) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05), inset 0 1.5px 1px rgba(255, 255, 255, 0.98) !important;
+}
+
+html[data-theme="light"][data-glass-style="blur"] .apple-card,
+html[data-theme="light"][data-glass-style="blur"] .settings-card,
+html[data-theme="light"][data-glass-style="blur"] .ms-card,
+html[data-theme="light"][data-glass-style="blur"] .history-card {
+  background: rgba(245, 245, 250, 0.88) !important;
+  backdrop-filter: blur(8px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(130%) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+html[data-theme="light"][data-glass-style="amoled"] .apple-card,
+html[data-theme="light"][data-glass-style="amoled"] .settings-card,
+html[data-theme="light"][data-glass-style="amoled"] .ms-card,
+html[data-theme="light"][data-glass-style="amoled"] .history-card,
+html[data-theme="light"][data-glass-style="solid"] .apple-card,
+html[data-theme="light"][data-glass-style="solid"] .settings-card {
+  background: #FFFFFF !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
 }
 
 /* ==========================================================================
@@ -4995,32 +5263,66 @@ html, body {
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+/* Floating Dock Themed Glass Surfaces */
+[data-glass-style="frosted"] .floating-pill-dock,
 [data-glass-style="glass"] .floating-pill-dock,
-[data-glass-style="prism"] .floating-pill-dock,
-[data-theme-style="glass"] .floating-pill-dock,
-[data-theme-style="prism"] .floating-pill-dock {
-  background: rgba(14, 18, 28, 0.85) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.16) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.32) !important;
-  box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.85),
-              0 0 20px -2px rgba(var(--primary-rgb, 10, 132, 255), 0.35),
-              inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+[data-theme-style="frosted"] .floating-pill-dock,
+body.theme-glass-frosted .floating-pill-dock {
+  background: rgba(18, 20, 30, 0.78) !important;
+  backdrop-filter: blur(8px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(130%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.35) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.28) !important;
   overflow: hidden !important;
 }
 
-/* Moving Abstract Gradient Inside Floating Dock - Dynamic Theme Colors */
+[data-glass-style="clear"] .floating-pill-dock,
+[data-glass-style="prism"] .floating-pill-dock,
+[data-theme-style="clear"] .floating-pill-dock,
+body.theme-glass-clear .floating-pill-dock {
+  background: rgba(22, 24, 34, 0.68) !important;
+  backdrop-filter: blur(3px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(3px) saturate(140%) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.30) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75), inset 0 1.5px 1px rgba(255, 255, 255, 0.45) !important;
+  overflow: hidden !important;
+}
+
+[data-glass-style="blur"] .floating-pill-dock,
+[data-theme-style="blur"] .floating-pill-dock,
+body.theme-glass-blur .floating-pill-dock {
+  background: rgba(16, 14, 20, 0.85) !important;
+  backdrop-filter: blur(8px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(120%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+  overflow: hidden !important;
+}
+
+[data-glass-style="amoled"] .floating-pill-dock,
+[data-glass-style="solid"] .floating-pill-dock,
+[data-theme-style="amoled"] .floating-pill-dock,
+body.theme-glass-amoled .floating-pill-dock {
+  background: #090a0f !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.95) !important;
+}
+
+/* Subtle Dynamic Theme Ambient Hue inside Floating Dock */
+[data-glass-style="frosted"] .floating-pill-dock::before,
+[data-glass-style="clear"] .floating-pill-dock::before,
+[data-glass-style="blur"] .floating-pill-dock::before,
 [data-glass-style="glass"] .floating-pill-dock::before,
-[data-glass-style="prism"] .floating-pill-dock::before,
-[data-theme-style="glass"] .floating-pill-dock::before,
-[data-theme-style="prism"] .floating-pill-dock::before {
+[data-glass-style="prism"] .floating-pill-dock::before {
   content: "";
   position: absolute;
   inset: -40%;
   border-radius: inherit;
-  background: radial-gradient(circle at 30% 50%, rgba(var(--primary-rgb, 10, 132, 255), 0.3) 0%, transparent 60%),
-              radial-gradient(circle at 70% 50%, rgba(var(--secondary-rgb, 0, 198, 251), 0.25) 0%, transparent 60%);
+  background: radial-gradient(circle at 30% 50%, rgba(var(--primary-rgb, 10, 132, 255), 0.25) 0%, transparent 60%),
+              radial-gradient(circle at 70% 50%, rgba(var(--secondary-rgb, 0, 198, 251), 0.2) 0%, transparent 60%);
   animation: dockMeshDrift 7s ease-in-out infinite alternate;
   pointer-events: none;
   z-index: -1;
@@ -5282,18 +5584,17 @@ html:not([data-theme="light"]) .ms-platform-pill:not(.active) {
   border-radius: 18px !important;
 }
 
-html:not([data-theme="light"]) .search-studio-card,
-html:not([data-theme="light"]) .apple-card.search-studio-card,
-html:not([data-theme="light"])[data-glass-style] .apple-card.search-studio-card,
-html:not([data-theme="light"])[data-theme-style] .apple-card.search-studio-card,
-html:not([data-theme="light"])[data-glass-style="glass"] .search-studio-card,
-html:not([data-theme="light"])[data-glass-style="prism"] .search-studio-card,
-html:not([data-theme="light"])[data-theme-style="glass"] .search-studio-card,
-html:not([data-theme="light"])[data-theme-style="prism"] .search-studio-card {
-  background: #0d111a !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.22) !important;
-  box-shadow: 0 10px 30px -6px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+/* Dark Mode Base Card Styles (fallback when no specific glass style is active) */
+html:not([data-theme="light"]):not([data-glass-style]) .apple-card,
+html:not([data-theme="light"]):not([data-glass-style]) .settings-card,
+html:not([data-theme="light"]):not([data-glass-style]) .media-analysis-workspace,
+html:not([data-theme="light"]):not([data-glass-style]) .search-studio-card,
+html:not([data-theme="light"]):not([data-glass-style]) .ms-card,
+html:not([data-theme="light"]):not([data-glass-style]) .history-card {
+  background: #0d111a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 10px 30px -6px rgba(0, 0, 0, 0.75);
 }
 
 .search-studio-card.has-open-suggestions,
@@ -5301,75 +5602,13 @@ html:not([data-theme="light"])[data-theme-style="prism"] .search-studio-card {
   z-index: 999999 !important;
 }
 
-[data-glass-style="glass"] .apple-card:not(.search-studio-card),
-[data-glass-style="prism"] .apple-card:not(.search-studio-card),
-[data-theme-style="glass"] .apple-card:not(.search-studio-card),
-[data-theme-style="prism"] .apple-card:not(.search-studio-card),
-[data-glass-style="glass"] .settings-card,
-[data-glass-style="prism"] .settings-card,
-[data-theme-style="glass"] .settings-card,
-[data-theme-style="prism"] .settings-card,
-[data-glass-style="glass"] .media-analysis-workspace,
-[data-glass-style="prism"] .media-analysis-workspace,
-[data-theme-style="glass"] .media-analysis-workspace,
-[data-theme-style="prism"] .media-analysis-workspace {
-  position: relative !important;
-  overflow: hidden !important;
-  border-radius: 18px !important;
-  contain: content;
-}
-
-html:not([data-theme="light"]) [data-glass-style="glass"] .apple-card:not(.search-studio-card),
-html:not([data-theme="light"]) [data-glass-style="prism"] .apple-card:not(.search-studio-card),
-html:not([data-theme="light"]) [data-theme-style="glass"] .apple-card:not(.search-studio-card),
-html:not([data-theme="light"]) [data-theme-style="prism"] .apple-card:not(.search-studio-card),
-html:not([data-theme="light"]) [data-glass-style="glass"] .settings-card,
-html:not([data-theme="light"]) [data-glass-style="prism"] .settings-card,
-html:not([data-theme="light"]) [data-theme-style="glass"] .settings-card,
-html:not([data-theme="light"]) [data-theme-style="prism"] .settings-card,
-html:not([data-theme="light"]) [data-glass-style="glass"] .media-analysis-workspace,
-html:not([data-theme="light"]) [data-glass-style="prism"] .media-analysis-workspace,
-html:not([data-theme="light"]) [data-theme-style="glass"] .media-analysis-workspace,
-html:not([data-theme="light"]) [data-theme-style="prism"] .media-analysis-workspace {
-  background: #0d111a !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.22) !important;
-  box-shadow: 0 10px 30px -6px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
-}
-
 /* Fast Lightweight Grid Media Cards (165+ items without GPU frame drops) */
 .ms-card,
-.history-card,
-[data-glass-style="glass"] .ms-card,
-[data-glass-style="prism"] .ms-card,
-[data-theme-style="glass"] .ms-card,
-[data-theme-style="prism"] .ms-card,
-[data-glass-style="glass"] .history-card,
-[data-glass-style="prism"] .history-card,
-[data-theme-style="glass"] .history-card,
-[data-theme-style="prism"] .history-card {
+.history-card {
   position: relative !important;
   overflow: hidden !important;
   border-radius: 16px !important;
   contain: layout style;
-}
-
-html:not([data-theme="light"]) .ms-card,
-html:not([data-theme="light"]) .history-card,
-html:not([data-theme="light"]) [data-glass-style="glass"] .ms-card,
-html:not([data-theme="light"]) [data-glass-style="prism"] .ms-card,
-html:not([data-theme="light"]) [data-theme-style="glass"] .ms-card,
-html:not([data-theme="light"]) [data-theme-style="prism"] .ms-card,
-html:not([data-theme="light"]) [data-glass-style="glass"] .history-card,
-html:not([data-theme="light"]) [data-glass-style="prism"] .history-card,
-html:not([data-theme="light"]) [data-theme-style="glass"] .history-card,
-html:not([data-theme="light"]) [data-theme-style="prism"] .history-card {
-  background: #0d111a !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.18) !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
 }
 
 /* Turn off heavy continuous keyframe animations on all cards to prevent GPU throttling */
@@ -5750,19 +5989,40 @@ html[data-theme="light"] .settings-path-text {
   z-index: 2 !important;
 }
 
-/* Glassmorphic Glowing Buttons - 100% Dynamic Theme Colors */
+/* Glassmorphic Glowing Buttons - 100% Dynamic Theme Colors (Frosted, Clear, Blur) */
+[data-glass-style="frosted"] .ms-btn-download,
+[data-glass-style="clear"] .ms-btn-download,
+[data-glass-style="blur"] .ms-btn-download,
 [data-glass-style="glass"] .ms-btn-download,
 [data-glass-style="prism"] .ms-btn-download,
-[data-theme-style="glass"] .ms-btn-download,
-[data-theme-style="prism"] .ms-btn-download,
+[data-theme-style="frosted"] .ms-btn-download,
+[data-theme-style="clear"] .ms-btn-download,
+[data-theme-style="blur"] .ms-btn-download,
+body.theme-glass-frosted .ms-btn-download,
+body.theme-glass-clear .ms-btn-download,
+body.theme-glass-blur .ms-btn-download,
+[data-glass-style="frosted"] .apple-btn-primary,
+[data-glass-style="clear"] .apple-btn-primary,
+[data-glass-style="blur"] .apple-btn-primary,
 [data-glass-style="glass"] .apple-btn-primary,
 [data-glass-style="prism"] .apple-btn-primary,
-[data-theme-style="glass"] .apple-btn-primary,
-[data-theme-style="prism"] .apple-btn-primary,
+[data-theme-style="frosted"] .apple-btn-primary,
+[data-theme-style="clear"] .apple-btn-primary,
+[data-theme-style="blur"] .apple-btn-primary,
+body.theme-glass-frosted .apple-btn-primary,
+body.theme-glass-clear .apple-btn-primary,
+body.theme-glass-blur .apple-btn-primary,
+[data-glass-style="frosted"] .ms-search-btn,
+[data-glass-style="clear"] .ms-search-btn,
+[data-glass-style="blur"] .ms-search-btn,
 [data-glass-style="glass"] .ms-search-btn,
 [data-glass-style="prism"] .ms-search-btn,
-[data-theme-style="glass"] .ms-search-btn,
-[data-theme-style="prism"] .ms-search-btn {
+[data-theme-style="frosted"] .ms-search-btn,
+[data-theme-style="clear"] .ms-search-btn,
+[data-theme-style="blur"] .ms-search-btn,
+body.theme-glass-frosted .ms-search-btn,
+body.theme-glass-clear .ms-search-btn,
+body.theme-glass-blur .ms-search-btn {
   background: linear-gradient(135deg, var(--brand-accent) 0%, var(--brand-secondary) 100%) !important;
   border: 1px solid rgba(255, 255, 255, 0.28) !important;
   border-top: 1px solid rgba(255, 255, 255, 0.55) !important;
@@ -5776,10 +6036,17 @@ html[data-theme="light"] .settings-path-text {
   transition: transform 0.15s ease !important;
 }
 
+[data-glass-style="frosted"] .ms-btn-trim,
+[data-glass-style="clear"] .ms-btn-trim,
+[data-glass-style="blur"] .ms-btn-trim,
 [data-glass-style="glass"] .ms-btn-trim,
 [data-glass-style="prism"] .ms-btn-trim,
-[data-theme-style="glass"] .ms-btn-trim,
-[data-theme-style="prism"] .ms-btn-trim {
+[data-theme-style="frosted"] .ms-btn-trim,
+[data-theme-style="clear"] .ms-btn-trim,
+[data-theme-style="blur"] .ms-btn-trim,
+body.theme-glass-frosted .ms-btn-trim,
+body.theme-glass-clear .ms-btn-trim,
+body.theme-glass-blur .ms-btn-trim {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -5807,72 +6074,133 @@ html[data-theme="light"] .settings-path-text {
    7. SOLID AMOLED THEME (Pure Deep Pitch Black for Battery Saving)
    ========================================================================== */
 
+[data-glass-style="amoled"] .ambient-fluid-mesh,
 [data-glass-style="solid"] .ambient-fluid-mesh,
-[data-theme-style="solid"] .ambient-fluid-mesh {
+[data-theme-style="amoled"] .ambient-fluid-mesh,
+[data-theme-style="solid"] .ambient-fluid-mesh,
+body.theme-glass-amoled .ambient-fluid-mesh {
   display: none !important;
 }
 
+[data-glass-style="amoled"] .footer-ambient-backdrop,
 [data-glass-style="solid"] .footer-ambient-backdrop,
-[data-theme-style="solid"] .footer-ambient-backdrop {
+[data-theme-style="amoled"] .footer-ambient-backdrop,
+[data-theme-style="solid"] .footer-ambient-backdrop,
+body.theme-glass-amoled .footer-ambient-backdrop {
   background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.85) 60%, #000000 100%) !important;
   animation: none !important;
   filter: none !important;
 }
 
+[data-glass-style="amoled"] .floating-pill-dock,
 [data-glass-style="solid"] .floating-pill-dock,
-[data-theme-style="solid"] .floating-pill-dock {
+[data-theme-style="amoled"] .floating-pill-dock,
+[data-theme-style="solid"] .floating-pill-dock,
+body.theme-glass-amoled .floating-pill-dock {
   background: #090a0f !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.95) !important;
 }
 
+[data-glass-style="amoled"] .floating-pill-dock::before,
 [data-glass-style="solid"] .floating-pill-dock::before,
+[data-theme-style="amoled"] .floating-pill-dock::before,
 [data-theme-style="solid"] .floating-pill-dock::before,
+[data-glass-style="amoled"] .ms-card::before,
 [data-glass-style="solid"] .ms-card::before,
+[data-glass-style="amoled"] .ms-card::after,
 [data-glass-style="solid"] .ms-card::after,
+[data-glass-style="amoled"] .history-card::before,
 [data-glass-style="solid"] .history-card::before,
+[data-glass-style="amoled"] .history-card::after,
 [data-glass-style="solid"] .history-card::after,
+[data-glass-style="amoled"] .apple-card::before,
 [data-glass-style="solid"] .apple-card::before,
+[data-glass-style="amoled"] .apple-card::after,
 [data-glass-style="solid"] .apple-card::after,
+[data-theme-style="amoled"] .ms-card::before,
 [data-theme-style="solid"] .ms-card::before,
+[data-theme-style="amoled"] .ms-card::after,
 [data-theme-style="solid"] .ms-card::after,
+[data-theme-style="amoled"] .history-card::before,
 [data-theme-style="solid"] .history-card::before,
+[data-theme-style="amoled"] .history-card::after,
 [data-theme-style="solid"] .history-card::after,
+[data-theme-style="amoled"] .apple-card::before,
 [data-theme-style="solid"] .apple-card::before,
+[data-theme-style="amoled"] .apple-card::after,
 [data-theme-style="solid"] .apple-card::after,
+[data-glass-style="amoled"] .app-header::before,
 [data-glass-style="solid"] .app-header::before,
+[data-glass-style="amoled"] .app-header::after,
 [data-glass-style="solid"] .app-header::after,
+[data-theme-style="amoled"] .app-header::before,
 [data-theme-style="solid"] .app-header::before,
-[data-theme-style="solid"] .app-header::after {
+[data-theme-style="amoled"] .app-header::after,
+[data-theme-style="solid"] .app-header::after,
+body.theme-glass-amoled .floating-pill-dock::before,
+body.theme-glass-amoled .ms-card::before,
+body.theme-glass-amoled .ms-card::after,
+body.theme-glass-amoled .history-card::before,
+body.theme-glass-amoled .history-card::after,
+body.theme-glass-amoled .apple-card::before,
+body.theme-glass-amoled .apple-card::after,
+body.theme-glass-amoled .app-header::before,
+body.theme-glass-amoled .app-header::after {
   display: none !important;
 }
 
+[data-glass-style="amoled"] .ms-card,
 [data-glass-style="solid"] .ms-card,
+[data-glass-style="amoled"] .history-card,
 [data-glass-style="solid"] .history-card,
+[data-glass-style="amoled"] .apple-card,
 [data-glass-style="solid"] .apple-card,
+[data-theme-style="amoled"] .ms-card,
 [data-theme-style="solid"] .ms-card,
+[data-theme-style="amoled"] .history-card,
 [data-theme-style="solid"] .history-card,
-[data-theme-style="solid"] .apple-card {
+[data-theme-style="amoled"] .apple-card,
+[data-theme-style="solid"] .apple-card,
+body.theme-glass-amoled .ms-card,
+body.theme-glass-amoled .history-card,
+body.theme-glass-amoled .apple-card {
   background: #000000 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 18px !important;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8) !important;
 }
 
+[data-glass-style="amoled"] .ms-btn-download,
 [data-glass-style="solid"] .ms-btn-download,
+[data-theme-style="amoled"] .ms-btn-download,
 [data-theme-style="solid"] .ms-btn-download,
+[data-glass-style="amoled"] .apple-btn-primary,
 [data-glass-style="solid"] .apple-btn-primary,
+[data-theme-style="amoled"] .apple-btn-primary,
 [data-theme-style="solid"] .apple-btn-primary,
+[data-glass-style="amoled"] .ms-search-btn,
 [data-glass-style="solid"] .ms-search-btn,
-[data-theme-style="solid"] .ms-search-btn {
+[data-theme-style="amoled"] .ms-search-btn,
+[data-theme-style="solid"] .ms-search-btn,
+body.theme-glass-amoled .ms-btn-download,
+body.theme-glass-amoled .apple-btn-primary,
+body.theme-glass-amoled .ms-search-btn {
   background: var(--brand-accent) !important;
   color: #000000 !important;
   border: none !important;
   box-shadow: 0 4px 14px rgba(var(--primary-rgb, 10, 132, 255), 0.35) !important;
 }
 
+[data-glass-style="amoled"] .ms-btn-trim,
 [data-glass-style="solid"] .ms-btn-trim,
-[data-theme-style="solid"] .ms-btn-trim {
+[data-theme-style="amoled"] .ms-btn-trim,
+[data-theme-style="solid"] .ms-btn-trim,
+body.theme-glass-amoled .ms-btn-trim {
   background: #14161f !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
   color: var(--brand-accent) !important;

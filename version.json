@@ -8,16 +8,15 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "v1.7.4: Complete UI Glass Theme synchronization & enhanced text contrast! All header bars, media type selector buttons, project badges, target folder labels, analyze buttons, and search studio thumbnail expand/zoom controls now seamlessly match the chosen Glass theme (Frosted, Clear, Blur) with crystal-clear high-contrast text legibility across every theme.",
   "mobile": {
-    "version": "1.0.53",
-    "versionCode": 53,
-    "releaseDate": "2026-10-16",
+    "version": "1.0.54",
+    "versionCode": 54,
+    "releaseDate": "2026-10-18",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": false,
     "releaseNotes": [
-      "Fixed YouTube premieres and upcoming live stream metadata detection with cover download.",
-      "Resolved continuous update alert popup by synchronizing build version code.",
-      "Full multi-media extraction for Behance projects and carousels across desktop and mobile APK.",
-      "Fixed links and download handling across all platforms without failure."
+      "New true Glassmorphism theme engine: Frosted, Clear, and Blur styles ported directly from MediaFetch Pro CEP plugin.",
+      "Optimized GPU compositing and zero nested blurs for extended battery life and smooth 60/120fps scrolling.",
+      "Short, clean theme selector (Amoled, Frosted, Clear, Blur) with high-contrast text legibility across all UI elements."
     ]
   }
 }

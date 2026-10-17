@@ -746,18 +746,32 @@
     } catch (_) {}
   }
 
-  // Visual Surface & Glassmorphism System (Solid AMOLED / Liquid Glass / Cyber Aurora)
-  let currentVisualStyle = 'glass';
+  // Visual Surface & Glassmorphism System (Amoled, Frosted, Clear, Blur)
+  let currentVisualStyle = 'frosted';
 
   function applyVisualStyle(styleKey) {
-    const validStyles = ['solid', 'glass', 'prism'];
-    if (!validStyles.includes(styleKey)) styleKey = 'glass';
+    // Legacy migration
+    if (styleKey === 'solid') styleKey = 'amoled';
+    if (styleKey === 'glass') styleKey = 'frosted';
+    if (styleKey === 'prism') styleKey = 'clear';
+
+    const validStyles = ['amoled', 'frosted', 'clear', 'blur'];
+    if (!validStyles.includes(styleKey)) styleKey = 'frosted';
     currentVisualStyle = styleKey;
+
     document.documentElement.setAttribute('data-glass-style', styleKey);
     document.documentElement.setAttribute('data-theme-style', styleKey);
     if (document.body) {
       document.body.setAttribute('data-glass-style', styleKey);
       document.body.setAttribute('data-theme-style', styleKey);
+
+      // Synchronize exact body classes from Adobe CEP plugin
+      document.body.classList.remove('theme-glass-amoled', 'theme-glass-frosted', 'theme-glass-clear', 'theme-glass-blur', 'theme-icons-core');
+      if (styleKey === 'amoled') {
+        document.body.classList.add('theme-glass-amoled', 'theme-icons-core');
+      } else {
+        document.body.classList.add(`theme-glass-${styleKey}`);
+      }
     }
 
     try {
@@ -765,17 +779,18 @@
     } catch (_) {}
 
     document.querySelectorAll('.visual-style-card').forEach(card => {
-      const isActive = (card.getAttribute('data-style') === styleKey);
+      const cardStyle = card.getAttribute('data-style');
+      const isActive = (cardStyle === styleKey || (styleKey === 'amoled' && cardStyle === 'solid'));
       card.classList.toggle('active', isActive);
     });
   }
 
   function initVisualStyle() {
     try {
-      const saved = localStorage.getItem('mediafetch_visual_style') || 'glass';
+      const saved = localStorage.getItem('mediafetch_visual_style') || 'frosted';
       applyVisualStyle(saved);
     } catch (_) {
-      applyVisualStyle('glass');
+      applyVisualStyle('frosted');
     }
   }
 
