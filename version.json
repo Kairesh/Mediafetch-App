@@ -1,12 +1,12 @@
 {
-  "version": "1.7.3",
+  "version": "1.7.4",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.7.3: Major Performance & Smoothness Optimization! Silky 60fps lag-free glass themes (Frosted, Clear, Blur) across both low-end (8GB RAM) and high-end PCs by eliminating nested backdrop blurs and adding GPU paint containment; optimized Chromium CEF memory flags; live PR/AE theme sync; and low-RAM backup/restore.",
+  "releaseNotes": "v1.7.4: Complete UI Glass Theme synchronization & enhanced text contrast! All header bars, media type selector buttons, project badges, target folder labels, analyze buttons, and search studio thumbnail expand/zoom controls now seamlessly match the chosen Glass theme (Frosted, Clear, Blur) with crystal-clear high-contrast text legibility across every theme.",
   "mobile": {
     "version": "1.0.53",
     "versionCode": 53,
