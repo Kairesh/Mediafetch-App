@@ -1,12 +1,12 @@
 {
-  "version": "1.8.0",
+  "version": "1.8.1",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.8.0: True Quality & Format Engine: Full 4K/1440p/1080p/720p/480p/360p resolution fidelity without AV1 codec dropouts, exact container preservation for MOV, WEBM, MKV, MP4, WAV, M4A, FLAC, and MP3, enhanced Music Search format selection, and hardware-accelerated Adobe compatibility normalization.",
+  "releaseNotes": "v1.8.1: Instant Lossless MOV/MP4 Engine & Max Speed Acceleration: 0.1s instant H.264 stream-copy remux for MOV/MP4, active hardware encoder detection with CPU fallback, 16M buffer & 10M chunk download speed optimization across all resolutions.",
   "mobile": {
     "version": "1.0.54",
     "versionCode": 54,
