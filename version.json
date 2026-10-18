@@ -1,23 +1,23 @@
 {
-  "version": "1.8.10",
+  "version": "1.8.11",
   "name": "MediaFetch Adobe CEP",
-  "standardVersion": "1.8.2",
-  "proVersion": "1.8.10",
+  "standardVersion": "1.8.3",
+  "proVersion": "1.8.11",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "Complete fix for Premiere Pro Project Panel auto-import and Timeline insertion for large and long video files (including 1080p/4K MOV & ProRes), ExtendScript tick conversion, and 120s execution timeout.",
+  "releaseNotes": "Comprehensive fix for Premiere Pro auto-import and timeline placement for long/large videos (17m, 30m, 1h+), 15s adaptive ingestion polling loop, OS file lock retry, and strict item matching.",
   "pro": {
-    "version": "1.8.10",
+    "version": "1.8.11",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-    "releaseNotes": "Complete fix for Premiere Pro Project Panel auto-import and Timeline insertion for large and long video files (including 1080p/4K MOV & ProRes), ExtendScript tick conversion, and 120s execution timeout."
+    "releaseNotes": "Comprehensive fix for Premiere Pro auto-import and timeline placement for long/large videos (17m, 30m, 1h+), 15s adaptive ingestion polling loop, OS file lock retry, and strict item matching."
   },
   "standard": {
-    "version": "1.8.2",
+    "version": "1.8.3",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
-    "releaseNotes": "Complete fix for Premiere Pro Project Panel auto-import and Timeline insertion for large and long video files (including 1080p/4K MOV & ProRes), ExtendScript tick conversion, and 120s execution timeout."
+    "releaseNotes": "Comprehensive fix for Premiere Pro auto-import and timeline placement for long/large videos (17m, 30m, 1h+), 15s adaptive ingestion polling loop, OS file lock retry, and strict item matching."
   },
   "mobile": {
     "version": "1.0.54",
