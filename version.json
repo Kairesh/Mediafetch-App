@@ -1,23 +1,23 @@
 {
-  "version": "1.8.9",
+  "version": "1.8.10",
   "name": "MediaFetch Adobe CEP",
-  "standardVersion": "1.8.1",
-  "proVersion": "1.8.9",
+  "standardVersion": "1.8.2",
+  "proVersion": "1.8.10",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "Enhanced Premiere Pro Project Panel auto-import with forward-slash path resolution, multi-path retry engine, and real-time status feedback for all video sizes and formats.",
+  "releaseNotes": "Complete fix for Premiere Pro Project Panel auto-import and Timeline insertion for large and long video files (including 1080p/4K MOV & ProRes), ExtendScript tick conversion, and 120s execution timeout.",
   "pro": {
-    "version": "1.8.9",
+    "version": "1.8.10",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-    "releaseNotes": "Enhanced Premiere Pro Project Panel auto-import with forward-slash path resolution, multi-path retry engine, and real-time status feedback for all video sizes and formats."
+    "releaseNotes": "Complete fix for Premiere Pro Project Panel auto-import and Timeline insertion for large and long video files (including 1080p/4K MOV & ProRes), ExtendScript tick conversion, and 120s execution timeout."
   },
   "standard": {
-    "version": "1.8.1",
+    "version": "1.8.2",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
-    "releaseNotes": "Enhanced Premiere Pro Project Panel auto-import with forward-slash path resolution, multi-path retry engine, and real-time status feedback for all video sizes and formats."
+    "releaseNotes": "Complete fix for Premiere Pro Project Panel auto-import and Timeline insertion for large and long video files (including 1080p/4K MOV & ProRes), ExtendScript tick conversion, and 120s execution timeout."
   },
   "mobile": {
     "version": "1.0.54",
