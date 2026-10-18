@@ -1,12 +1,12 @@
 {
-  "version": "1.7.5",
+  "version": "1.7.6",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.7.5: Pro Front-End Update! Added Reverse Gradient Button (instantly swap top & bottom glow colors like Ae/Pr), 3-Way Gradient Direction Styles (Left, Center, and Right), and custom theme preset saving in Button & Accent Color Theme to save and manage personalized accent colors.",
+  "releaseNotes": "v1.7.6: Pro UI & Import Fixes! Full Glassmorphism sync for active download queue cards, History dialog modals, and action buttons. Fixed auto-import to Premiere Pro and After Effects project panels in Default Organised mode.",
   "mobile": {
     "version": "1.0.54",
     "versionCode": 54,
