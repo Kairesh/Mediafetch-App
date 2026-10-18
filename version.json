@@ -1,12 +1,12 @@
 {
-  "version": "1.7.8",
+  "version": "1.7.9",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.7.8: Pro Glass Theme Polish: Full glassmorphism sync for Search Studio Format & Ratio filter dropdown, filter button, and Playlist Detected modal dialog with translucent frosted glass cards, specular rim highlights, and high-contrast text.",
+  "releaseNotes": "v1.7.9: Real Artist Portraits & Deduplication: High-resolution authentic artist images across Music Search Studio, intelligent deduplication of artist discography, and error-resilient CDN image delivery.",
   "mobile": {
     "version": "1.0.54",
     "versionCode": 54,
