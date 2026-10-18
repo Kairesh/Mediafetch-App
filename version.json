@@ -1,23 +1,23 @@
 {
-  "version": "1.8.4",
+  "version": "1.8.5",
   "name": "MediaFetch Adobe CEP",
-  "standardVersion": "1.7.6",
-  "proVersion": "1.8.4",
+  "standardVersion": "1.7.7",
+  "proVersion": "1.8.5",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "High-speed download engine optimization, real-time MB & speed progress tracking, true resolution and format accuracy, and automatic Paste IMG timeline insertion.",
+  "releaseNotes": "Instant zero-delay stream copy for MOV/MP4, NVIDIA GPU hardware acceleration, real-time MB/speed progress tracking, and true 1080p/4K resolution.",
   "pro": {
-    "version": "1.8.4",
+    "version": "1.8.5",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-    "releaseNotes": "High-speed download engine optimization, real-time MB & speed progress tracking, true resolution and format accuracy, and automatic Paste IMG timeline insertion."
+    "releaseNotes": "Instant zero-delay stream copy for MOV/MP4, NVIDIA GPU hardware acceleration, real-time MB/speed progress tracking, and true 1080p/4K resolution."
   },
   "standard": {
-    "version": "1.7.6",
+    "version": "1.7.7",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
-    "releaseNotes": "High-speed download engine optimization, real-time MB & speed progress tracking, true resolution and format accuracy, and automatic Paste IMG timeline insertion."
+    "releaseNotes": "Instant zero-delay stream copy for MOV/MP4, NVIDIA GPU hardware acceleration, real-time MB/speed progress tracking, and true 1080p/4K resolution."
   },
   "mobile": {
     "version": "1.0.54",
