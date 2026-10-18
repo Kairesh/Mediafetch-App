@@ -1,12 +1,12 @@
 {
-  "version": "1.7.4",
+  "version": "1.7.5",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.7.4: Complete UI Glass Theme synchronization & enhanced text contrast! All header bars, media type selector buttons, project badges, target folder labels, analyze buttons, and search studio thumbnail expand/zoom controls now seamlessly match the chosen Glass theme (Frosted, Clear, Blur) with crystal-clear high-contrast text legibility across every theme.",
+  "releaseNotes": "v1.7.5: Pro Front-End Update! Added Reverse Gradient Button (instantly swap top & bottom glow colors like Ae/Pr), 3-Way Gradient Direction Styles (Left, Center, and Right), and custom theme preset saving in Button & Accent Color Theme to save and manage personalized accent colors.",
   "mobile": {
     "version": "1.0.54",
     "versionCode": 54,
