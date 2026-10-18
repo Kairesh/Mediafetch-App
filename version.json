@@ -1,23 +1,23 @@
 {
-  "version": "1.8.5",
+  "version": "1.8.6",
   "name": "MediaFetch Adobe CEP",
-  "standardVersion": "1.7.7",
-  "proVersion": "1.8.5",
+  "standardVersion": "1.7.8",
+  "proVersion": "1.8.6",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "Instant zero-delay stream copy for MOV/MP4, NVIDIA GPU hardware acceleration, real-time MB/speed progress tracking, and true 1080p/4K resolution.",
+  "releaseNotes": "Fixed multi-stream continuous progress tracking (no more double download or 0% resets), fixed After Effects project bin & active timeline auto-import, and seamless download pause/resume preservation.",
   "pro": {
-    "version": "1.8.5",
+    "version": "1.8.6",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-    "releaseNotes": "Instant zero-delay stream copy for MOV/MP4, NVIDIA GPU hardware acceleration, real-time MB/speed progress tracking, and true 1080p/4K resolution."
+    "releaseNotes": "Fixed multi-stream continuous progress tracking (no more double download or 0% resets), fixed After Effects project bin & active timeline auto-import, and seamless download pause/resume preservation."
   },
   "standard": {
-    "version": "1.7.7",
+    "version": "1.7.8",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
-    "releaseNotes": "Instant zero-delay stream copy for MOV/MP4, NVIDIA GPU hardware acceleration, real-time MB/speed progress tracking, and true 1080p/4K resolution."
+    "releaseNotes": "Fixed multi-stream continuous progress tracking (no more double download or 0% resets), fixed After Effects project bin & active timeline auto-import, and seamless download pause/resume preservation."
   },
   "mobile": {
     "version": "1.0.54",
