@@ -1,12 +1,24 @@
 {
-  "version": "1.8.1",
-  "name": "MediaFetch Pro Adobe CEP",
+  "version": "1.7.4",
+  "name": "MediaFetch Adobe CEP",
+  "standardVersion": "1.7.4",
+  "proVersion": "1.8.1",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.8.1: Instant Lossless MOV/MP4 Engine & Max Speed Acceleration: 0.1s instant H.264 stream-copy remux for MOV/MP4, active hardware encoder detection with CPU fallback, 16M buffer & 10M chunk download speed optimization across all resolutions.",
+  "releaseNotes": "Performance optimizations, enhanced stability, and core engine improvements.",
+  "pro": {
+    "version": "1.8.1",
+    "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
+    "releaseNotes": "Performance optimizations, enhanced stability, and core engine improvements."
+  },
+  "standard": {
+    "version": "1.7.4",
+    "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
+    "releaseNotes": "Standard stable release."
+  },
   "mobile": {
     "version": "1.0.54",
     "versionCode": 54,
