@@ -1,12 +1,12 @@
 {
-  "version": "1.7.6",
+  "version": "1.7.7",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.7.6: Pro UI & Import Fixes! Full Glassmorphism sync for active download queue cards, History dialog modals, and action buttons. Fixed auto-import to Premiere Pro and After Effects project panels in Default Organised mode.",
+  "releaseNotes": "v1.7.7: Pro Fix: Default Organised mode now cleanly sorts into Link & Search bins (Video, Audio, Images). Fixed audio auto-import collision in Premiere Pro project panel. Settings custom location path selection is now cleanly hidden on standard modes.",
   "mobile": {
     "version": "1.0.54",
     "versionCode": 54,
