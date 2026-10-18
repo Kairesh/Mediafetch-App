@@ -1,23 +1,23 @@
 {
-  "version": "1.8.11",
+  "version": "1.8.12",
   "name": "MediaFetch Adobe CEP",
-  "standardVersion": "1.8.3",
-  "proVersion": "1.8.11",
+  "standardVersion": "1.8.4",
+  "proVersion": "1.8.12",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "Comprehensive fix for Premiere Pro auto-import and timeline placement for long/large videos (17m, 30m, 1h+), 15s adaptive ingestion polling loop, OS file lock retry, and strict item matching.",
+  "releaseNotes": "Resolved Premiere Pro C++ bin import fallback, decoded URL-escaped filenames, and enhanced 20s ingestion polling for large/long videos of any duration.",
   "pro": {
-    "version": "1.8.11",
+    "version": "1.8.12",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-    "releaseNotes": "Comprehensive fix for Premiere Pro auto-import and timeline placement for long/large videos (17m, 30m, 1h+), 15s adaptive ingestion polling loop, OS file lock retry, and strict item matching."
+    "releaseNotes": "Resolved Premiere Pro C++ bin import fallback, decoded URL-escaped filenames, and enhanced 20s ingestion polling for large/long videos of any duration."
   },
   "standard": {
-    "version": "1.8.3",
+    "version": "1.8.4",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
-    "releaseNotes": "Comprehensive fix for Premiere Pro auto-import and timeline placement for long/large videos (17m, 30m, 1h+), 15s adaptive ingestion polling loop, OS file lock retry, and strict item matching."
+    "releaseNotes": "Resolved Premiere Pro C++ bin import fallback, decoded URL-escaped filenames, and enhanced 20s ingestion polling for large/long videos of any duration."
   },
   "mobile": {
     "version": "1.0.54",
