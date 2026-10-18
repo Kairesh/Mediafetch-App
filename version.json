@@ -1,12 +1,12 @@
 {
-  "version": "1.7.9",
+  "version": "1.8.0",
   "name": "MediaFetch Pro Adobe CEP",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "v1.7.9: Real Artist Portraits & Deduplication: High-resolution authentic artist images across Music Search Studio, intelligent deduplication of artist discography, and error-resilient CDN image delivery.",
+  "releaseNotes": "v1.8.0: True Quality & Format Engine: Full 4K/1440p/1080p/720p/480p/360p resolution fidelity without AV1 codec dropouts, exact container preservation for MOV, WEBM, MKV, MP4, WAV, M4A, FLAC, and MP3, enhanced Music Search format selection, and hardware-accelerated Adobe compatibility normalization.",
   "mobile": {
     "version": "1.0.54",
     "versionCode": 54,
