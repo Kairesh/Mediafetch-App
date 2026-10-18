@@ -1,23 +1,23 @@
 {
-  "version": "1.8.7",
+  "version": "1.8.8",
   "name": "MediaFetch Adobe CEP",
-  "standardVersion": "1.7.9",
-  "proVersion": "1.8.7",
+  "standardVersion": "1.8.0",
+  "proVersion": "1.8.8",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "Fixed Adobe Premiere Pro & After Effects project bin auto-import and timeline sequence creation, resolved file-lock contention on large ProRes/MOV downloads, and optimized speed & resolution stability.",
+  "releaseNotes": "Fixed Premiere Pro Project Panel auto-import and manual Import button for all media lengths and formats (including long ProRes/MOV videos), resolved ExtendScript syntax and root bin move errors, and enhanced real-time import status feedback.",
   "pro": {
-    "version": "1.8.7",
+    "version": "1.8.8",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-    "releaseNotes": "Fixed Adobe Premiere Pro & After Effects project bin auto-import and timeline sequence creation, resolved file-lock contention on large ProRes/MOV downloads, and optimized speed & resolution stability."
+    "releaseNotes": "Fixed Premiere Pro Project Panel auto-import and manual Import button for all media lengths and formats (including long ProRes/MOV videos), resolved ExtendScript syntax and root bin move errors, and enhanced real-time import status feedback."
   },
   "standard": {
-    "version": "1.7.9",
+    "version": "1.8.0",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
-    "releaseNotes": "Fixed Adobe Premiere Pro & After Effects project bin auto-import and timeline sequence creation, resolved file-lock contention on large ProRes/MOV downloads, and optimized speed & resolution stability."
+    "releaseNotes": "Fixed Premiere Pro Project Panel auto-import and manual Import button for all media lengths and formats (including long ProRes/MOV videos), resolved ExtendScript syntax and root bin move errors, and enhanced real-time import status feedback."
   },
   "mobile": {
     "version": "1.0.54",
