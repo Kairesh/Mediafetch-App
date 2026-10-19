@@ -1,23 +1,23 @@
 {
-  "version": "1.8.12",
+  "version": "1.8.13",
   "name": "MediaFetch Adobe CEP",
-  "standardVersion": "1.8.4",
-  "proVersion": "1.8.12",
+  "standardVersion": "1.8.5",
+  "proVersion": "1.8.13",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "Resolved Premiere Pro C++ bin import fallback, decoded URL-escaped filenames, and enhanced 20s ingestion polling for large/long videos of any duration.",
+  "releaseNotes": "Fixed auto-import blocking loop timeout on large/long videos, fixed metadata resolution on direct download without Analyze, and added theme-synced custom glass dropdowns.",
   "pro": {
-    "version": "1.8.12",
+    "version": "1.8.13",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-    "releaseNotes": "Resolved Premiere Pro C++ bin import fallback, decoded URL-escaped filenames, and enhanced 20s ingestion polling for large/long videos of any duration."
+    "releaseNotes": "Fixed auto-import blocking loop timeout on large/long videos, fixed metadata resolution on direct download without Analyze, and added theme-synced custom glass dropdowns."
   },
   "standard": {
-    "version": "1.8.4",
+    "version": "1.8.5",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
-    "releaseNotes": "Resolved Premiere Pro C++ bin import fallback, decoded URL-escaped filenames, and enhanced 20s ingestion polling for large/long videos of any duration."
+    "releaseNotes": "Fixed auto-import blocking loop timeout on large/long videos, fixed metadata resolution on direct download without Analyze, and added theme-synced custom glass dropdowns."
   },
   "mobile": {
     "version": "1.0.54",
