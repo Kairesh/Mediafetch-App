@@ -1,23 +1,23 @@
 {
-  "version": "1.8.13",
+  "version": "1.8.14",
   "name": "MediaFetch Adobe CEP",
-  "standardVersion": "1.8.5",
-  "proVersion": "1.8.13",
+  "standardVersion": "1.8.6",
+  "proVersion": "1.8.14",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "Fixed auto-import blocking loop timeout on large/long videos, fixed metadata resolution on direct download without Analyze, and added theme-synced custom glass dropdowns.",
+  "releaseNotes": "Major stability and performance release: 512MB heap daemon, resilient 3-tier trim engine with duration verification, reliable pending-imports catch-up, sequential timeline placement, and aria2c multi-connection download acceleration.",
   "pro": {
-    "version": "1.8.13",
+    "version": "1.8.14",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-    "releaseNotes": "Fixed auto-import blocking loop timeout on large/long videos, fixed metadata resolution on direct download without Analyze, and added theme-synced custom glass dropdowns."
+    "releaseNotes": "Major stability and performance release: 512MB heap daemon, resilient 3-tier trim engine with duration verification, reliable pending-imports catch-up, sequential timeline placement, and aria2c multi-connection download acceleration."
   },
   "standard": {
-    "version": "1.8.5",
+    "version": "1.8.6",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
-    "releaseNotes": "Fixed auto-import blocking loop timeout on large/long videos, fixed metadata resolution on direct download without Analyze, and added theme-synced custom glass dropdowns."
+    "releaseNotes": "Major stability and performance release: 512MB heap daemon, resilient 3-tier trim engine with duration verification, reliable pending-imports catch-up, sequential timeline placement, and aria2c multi-connection download acceleration."
   },
   "mobile": {
     "version": "1.0.54",
