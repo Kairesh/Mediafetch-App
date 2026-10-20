@@ -1,8 +1,8 @@
 {
-  "version": "1.8.17",
+  "version": "1.8.18",
   "name": "MediaFetch Adobe CEP",
-  "standardVersion": "1.8.9",
-  "proVersion": "1.8.17",
+  "standardVersion": "1.8.10",
+  "proVersion": "1.8.18",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
@@ -10,12 +10,12 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "General performance optimizations and stability improvements.",
   "pro": {
-    "version": "1.8.17",
+    "version": "1.8.18",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
     "releaseNotes": "General performance optimizations and stability improvements."
   },
   "standard": {
-    "version": "1.8.9",
+    "version": "1.8.10",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
     "releaseNotes": "General performance optimizations and stability improvements."
   },
