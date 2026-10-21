@@ -1,18 +1,18 @@
 {
-  "version": "1.8.29",
+  "version": "1.8.30",
   "name": "MediaFetch Adobe CEP",
   "standardVersion": "1.8.16",
-  "proVersion": "1.8.29",
+  "proVersion": "1.8.30",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "Fix Facebook photo URLs direct extraction (photo/?fbid=...); guarantee default automatic timeline insertion at playhead for all IMG Paste / clipboard image imports.",
+  "releaseNotes": "Fix browser clipboard image copy (DeviceIndependentBitmap, UTF-8 HTML memory streams, base64 data URIs, native PowerShell Get-Clipboard, and seamless Ctrl+V paste).",
   "pro": {
-    "version": "1.8.29",
+    "version": "1.8.30",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-    "releaseNotes": "Fix Facebook photo URLs direct extraction (photo/?fbid=...); guarantee default automatic timeline insertion at playhead for all IMG Paste / clipboard image imports."
+    "releaseNotes": "Fix browser clipboard image copy (DeviceIndependentBitmap, UTF-8 HTML memory streams, base64 data URIs, native PowerShell Get-Clipboard, and seamless Ctrl+V paste)."
   },
   "standard": {
     "version": "1.8.16",
