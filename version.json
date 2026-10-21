@@ -1,18 +1,18 @@
 {
-  "version": "1.8.30",
+  "version": "1.8.31",
   "name": "MediaFetch Adobe CEP",
   "standardVersion": "1.8.16",
-  "proVersion": "1.8.30",
+  "proVersion": "1.8.31",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "Fix browser clipboard image copy (DeviceIndependentBitmap, UTF-8 HTML memory streams, base64 data URIs, native PowerShell Get-Clipboard, and seamless Ctrl+V paste).",
+  "releaseNotes": "Direct in-panel Node.js PowerShell image clipboard extraction, Uint8Array buffer safety, resilient daemon auto-restart, and smart image paste routing.",
   "pro": {
-    "version": "1.8.30",
+    "version": "1.8.31",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-    "releaseNotes": "Fix browser clipboard image copy (DeviceIndependentBitmap, UTF-8 HTML memory streams, base64 data URIs, native PowerShell Get-Clipboard, and seamless Ctrl+V paste)."
+    "releaseNotes": "Direct in-panel Node.js PowerShell image clipboard extraction, Uint8Array buffer safety, resilient daemon auto-restart, and smart image paste routing."
   },
   "standard": {
     "version": "1.8.16",
