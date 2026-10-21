@@ -1,18 +1,18 @@
 {
-  "version": "1.8.27",
+  "version": "1.8.28",
   "name": "MediaFetch Adobe CEP",
   "standardVersion": "1.8.16",
-  "proVersion": "1.8.27",
+  "proVersion": "1.8.28",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "Fixed Google Drive full 220-file folder pagination and subfolder scroll navigation; fixed player switcher dropdown interaction.",
+  "releaseNotes": "Ultra-fast in-memory IMG paste (highest uncompressed studio master quality) with Ctrl+V support; full Facebook media support (Videos, Reels, Watch, Photos, Posts, Share links).",
   "pro": {
-    "version": "1.8.27",
+    "version": "1.8.28",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-    "releaseNotes": "Fixed Google Drive full 220-file folder pagination and subfolder scroll navigation; fixed player switcher dropdown interaction."
+    "releaseNotes": "Ultra-fast in-memory IMG paste (highest uncompressed studio master quality) with Ctrl+V support; full Facebook media support (Videos, Reels, Watch, Photos, Posts, Share links)."
   },
   "standard": {
     "version": "1.8.16",
