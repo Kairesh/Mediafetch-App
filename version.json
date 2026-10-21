@@ -1,8 +1,8 @@
 {
-  "version": "1.8.32",
+  "version": "1.8.33",
   "name": "MediaFetch Adobe CEP",
   "standardVersion": "1.8.16",
-  "proVersion": "1.8.32",
+  "proVersion": "1.8.33",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
@@ -10,7 +10,7 @@
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
   "releaseNotes": "Fix timeline playhead position: keep editor playhead at active edit point during single media and IMG Paste (prevent jumping to the end of the sequence).",
   "pro": {
-    "version": "1.8.32",
+    "version": "1.8.33",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
     "releaseNotes": "Fix timeline playhead position: keep editor playhead at active edit point during single media and IMG Paste (prevent jumping to the end of the sequence)."
   },
