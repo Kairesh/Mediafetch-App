@@ -1,23 +1,23 @@
 {
-    "version":  "1.8.37",
+    "version":  "1.8.39",
     "name":  "MediaFetch Adobe CEP",
-    "standardVersion":  "1.8.16",
-    "proVersion":  "1.8.37",
+    "standardVersion":  "1.8.17",
+    "proVersion":  "1.8.39",
     "packageUrl":  "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
     "standardPackageUrl":  "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
     "backupPackageUrl":  "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
     "backupStandardPackageUrl":  "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
     "updateUrl":  "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-    "releaseNotes":  "Smart Timeline Placement: Restricts gap-fitting duration trimming exclusively to images/clipboard, ensuring all video and audio media are placed with 100% full length onto clear tracks without overwriting, cutting, or removing any adjacent timeline footages in Premiere Pro \u0026 After Effects.",
+    "releaseNotes":  "Ensure video and audio imports always target clear timeline tracks without trimming or clipping footages, while preserving smart gap-fitting for images.",
     "pro":  {
-                "version":  "1.8.37",
+                "version":  "1.8.39",
                 "packageUrl":  "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-                "releaseNotes":  "Smart Timeline Placement: Restricts gap-fitting duration trimming exclusively to images/clipboard, ensuring all video and audio media are placed with 100% full length onto clear tracks without overwriting, cutting, or removing any adjacent timeline footages in Premiere Pro \u0026 After Effects."
+                "releaseNotes":  "Ensure video and audio imports always target clear timeline tracks without trimming or clipping footages, while preserving smart gap-fitting for images."
             },
     "standard":  {
-                     "version":  "1.8.16",
+                     "version":  "1.8.17",
                      "packageUrl":  "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
-                     "releaseNotes":  "General performance optimizations and stability improvements."
+                     "releaseNotes":  "Ensure video and audio imports always target clear timeline tracks without trimming or clipping footages, while preserving smart gap-fitting for images."
                  },
     "mobile":  {
                    "version":  "1.0.54",
@@ -32,3 +32,4 @@
                                     ]
                }
 }
+
