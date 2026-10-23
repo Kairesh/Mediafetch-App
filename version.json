@@ -1,23 +1,23 @@
 {
-  "version": "1.8.44",
+  "version": "1.8.45",
   "name": "MediaFetch Adobe CEP",
-  "standardVersion": "1.8.22",
-  "proVersion": "1.8.44",
+  "standardVersion": "1.8.23",
+  "proVersion": "1.8.45",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "Guaranteed true maximum stream resolution extraction across all platforms (up to 4K), ultra-fast precision clip trimming, zero Premiere Pro import errors, and instant daemon stability.",
+  "releaseNotes": "Search Studio Direct Player fixes with instant VP9/WebM & MP4 transcode stream resolution, strict 16:9 Landscape & 9:16 Portrait filter accuracy across all video providers, and 3x expanded Wikimedia search results with pagination.",
   "pro": {
-    "version": "1.8.44",
+    "version": "1.8.45",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-    "releaseNotes": "Guaranteed true maximum stream resolution extraction across all platforms (up to 4K), ultra-fast precision clip trimming, zero Premiere Pro import errors, and instant daemon stability."
+    "releaseNotes": "Search Studio Direct Player fixes with instant VP9/WebM & MP4 transcode stream resolution, strict 16:9 Landscape & 9:16 Portrait filter accuracy across all video providers, and 3x expanded Wikimedia search results with pagination."
   },
   "standard": {
-    "version": "1.8.22",
+    "version": "1.8.23",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
-    "releaseNotes": "Guaranteed true maximum stream resolution extraction across all platforms (up to 4K), ultra-fast precision clip trimming, zero Premiere Pro import errors, and instant daemon stability."
+    "releaseNotes": "Search Studio Direct Player fixes with instant VP9/WebM & MP4 transcode stream resolution, strict 16:9 Landscape & 9:16 Portrait filter accuracy across all video providers, and 3x expanded Wikimedia search results with pagination."
   },
   "mobile": {
     "version": "1.0.54",
