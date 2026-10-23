@@ -1,23 +1,23 @@
 {
-    "version":  "1.8.39",
+    "version":  "1.8.40",
     "name":  "MediaFetch Adobe CEP",
-    "standardVersion":  "1.8.17",
-    "proVersion":  "1.8.39",
+    "standardVersion":  "1.8.18",
+    "proVersion":  "1.8.40",
     "packageUrl":  "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
     "standardPackageUrl":  "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
     "backupPackageUrl":  "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
     "backupStandardPackageUrl":  "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
     "updateUrl":  "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-    "releaseNotes":  "Ensure video and audio imports always target clear timeline tracks without trimming or clipping footages, while preserving smart gap-fitting for images.",
+    "releaseNotes":  "Fix YouTube URL analysis timeout and download connection delay; import video to top track and audio to bottom track preserving full duration while keeping image gap-fitting.",
     "pro":  {
-                "version":  "1.8.39",
+                "version":  "1.8.40",
                 "packageUrl":  "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-                "releaseNotes":  "Ensure video and audio imports always target clear timeline tracks without trimming or clipping footages, while preserving smart gap-fitting for images."
+                "releaseNotes":  "Fix YouTube URL analysis timeout and download connection delay; import video to top track and audio to bottom track preserving full duration while keeping image gap-fitting."
             },
     "standard":  {
-                     "version":  "1.8.17",
+                     "version":  "1.8.18",
                      "packageUrl":  "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
-                     "releaseNotes":  "Ensure video and audio imports always target clear timeline tracks without trimming or clipping footages, while preserving smart gap-fitting for images."
+                     "releaseNotes":  "Fix YouTube URL analysis timeout and download connection delay; import video to top track and audio to bottom track preserving full duration while keeping image gap-fitting."
                  },
     "mobile":  {
                    "version":  "1.0.54",
@@ -32,4 +32,3 @@
                                     ]
                }
 }
-
