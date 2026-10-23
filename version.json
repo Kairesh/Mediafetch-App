@@ -1,34 +1,34 @@
 {
-    "version":  "1.8.40",
-    "name":  "MediaFetch Adobe CEP",
-    "standardVersion":  "1.8.18",
-    "proVersion":  "1.8.40",
-    "packageUrl":  "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-    "standardPackageUrl":  "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
-    "backupPackageUrl":  "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
-    "backupStandardPackageUrl":  "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
-    "updateUrl":  "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-    "releaseNotes":  "Fix YouTube URL analysis timeout and download connection delay; import video to top track and audio to bottom track preserving full duration while keeping image gap-fitting.",
-    "pro":  {
-                "version":  "1.8.40",
-                "packageUrl":  "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-                "releaseNotes":  "Fix YouTube URL analysis timeout and download connection delay; import video to top track and audio to bottom track preserving full duration while keeping image gap-fitting."
-            },
-    "standard":  {
-                     "version":  "1.8.18",
-                     "packageUrl":  "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
-                     "releaseNotes":  "Fix YouTube URL analysis timeout and download connection delay; import video to top track and audio to bottom track preserving full duration while keeping image gap-fitting."
-                 },
-    "mobile":  {
-                   "version":  "1.0.54",
-                   "versionCode":  54,
-                   "releaseDate":  "2026-10-18",
-                   "apkUrl":  "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
-                   "mandatory":  false,
-                   "releaseNotes":  [
-                                        "New true Glassmorphism theme engine: Frosted, Clear, and Blur styles ported directly from MediaFetch Pro CEP plugin.",
-                                        "Optimized GPU compositing and zero nested blurs for extended battery life and smooth 60/120fps scrolling.",
-                                        "Short, clean theme selector (Amoled, Frosted, Clear, Blur) with high-contrast text legibility across all UI elements."
-                                    ]
-               }
+    "version": "1.8.41",
+    "name": "MediaFetch Adobe CEP",
+    "standardVersion": "1.8.19",
+    "proVersion": "1.8.41",
+    "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
+    "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
+    "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
+    "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
+    "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
+    "releaseNotes": "Fix YouTube URL analysis timeout and download connection delay; import video to top track and audio to bottom track preserving full duration while keeping image gap-fitting.",
+    "pro": {
+        "version": "1.8.41",
+        "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
+        "releaseNotes": "Fix YouTube URL analysis timeout and download connection delay; import video to top track and audio to bottom track preserving full duration while keeping image gap-fitting."
+    },
+    "standard": {
+        "version": "1.8.19",
+        "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
+        "releaseNotes": "Fix YouTube URL analysis timeout and download connection delay; import video to top track and audio to bottom track preserving full duration while keeping image gap-fitting."
+    },
+    "mobile": {
+        "version": "1.0.54",
+        "versionCode": 54,
+        "releaseDate": "2026-10-18",
+        "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
+        "mandatory": false,
+        "releaseNotes": [
+            "New true Glassmorphism theme engine: Frosted, Clear, and Blur styles ported directly from MediaFetch Pro CEP plugin.",
+            "Optimized GPU compositing and zero nested blurs for extended battery life and smooth 60/120fps scrolling.",
+            "Short, clean theme selector (Amoled, Frosted, Clear, Blur) with high-contrast text legibility across all UI elements."
+        ]
+    }
 }
