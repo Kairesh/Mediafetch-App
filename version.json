@@ -1,18 +1,18 @@
 {
-  "version": "1.8.35",
+  "version": "1.8.36",
   "name": "MediaFetch Adobe CEP",
   "standardVersion": "1.8.16",
-  "proVersion": "1.8.35",
+  "proVersion": "1.8.36",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "Smart Gap-Fitting Placement for Premiere Pro and After Effects: Automatically detects the lowest available track/layer with open space at the playhead and auto-trims clip length to perfectly fit the empty space without cutting or overwriting adjacent media.",
+  "releaseNotes": "Smart Gap-Fitting Placement: Automatically detects the lowest available video track with free space at the playhead and dynamically trims image/clip duration to fit empty timeline gaps edge-to-edge without rippling or overwriting adjacent media in Premiere Pro & After Effects.",
   "pro": {
-    "version": "1.8.35",
+    "version": "1.8.36",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-    "releaseNotes": "Smart Gap-Fitting Placement for Premiere Pro and After Effects: Automatically detects the lowest available track/layer with open space at the playhead and auto-trims clip length to perfectly fit the empty space without cutting or overwriting adjacent media."
+    "releaseNotes": "Smart Gap-Fitting Placement: Automatically detects the lowest available video track with free space at the playhead and dynamically trims image/clip duration to fit empty timeline gaps edge-to-edge without rippling or overwriting adjacent media in Premiere Pro & After Effects."
   },
   "standard": {
     "version": "1.8.16",
