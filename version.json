@@ -1,23 +1,23 @@
 {
-  "version": "1.8.43",
+  "version": "1.8.44",
   "name": "MediaFetch Adobe CEP",
-  "standardVersion": "1.8.21",
-  "proVersion": "1.8.43",
+  "standardVersion": "1.8.22",
+  "proVersion": "1.8.44",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "Ultra-fast precision clip trimming, zero import errors in Premiere Pro, authentic max resolution selector (480p-4K), and live update notification.",
+  "releaseNotes": "Guaranteed true maximum stream resolution extraction across all platforms (up to 4K), ultra-fast precision clip trimming, zero Premiere Pro import errors, and instant daemon stability.",
   "pro": {
-    "version": "1.8.43",
+    "version": "1.8.44",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-    "releaseNotes": "Ultra-fast precision clip trimming, zero import errors in Premiere Pro, authentic max resolution selector (480p-4K), and live update notification."
+    "releaseNotes": "Guaranteed true maximum stream resolution extraction across all platforms (up to 4K), ultra-fast precision clip trimming, zero Premiere Pro import errors, and instant daemon stability."
   },
   "standard": {
-    "version": "1.8.21",
+    "version": "1.8.22",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
-    "releaseNotes": "Ultra-fast precision clip trimming, zero import errors in Premiere Pro, authentic max resolution selector (480p-4K), and live update notification."
+    "releaseNotes": "Guaranteed true maximum stream resolution extraction across all platforms (up to 4K), ultra-fast precision clip trimming, zero Premiere Pro import errors, and instant daemon stability."
   },
   "mobile": {
     "version": "1.0.54",
