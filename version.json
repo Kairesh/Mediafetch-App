@@ -1,23 +1,23 @@
 {
-  "version": "1.8.47",
+  "version": "1.8.48",
   "name": "MediaFetch Adobe CEP",
-  "standardVersion": "1.8.25",
-  "proVersion": "1.8.47",
+  "standardVersion": "1.8.26",
+  "proVersion": "1.8.48",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "Resolved YouTube Link Downloader analysis timeouts, fixed Search Studio 16:9 and 9:16 aspect ratio filters, and resolved Wikimedia black screen preview with VP9 WebM transcodes.",
+  "releaseNotes": "Fixed media server background daemon socket binding, enhanced download reliability, and improved stream processing.",
   "pro": {
-    "version": "1.8.47",
+    "version": "1.8.48",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-    "releaseNotes": "Resolved YouTube Link Downloader analysis timeouts, fixed Search Studio 16:9 and 9:16 aspect ratio filters, and resolved Wikimedia black screen preview with VP9 WebM transcodes."
+    "releaseNotes": "Fixed media server background daemon socket binding, enhanced download reliability, and improved stream processing."
   },
   "standard": {
-    "version": "1.8.25",
+    "version": "1.8.26",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
-    "releaseNotes": "Resolved YouTube Link Downloader analysis timeouts and hardened background service communication."
+    "releaseNotes": "Fixed media server background daemon socket binding, enhanced download reliability, and improved stream processing."
   },
   "mobile": {
     "version": "1.0.54",
