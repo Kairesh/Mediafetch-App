@@ -1,23 +1,23 @@
 {
-  "version": "1.8.46",
+  "version": "1.8.47",
   "name": "MediaFetch Adobe CEP",
-  "standardVersion": "1.8.24",
-  "proVersion": "1.8.46",
+  "standardVersion": "1.8.25",
+  "proVersion": "1.8.47",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "Resolved Link Downloader analysis timeouts, fixed aspect ratio filters & Wikimedia player. Hardened in-app updater and batch scripts with automatic UAC elevation, User Extensions fallback, and added 1-click install.bat / install.command.",
+  "releaseNotes": "Resolved YouTube Link Downloader analysis timeouts, fixed Search Studio 16:9 and 9:16 aspect ratio filters, and resolved Wikimedia black screen preview with VP9 WebM transcodes.",
   "pro": {
-    "version": "1.8.46",
+    "version": "1.8.47",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-    "releaseNotes": "Resolved Link Downloader analysis timeouts, fixed aspect ratio filters & Wikimedia player. Hardened in-app updater and batch scripts with automatic UAC elevation, User Extensions fallback, and added 1-click install.bat / install.command."
+    "releaseNotes": "Resolved YouTube Link Downloader analysis timeouts, fixed Search Studio 16:9 and 9:16 aspect ratio filters, and resolved Wikimedia black screen preview with VP9 WebM transcodes."
   },
   "standard": {
-    "version": "1.8.24",
+    "version": "1.8.25",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
-    "releaseNotes": "Resolved Link Downloader analysis timeouts, fixed aspect ratio filters & Wikimedia player. Hardened in-app updater and batch scripts with automatic UAC elevation, User Extensions fallback, and added 1-click install.bat / install.command."
+    "releaseNotes": "Resolved YouTube Link Downloader analysis timeouts and hardened background service communication."
   },
   "mobile": {
     "version": "1.0.54",
