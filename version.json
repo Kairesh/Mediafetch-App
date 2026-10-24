@@ -8,16 +8,16 @@
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "Resolved Link Downloader analysis timeouts by eliminating stale visitor data and bot flags from daemon bundles. Enforced strict 16:9 Landscape and 9:16 Portrait aspect ratio filters with zero duplicate cards. Resolved Wikimedia Direct Player video playback by guaranteeing decodable VP9 WebM and H.264 MP4 streams with format sync.",
+  "releaseNotes": "Resolved Link Downloader analysis timeouts, fixed aspect ratio filters & Wikimedia player. Hardened in-app updater and batch scripts with automatic UAC elevation, User Extensions fallback, and added 1-click install.bat / install.command.",
   "pro": {
     "version": "1.8.46",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-    "releaseNotes": "Resolved Link Downloader analysis timeouts by eliminating stale visitor data and bot flags from daemon bundles. Enforced strict 16:9 Landscape and 9:16 Portrait aspect ratio filters with zero duplicate cards. Resolved Wikimedia Direct Player video playback by guaranteeing decodable VP9 WebM and H.264 MP4 streams with format sync."
+    "releaseNotes": "Resolved Link Downloader analysis timeouts, fixed aspect ratio filters & Wikimedia player. Hardened in-app updater and batch scripts with automatic UAC elevation, User Extensions fallback, and added 1-click install.bat / install.command."
   },
   "standard": {
     "version": "1.8.24",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
-    "releaseNotes": "Resolved Link Downloader analysis timeouts by eliminating stale visitor data and bot flags from daemon bundles. Enforced strict 16:9 Landscape and 9:16 Portrait aspect ratio filters with zero duplicate cards. Resolved Wikimedia Direct Player video playback by guaranteeing decodable VP9 WebM and H.264 MP4 streams with format sync."
+    "releaseNotes": "Resolved Link Downloader analysis timeouts, fixed aspect ratio filters & Wikimedia player. Hardened in-app updater and batch scripts with automatic UAC elevation, User Extensions fallback, and added 1-click install.bat / install.command."
   },
   "mobile": {
     "version": "1.0.54",
