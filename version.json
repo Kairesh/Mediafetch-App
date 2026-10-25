@@ -1,23 +1,23 @@
 {
-  "version": "1.8.48",
+  "version": "1.8.49",
   "name": "MediaFetch Adobe CEP",
-  "standardVersion": "1.8.26",
-  "proVersion": "1.8.48",
+  "standardVersion": "1.8.27",
+  "proVersion": "1.8.49",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "Fixed media server background daemon socket binding, enhanced download reliability, and improved stream processing.",
+  "releaseNotes": "Added Cloudflare workstation auto-release on uninstallation, fixed background media daemon reconnection and socket binding healing, and upgraded yt-dlp and FFmpeg pipelines.",
   "pro": {
-    "version": "1.8.48",
+    "version": "1.8.49",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-    "releaseNotes": "Fixed media server background daemon socket binding, enhanced download reliability, and improved stream processing."
+    "releaseNotes": "Added Cloudflare workstation auto-release on uninstallation, fixed background media daemon reconnection and socket binding healing, and upgraded yt-dlp and FFmpeg pipelines."
   },
   "standard": {
-    "version": "1.8.26",
+    "version": "1.8.27",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
-    "releaseNotes": "Fixed media server background daemon socket binding, enhanced download reliability, and improved stream processing."
+    "releaseNotes": "Added Cloudflare workstation auto-release on uninstallation, fixed background media daemon reconnection and socket binding healing, and upgraded yt-dlp and FFmpeg pipelines."
   },
   "mobile": {
     "version": "1.0.54",
