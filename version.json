@@ -1,23 +1,23 @@
 {
-  "version": "1.8.49",
+  "version": "1.8.50",
   "name": "MediaFetch Adobe CEP",
-  "standardVersion": "1.8.27",
-  "proVersion": "1.8.49",
+  "standardVersion": "1.8.28",
+  "proVersion": "1.8.50",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "Added Cloudflare workstation auto-release on uninstallation, fixed background media daemon reconnection and socket binding healing, and upgraded yt-dlp and FFmpeg pipelines.",
+  "releaseNotes": "Instant download speed with lossless H.264 stream copy, GPU hardware-accelerated transcoding (NVENC/QSV/AMF/ultrafast), full 4-6 concurrent parallel downloads, and synchronized high-contrast White theme & checkbox UI.",
   "pro": {
-    "version": "1.8.49",
+    "version": "1.8.50",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-    "releaseNotes": "Added Cloudflare workstation auto-release on uninstallation, fixed background media daemon reconnection and socket binding healing, and upgraded yt-dlp and FFmpeg pipelines."
+    "releaseNotes": "Instant download speed with lossless H.264 stream copy, GPU hardware-accelerated transcoding (NVENC/QSV/AMF/ultrafast), full 4-6 concurrent parallel downloads, and synchronized high-contrast White theme & checkbox UI."
   },
   "standard": {
-    "version": "1.8.27",
+    "version": "1.8.28",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
-    "releaseNotes": "Added Cloudflare workstation auto-release on uninstallation, fixed background media daemon reconnection and socket binding healing, and upgraded yt-dlp and FFmpeg pipelines."
+    "releaseNotes": "Instant download speed with lossless H.264 stream copy, GPU hardware-accelerated transcoding (NVENC/QSV/AMF/ultrafast), full 4-6 concurrent parallel downloads, and synchronized high-contrast White theme & checkbox UI."
   },
   "mobile": {
     "version": "1.0.54",
