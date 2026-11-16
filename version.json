@@ -1,23 +1,23 @@
 {
-  "version": "1.8.51",
+  "version": "1.8.52",
   "name": "MediaFetch Adobe CEP",
-  "standardVersion": "1.8.29",
-  "proVersion": "1.8.51",
+  "standardVersion": "1.8.30",
+  "proVersion": "1.8.52",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "Added individual item removal (✕) on completed downloads, preserved timeline fullscreen during auto-import, fixed Instagram download & photo detection, expanded media extraction for Snapchat, Facebook, X, YouTube Community posts, added preset folder option in playlist modal, and persistent custom download path.",
+  "releaseNotes": "Fixed: timeline auto-import restored (video now correctly inserts into timeline when Auto-Timeline is enabled). Added individual item removal (✕) on completed downloads, preserved timeline fullscreen during auto-import, fixed Instagram download & photo detection, expanded media extraction for Snapchat, Facebook, X, YouTube Community posts, added preset folder option in playlist modal, and persistent custom download path.",
   "pro": {
-    "version": "1.8.51",
+    "version": "1.8.52",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-    "releaseNotes": "Added individual item removal (✕) on completed downloads, preserved timeline fullscreen during auto-import, fixed Instagram download & photo detection, expanded media extraction for Snapchat, Facebook, X, YouTube Community posts, added preset folder option in playlist modal, and persistent custom download path."
+    "releaseNotes": "Fixed: timeline auto-import restored (video now correctly inserts into timeline when Auto-Timeline is enabled). Added individual item removal (✕) on completed downloads, preserved timeline fullscreen during auto-import, fixed Instagram download & photo detection, expanded media extraction for Snapchat, Facebook, X, YouTube Community posts, added preset folder option in playlist modal, and persistent custom download path."
   },
   "standard": {
-    "version": "1.8.29",
+    "version": "1.8.30",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
-    "releaseNotes": "Added individual item removal (✕) on completed downloads, preserved timeline fullscreen during auto-import, fixed Instagram download & photo detection, expanded media extraction for Snapchat, Facebook, X, YouTube Community posts, added preset folder option in playlist modal, and persistent custom download path."
+    "releaseNotes": "Fixed: timeline auto-import restored (video now correctly inserts into timeline when Auto-Timeline is enabled). Added individual item removal (✕) on completed downloads, preserved timeline fullscreen during auto-import, fixed Instagram download & photo detection, expanded media extraction for Snapchat, Facebook, X, YouTube Community posts, added preset folder option in playlist modal, and persistent custom download path."
   },
   "mobile": {
     "version": "1.0.54",
