@@ -1,23 +1,23 @@
 {
-  "version": "1.8.53",
+  "version": "1.8.54",
   "name": "MediaFetch Adobe CEP",
   "standardVersion": "1.8.31",
-  "proVersion": "1.8.53",
+  "proVersion": "1.8.54",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "Fixed Instagram photo downloads to preserve authentic full aspect ratios (portrait/landscape) without square cropping. Fixed media card & seeker badges to cleanly display 'PHOTO' instead of 'VIDEO'. Fixed single photo posts and direct image extraction across X (Twitter), Facebook, and universal web platforms with maximum original resolution. Restored timeline auto-import and fullscreen panel stability.",
+  "releaseNotes": "Fixed cloud storage links (Google Drive, Dropbox, OneDrive) showing incorrect VIDEO badge and fake stream resolutions. Cloud files now correctly display a CLOUD badge with direct download quality. Fixed YouTube video thumbnail / Photo Cover downloads not fetching the true maximum resolution (maxresdefault) — now always attempts highest quality first with smart fallback.",
   "pro": {
-    "version": "1.8.53",
+    "version": "1.8.54",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-    "releaseNotes": "Fixed Instagram photo downloads to preserve authentic full aspect ratios (portrait/landscape) without square cropping. Fixed media card & seeker badges to cleanly display 'PHOTO' instead of 'VIDEO'. Fixed single photo posts and direct image extraction across X (Twitter), Facebook, and universal web platforms with maximum original resolution. Restored timeline auto-import and fullscreen panel stability."
+    "releaseNotes": "Fixed cloud storage links (Google Drive, Dropbox, OneDrive) showing incorrect VIDEO badge and fake stream resolutions. Cloud files now correctly display a CLOUD badge with direct download quality. Fixed YouTube video thumbnail / Photo Cover downloads not fetching the true maximum resolution (maxresdefault) — now always attempts highest quality first with smart fallback."
   },
   "standard": {
     "version": "1.8.31",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
-    "releaseNotes": "Fixed Instagram photo downloads to preserve authentic full aspect ratios (portrait/landscape) without square cropping. Fixed media card & seeker badges to cleanly display 'PHOTO' instead of 'VIDEO'. Fixed single photo posts and direct image extraction across X (Twitter), Facebook, and universal web platforms with maximum original resolution. Restored timeline auto-import and fullscreen panel stability."
+    "releaseNotes": "Fixed Instagram photo downloads to preserve authentic full aspect ratios (portrait/landscape) without square cropping. Fixed media card and seeker badges to cleanly display PHOTO instead of VIDEO. Fixed single photo posts and direct image extraction across X (Twitter), Facebook, and universal web platforms with maximum original resolution. Restored timeline auto-import and fullscreen panel stability."
   },
   "mobile": {
     "version": "1.0.54",
