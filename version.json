@@ -1,18 +1,18 @@
 {
-  "version": "1.8.55",
+  "version": "1.8.56",
   "name": "MediaFetch Adobe CEP",
   "standardVersion": "1.8.31",
-  "proVersion": "1.8.55",
+  "proVersion": "1.8.56",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "Fixed cloud storage links (Google Drive, Dropbox, OneDrive, Mega) showing incorrect VIDEO badge and fake stream resolutions. Cloud files now correctly display a CLOUD badge with direct download quality. Fixed YouTube video thumbnail / Photo Cover downloads to always fetch the true maximum resolution (maxresdefault) first with automatic high-res fallback.",
+  "releaseNotes": "Fixed Google Drive and cloud storage downloads failing with header error in Premiere Pro. Cloud media now directly streams the untouched binary asset (PNG/JPG/MP4) with real filename detection. Fixed file naming falling back to 'Fetching media info'. Fixed YouTube video thumbnail / Photo Cover extraction to prioritize true 4K/HD maxresdefault.",
   "pro": {
-    "version": "1.8.55",
+    "version": "1.8.56",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-    "releaseNotes": "Fixed cloud storage links (Google Drive, Dropbox, OneDrive, Mega) showing incorrect VIDEO badge and fake stream resolutions. Cloud files now correctly display a CLOUD badge with direct download quality. Fixed YouTube video thumbnail / Photo Cover downloads to always fetch the true maximum resolution (maxresdefault) first with automatic high-res fallback."
+    "releaseNotes": "Fixed Google Drive and cloud storage downloads failing with header error in Premiere Pro. Cloud media now directly streams the untouched binary asset (PNG/JPG/MP4) with real filename detection. Fixed file naming falling back to 'Fetching media info'. Fixed YouTube video thumbnail / Photo Cover extraction to prioritize true 4K/HD maxresdefault."
   },
   "standard": {
     "version": "1.8.31",
