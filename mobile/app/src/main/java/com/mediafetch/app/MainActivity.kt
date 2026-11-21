@@ -96,6 +96,9 @@ class MainActivity : AppCompatActivity() {
             if (savedCookies.isNotBlank()) {
                 MediaEngine.applyCustomCookies(savedCookies)
             }
+            MediaSearchEngine.pexelsApiKey = prefs.getString("api_key_pexels", "") ?: ""
+            MediaSearchEngine.pixabayApiKey = prefs.getString("api_key_pixabay", "") ?: ""
+            MediaSearchEngine.unsplashApiKey = prefs.getString("api_key_unsplash", "") ?: ""
         } catch (_: Exception) {}
 
         // Check if launched via share action
@@ -964,6 +967,31 @@ class MainActivity : AppCompatActivity() {
         }
 
         @JavascriptInterface
+        fun performMediaSearchWithOptions(query: String, platformsJson: String, orientation: String, songFilter: String, page: Int) {
+            activityScope.launch {
+                try {
+                    val platList = mutableListOf<String>()
+                    val arr = JSONArray(platformsJson)
+                    for (i in 0 until arr.length()) {
+                        platList.add(arr.getString(i).lowercase())
+                    }
+                    if (orientation.isNotBlank()) platList.add("orientation:${orientation.lowercase()}")
+                    if (songFilter.isNotBlank()) platList.add("songs:${songFilter.lowercase()}")
+                    val results = MediaSearchEngine.searchAll(query, platList, page)
+                    val resultsArr = JSONArray()
+                    for (item in results) {
+                        resultsArr.put(item.toJson())
+                    }
+                    val resString = resultsArr.toString()
+                    webView.evaluateJavascript("window.onSearchResultsLoaded && window.onSearchResultsLoaded($resString);", null)
+                } catch (e: Exception) {
+                    val errSafe = JSONObject.quote(e.message ?: "Search failed")
+                    webView.evaluateJavascript("window.onSearchResultsError && window.onSearchResultsError($errSafe);", null)
+                }
+            }
+        }
+
+        @JavascriptInterface
         fun downloadSearchResult(itemJsonStr: String) {
             downloadSearchResultWithFormat(itemJsonStr, "best")
         }
@@ -1200,6 +1228,34 @@ class MainActivity : AppCompatActivity() {
         @JavascriptInterface
         fun updateNativeTheme(accentColorHex: String, surfaceColorHex: String, bgColorHex: String, isDark: Boolean) {
             updateNativeTheme(accentColorHex, surfaceColorHex, bgColorHex, isDark, false)
+        }
+
+        @JavascriptInterface
+        fun saveApiKeys(pexels: String, pixabay: String, unsplash: String) {
+            val p = pexels.trim()
+            val px = pixabay.trim()
+            val u = unsplash.trim()
+            val prefs = getSharedPreferences("mediafetch_prefs", Context.MODE_PRIVATE)
+            prefs.edit()
+                .putString("api_key_pexels", p)
+                .putString("api_key_pixabay", px)
+                .putString("api_key_unsplash", u)
+                .apply()
+            MediaSearchEngine.pexelsApiKey = p
+            MediaSearchEngine.pixabayApiKey = px
+            MediaSearchEngine.unsplashApiKey = u
+            showAppToast("API keys saved successfully")
+        }
+
+        @JavascriptInterface
+        fun getApiKeys(): String {
+            val prefs = getSharedPreferences("mediafetch_prefs", Context.MODE_PRIVATE)
+            val json = JSONObject().apply {
+                put("pexels", prefs.getString("api_key_pexels", "") ?: "")
+                put("pixabay", prefs.getString("api_key_pixabay", "") ?: "")
+                put("unsplash", prefs.getString("api_key_unsplash", "") ?: "")
+            }
+            return json.toString()
         }
 
         @JavascriptInterface

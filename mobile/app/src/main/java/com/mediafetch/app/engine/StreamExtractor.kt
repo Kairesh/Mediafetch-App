@@ -244,7 +244,8 @@ object StreamExtractor {
                                 reqLower.contains("pinimg.com") || reqLower.contains("dribbble.com") ||
                                 reqLower.contains("behance.net") || reqLower.contains("adobe.com") ||
                                 reqLower.contains("licdn.com") || reqLower.contains("reddit") ||
-                                reqLower.contains("redd.it") || reqLower.contains("unsplash.com")) &&
+                                reqLower.contains("redd.it") || reqLower.contains("unsplash.com") ||
+                                reqLower.contains("sc-cdn.net")) &&
                                 (reqLower.contains(".jpg") || reqLower.contains(".jpeg") || reqLower.contains(".webp") || reqLower.contains(".png")) &&
                                 !reqLower.contains("rsrc.php") && !reqLower.contains("emoji")
 
@@ -278,6 +279,9 @@ object StreamExtractor {
                         val isPinterestVideo = (reqLower.contains("pinimg.com") || reqLower.contains("pinterest.com")) &&
                             (reqLower.contains(".mp4") || reqLower.contains(".m3u8") || reqLower.contains("/videos/"))
 
+                        val isSnapchatVideo = (reqLower.contains("sc-cdn.net") || reqLower.contains("snapchat.com")) &&
+                            (reqLower.contains(".mp4") || reqLower.contains(".m3u8") || reqLower.contains("/media/") || reqLower.contains("/bolt/"))
+
                         val isYouTubeVideo = reqLower.contains("googlevideo.com/videoplayback")
 
                         val isGenericVideo = (reqLower.contains(".mp4") || reqLower.contains(".m3u8") || reqLower.contains(".webm")) &&
@@ -286,7 +290,7 @@ object StreamExtractor {
                         val isVideoAccept = accept.contains("video/") && !accept.contains("image/")
 
                         val isRealVideo = isInstagramVideo || isTwitterVideo || isTikTokVideo || isRedditVideo ||
-                            isPinterestVideo || isYouTubeVideo || isGenericVideo || isVideoAccept
+                            isPinterestVideo || isSnapchatVideo || isYouTubeVideo || isGenericVideo || isVideoAccept
 
                         if (isRealVideo) {
                             val isCarouselCandidate = url.contains("/p/") || url.contains("/post/")

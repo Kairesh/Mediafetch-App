@@ -50,8 +50,9 @@ data class SearchResultItem(
 
 object MediaSearchEngine {
 
-    private const val PEXELS_API_KEY = "nJhYrM3NMjdfzgsR092DY9sUSpWiYU2iXmbsAwnDLJHDxxp9F6vKwBnE"
-    private const val PIXABAY_API_KEY = "10547590-561862cf80d7e34284c5268bc"
+    var pexelsApiKey: String = ""
+    var pixabayApiKey: String = ""
+    var unsplashApiKey: String = ""
 
     private val client = OkHttpClient.Builder()
         .connectTimeout(10, TimeUnit.SECONDS)
@@ -103,53 +104,71 @@ object MediaSearchEngine {
         val clean = query.trim()
         if (clean.isBlank()) return@withContext emptyList<SearchResultItem>()
 
+        val orientation = platforms.find { it.startsWith("orientation:") }?.substringAfter(":")
+            ?: if (platforms.contains("landscape")) "landscape" else if (platforms.contains("portrait")) "portrait" else "all"
+
+        val songFilter = platforms.find { it.startsWith("songs:") }?.substringAfter(":")
+            ?: when {
+                platforms.contains("songs") || platforms.contains("song") -> "songs"
+                platforms.contains("albums") || platforms.contains("album") -> "albums"
+                platforms.contains("artists") || platforms.contains("artist") -> "artists"
+                platforms.contains("playlists") || platforms.contains("playlist") -> "playlists"
+                else -> "all"
+            }
+
         val deferredList = mutableListOf<kotlinx.coroutines.Deferred<List<SearchResultItem>>>()
 
         val isAll = platforms.isEmpty() || platforms.contains("all")
 
         // 1. YouTube Videos & Shorts
         if (isAll || platforms.contains("youtube") || platforms.contains("video")) {
-            deferredList.add(async { searchYouTube(clean, page) })
+            deferredList.add(async { searchYouTube(clean, page, orientation) })
         }
 
         // 2. Pexels HD / 4K Free Videos
         if (isAll || platforms.contains("pexels") || platforms.contains("pexels_video") || platforms.contains("video")) {
-            deferredList.add(async { searchPexelsVideos(clean, page) })
+            deferredList.add(async { searchPexelsVideos(clean, page, orientation) })
         }
 
         // 3. Pixabay HD / 4K Stock Videos
         if (isAll || platforms.contains("pixabay") || platforms.contains("pixabay_video") || platforms.contains("video")) {
-            deferredList.add(async { searchPixabayVideos(clean, page) })
+            deferredList.add(async { searchPixabayVideos(clean, page, orientation) })
         }
 
         // 4. Wikimedia Commons 4K / HD Videos
         if (isAll || platforms.contains("wikimedia") || platforms.contains("wikimedia_video") || platforms.contains("video")) {
-            deferredList.add(async { searchWikimediaVideos(clean, page) })
+            deferredList.add(async { searchWikimediaVideos(clean, page, orientation) })
         }
 
         // 5. Pexels High-Res Photos
         if (isAll || platforms.contains("pexels") || platforms.contains("pexels_photo") || platforms.contains("photo") || platforms.contains("image")) {
-            deferredList.add(async { searchPexelsPhotos(clean, page) })
+            deferredList.add(async { searchPexelsPhotos(clean, page, orientation) })
         }
 
         // 6. Pixabay High-Res Photos
         if (isAll || platforms.contains("pixabay") || platforms.contains("pixabay_photo") || platforms.contains("photo") || platforms.contains("image")) {
-            deferredList.add(async { searchPixabayPhotos(clean, page) })
+            deferredList.add(async { searchPixabayPhotos(clean, page, orientation) })
         }
 
         // 7. Openverse 700M+ High-Res Photos & Art
         if (isAll || platforms.contains("openverse") || platforms.contains("photo") || platforms.contains("image")) {
-            deferredList.add(async { searchOpenverseImages(clean, page) })
+            deferredList.add(async { searchOpenverseImages(clean, page, orientation) })
         }
 
         // 8. Wikimedia Commons High-Res Art & Photography
         if (isAll || platforms.contains("wikimedia") || platforms.contains("wikimedia_photo") || platforms.contains("photo") || platforms.contains("image")) {
-            deferredList.add(async { searchWikimediaPhotos(clean, page) })
+            deferredList.add(async { searchWikimediaPhotos(clean, page, orientation) })
         }
 
         // 9. Wallhaven 4K Ultra-HD Wallpapers
         if (isAll || platforms.contains("wallhaven") || platforms.contains("photo") || platforms.contains("wallpaper")) {
-            deferredList.add(async { searchWallhaven(clean, page) })
+            deferredList.add(async { searchWallhaven(clean, page, orientation) })
+        }
+
+        // 10. Universal Keyless Songs & Music Catalog
+        val hasSongFilter = platforms.any { it.contains("song") || it.contains("music") || it.contains("audio") || it.contains("album") || it.contains("artist") || it.contains("playlist") }
+        if (isAll || hasSongFilter) {
+            deferredList.add(async { searchSongs(clean, songFilter, page) })
         }
 
         val allResults = deferredList.awaitAll()
@@ -168,9 +187,9 @@ object MediaSearchEngine {
     }
 
     /**
-     * 1. Supercharged YouTube Search (Real YouTube results: long-form videos + viral shorts)
+     * 1. Supercharged YouTube Search (Real YouTube results: long-form videos + viral shorts + orientation support)
      */
-    suspend fun searchYouTube(query: String, page: Int = 1): List<SearchResultItem> = withContext(Dispatchers.IO) {
+    suspend fun searchYouTube(query: String, page: Int = 1, orientation: String = "all"): List<SearchResultItem> = withContext(Dispatchers.IO) {
         val clean = query.trim()
         if (clean.isBlank()) return@withContext emptyList<SearchResultItem>()
 
@@ -179,9 +198,29 @@ object MediaSearchEngine {
 
         try {
             val cleanQ = URLEncoder.encode(clean, "UTF-8")
-            // Query both default search and video-filtered search in parallel
-            val d1 = async { fetchYtInitialData("https://www.youtube.com/results?search_query=$cleanQ") }
-            val d2 = async { fetchYtInitialData("https://www.youtube.com/results?search_query=$cleanQ&sp=EgIQAQ%253D%253D") }
+            val isPortrait = orientation.equals("portrait", ignoreCase = true)
+            val isLandscape = orientation.equals("landscape", ignoreCase = true)
+
+            val d1 = async {
+                val qUrl = if (isPortrait) {
+                    "https://www.youtube.com/results?search_query=$cleanQ+%23shorts&sp=EgIYAQ%253D%253D"
+                } else if (isLandscape) {
+                    "https://www.youtube.com/results?search_query=$cleanQ&sp=EgIYAw%253D%253D"
+                } else {
+                    "https://www.youtube.com/results?search_query=$cleanQ"
+                }
+                fetchYtInitialData(qUrl)
+            }
+            val d2 = async {
+                val qUrl = if (isPortrait) {
+                    "https://www.youtube.com/results?search_query=$cleanQ+shorts"
+                } else if (isLandscape) {
+                    "https://www.youtube.com/results?search_query=$cleanQ&sp=EgIQAQ%253D%253D"
+                } else {
+                    "https://www.youtube.com/results?search_query=$cleanQ&sp=EgIQAQ%253D%253D"
+                }
+                fetchYtInitialData(qUrl)
+            }
 
             val json1 = d1.await()
             val json2 = d2.await()
@@ -199,6 +238,8 @@ object MediaSearchEngine {
         // Reliable fallback to InnerTube API if web results were empty
         if (items.isEmpty()) {
             try {
+                val isPortrait = orientation.equals("portrait", ignoreCase = true)
+                val finalQuery = if (isPortrait) "$clean #shorts" else clean
                 val payload = JSONObject().apply {
                     put("context", JSONObject().apply {
                         put("client", JSONObject().apply {
@@ -208,7 +249,7 @@ object MediaSearchEngine {
                             put("gl", "US")
                         })
                     })
-                    put("query", clean)
+                    put("query", finalQuery)
                 }
                 val request = Request.Builder()
                     .url("https://www.youtube.com/youtubei/v1/search")
@@ -223,6 +264,15 @@ object MediaSearchEngine {
                     }
                 }
             } catch (_: Exception) {}
+        }
+
+        // Apply strict orientation filtering if required
+        if (orientation.equals("portrait", ignoreCase = true)) {
+            val shortsOnly = items.filter { it.durationFormatted.contains("Short", ignoreCase = true) || it.title.contains("#shorts", ignoreCase = true) || it.durationSeconds <= 60L }
+            if (shortsOnly.isNotEmpty()) return@withContext shortsOnly
+        } else if (orientation.equals("landscape", ignoreCase = true)) {
+            val longOnly = items.filter { !it.durationFormatted.contains("Short", ignoreCase = true) && !it.title.contains("#shorts", ignoreCase = true) && it.durationSeconds > 60L }
+            if (longOnly.isNotEmpty()) return@withContext longOnly
         }
 
         items
@@ -377,10 +427,13 @@ object MediaSearchEngine {
     /**
      * 2. Wikimedia Commons 4K / HD Video Search (Real 4K Stock Clips with Direct URLs & Durations)
      */
-    suspend fun searchWikimediaVideos(query: String, page: Int = 1): List<SearchResultItem> = withContext(Dispatchers.IO) {
+    /**
+     * 2. Wikimedia Commons 4K / HD Video Search (Real 4K Stock Clips with Direct URLs & Durations)
+     */
+    suspend fun searchWikimediaVideos(query: String, page: Int = 1, orientation: String = "all"): List<SearchResultItem> = withContext(Dispatchers.IO) {
         val items = mutableListOf<SearchResultItem>()
         try {
-            val limit = 12
+            val limit = 30
             val url = "https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrnamespace=6&gsrsearch=filetype:video%20" +
                     URLEncoder.encode(query, "UTF-8") + "&gsrlimit=$limit&prop=imageinfo&iiprop=url|size|mime|dimensions&iiurlwidth=480&format=json"
 
@@ -406,6 +459,12 @@ object MediaSearchEngine {
                         val rawUrl = info.optString("url", "")
                         if (rawUrl.isBlank()) continue
 
+                        val width = info.optInt("width", 1920)
+                        val height = info.optInt("height", 1080)
+
+                        if (orientation.equals("landscape", ignoreCase = true) && width < height) continue
+                        if (orientation.equals("portrait", ignoreCase = true) && height <= width) continue
+
                         val titleRaw = pObj.optString("title", "Stock Video")
                             .replace(Regex("^File:", RegexOption.IGNORE_CASE), "")
                             .replace(Regex("\\.[^/.]+$"), "")
@@ -414,11 +473,7 @@ object MediaSearchEngine {
 
                         val durationSeconds = info.optDouble("duration", 0.0).toLong()
                         val durationStr = if (durationSeconds > 0) formatSecondsToDuration(durationSeconds) else "HD Video"
-
-                        val width = info.optInt("width", 1920)
-                        val height = info.optInt("height", 1080)
                         val badge = if (width >= 3840 || height >= 2160) "4K UHD" else "${width}x${height}"
-
                         val thumb = info.optString("thumburl", "")
 
                         items.add(
@@ -449,10 +504,11 @@ object MediaSearchEngine {
     /**
      * 7. Openverse 700M+ Creative Commons Photos & Art
      */
-    suspend fun searchOpenverseImages(query: String, page: Int = 1): List<SearchResultItem> = withContext(Dispatchers.IO) {
+    suspend fun searchOpenverseImages(query: String, page: Int = 1, orientation: String = "all"): List<SearchResultItem> = withContext(Dispatchers.IO) {
         val items = mutableListOf<SearchResultItem>()
         try {
-            val url = "https://api.openverse.org/v1/images/?q=" + URLEncoder.encode(query, "UTF-8") + "&page_size=12&page=$page"
+            val aspectParam = if (orientation.equals("landscape", ignoreCase = true)) "&aspect_ratio=wide" else if (orientation.equals("portrait", ignoreCase = true)) "&aspect_ratio=tall" else ""
+            val url = "https://api.openverse.org/v1/images/?q=" + URLEncoder.encode(query, "UTF-8") + "&page_size=35&page=$page$aspectParam"
             val request = Request.Builder()
                 .url(url)
                 .header("User-Agent", "Mozilla/5.0")
@@ -474,6 +530,12 @@ object MediaSearchEngine {
 
                         val width = r.optInt("width", 0)
                         val height = r.optInt("height", 0)
+
+                        if (width > 0 && height > 0) {
+                            if (orientation.equals("landscape", ignoreCase = true) && width < height) continue
+                            if (orientation.equals("portrait", ignoreCase = true) && height <= width) continue
+                        }
+
                         val badge = if (width > 0 && height > 0) "${width}x${height}" else "Full Photo"
 
                         items.add(
@@ -503,10 +565,10 @@ object MediaSearchEngine {
     /**
      * 8. Wikimedia Commons High-Res Art, Illustrations & Photos
      */
-    suspend fun searchWikimediaPhotos(query: String, page: Int = 1): List<SearchResultItem> = withContext(Dispatchers.IO) {
+    suspend fun searchWikimediaPhotos(query: String, page: Int = 1, orientation: String = "all"): List<SearchResultItem> = withContext(Dispatchers.IO) {
         val items = mutableListOf<SearchResultItem>()
         try {
-            val limit = 12
+            val limit = 35
             val url = "https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrnamespace=6&gsrsearch=filetype:bitmap%20" +
                     URLEncoder.encode(query, "UTF-8") + "&gsrlimit=$limit&prop=imageinfo&iiprop=url|size|mime|dimensions&iiurlwidth=480&format=json"
 
@@ -532,14 +594,18 @@ object MediaSearchEngine {
                         val rawUrl = info.optString("url", "")
                         if (rawUrl.isBlank()) continue
 
+                        val width = info.optInt("width", 1920)
+                        val height = info.optInt("height", 1080)
+
+                        if (orientation.equals("landscape", ignoreCase = true) && width < height) continue
+                        if (orientation.equals("portrait", ignoreCase = true) && height <= width) continue
+
                         val titleRaw = pObj.optString("title", "Artwork")
                             .replace(Regex("^File:", RegexOption.IGNORE_CASE), "")
                             .replace(Regex("\\.[^/.]+$"), "")
                             .replace(Regex("[_-]"), " ")
                             .trim()
 
-                        val width = info.optInt("width", 1920)
-                        val height = info.optInt("height", 1080)
                         val thumb = info.optString("thumburl", rawUrl)
 
                         items.add(
@@ -569,10 +635,13 @@ object MediaSearchEngine {
     /**
      * 9. Wallhaven 4K Ultra-HD Wallpapers
      */
-    suspend fun searchWallhaven(query: String, page: Int = 1): List<SearchResultItem> = withContext(Dispatchers.IO) {
+    suspend fun searchWallhaven(query: String, page: Int = 1, orientation: String = "all"): List<SearchResultItem> = withContext(Dispatchers.IO) {
         val items = mutableListOf<SearchResultItem>()
         try {
-            val url = "https://wallhaven.cc/api/v1/search?q=" + URLEncoder.encode(query, "UTF-8") + "&sorting=views&page=$page"
+            val ratiosParam = if (orientation.equals("landscape", ignoreCase = true)) "&ratios=landscape,16x9,16x10,21x9"
+                else if (orientation.equals("portrait", ignoreCase = true)) "&ratios=portrait,9x16"
+                else ""
+            val url = "https://wallhaven.cc/api/v1/search?q=" + URLEncoder.encode(query, "UTF-8") + "$ratiosParam&sorting=views&page=$page"
             val request = Request.Builder()
                 .url(url)
                 .header("User-Agent", "Mozilla/5.0 MediaFetch/1.0")
@@ -584,7 +653,7 @@ object MediaSearchEngine {
                 val json = JSONObject(body)
                 val data = json.optJSONArray("data")
                 if (data != null) {
-                    for (i in 0 until data.length().coerceAtMost(12)) {
+                    for (i in 0 until data.length().coerceAtMost(30)) {
                         val d = data.optJSONObject(i) ?: continue
                         val id = d.optString("id", "")
                         val fullPath = d.optString("path", "")
@@ -620,13 +689,15 @@ object MediaSearchEngine {
     /**
      * Pexels HD / 4K Stock Video Search (100% Free & Direct MP4 Streams)
      */
-    suspend fun searchPexelsVideos(query: String, page: Int = 1): List<SearchResultItem> = withContext(Dispatchers.IO) {
+    suspend fun searchPexelsVideos(query: String, page: Int = 1, orientation: String = "all"): List<SearchResultItem> = withContext(Dispatchers.IO) {
         val items = mutableListOf<SearchResultItem>()
+        if (pexelsApiKey.isBlank()) return@withContext items
         try {
-            val url = "https://api.pexels.com/videos/search?query=" + URLEncoder.encode(query, "UTF-8") + "&per_page=30&page=$page"
+            val orientParam = if (orientation.equals("landscape", ignoreCase = true) || orientation.equals("portrait", ignoreCase = true)) "&orientation=$orientation" else ""
+            val url = "https://api.pexels.com/videos/search?query=" + URLEncoder.encode(query, "UTF-8") + "$orientParam&per_page=40&page=$page"
             val request = Request.Builder()
                 .url(url)
-                .header("Authorization", PEXELS_API_KEY)
+                .header("Authorization", pexelsApiKey)
                 .header("User-Agent", "Mozilla/5.0 MediaFetch/1.0")
                 .build()
 
@@ -699,13 +770,15 @@ object MediaSearchEngine {
     /**
      * Pexels Ultra High-Res Photos & Wallpapers
      */
-    suspend fun searchPexelsPhotos(query: String, page: Int = 1): List<SearchResultItem> = withContext(Dispatchers.IO) {
+    suspend fun searchPexelsPhotos(query: String, page: Int = 1, orientation: String = "all"): List<SearchResultItem> = withContext(Dispatchers.IO) {
         val items = mutableListOf<SearchResultItem>()
+        if (pexelsApiKey.isBlank()) return@withContext items
         try {
-            val url = "https://api.pexels.com/v1/search?query=" + URLEncoder.encode(query, "UTF-8") + "&per_page=30&page=$page"
+            val orientParam = if (orientation.equals("landscape", ignoreCase = true) || orientation.equals("portrait", ignoreCase = true)) "&orientation=$orientation" else ""
+            val url = "https://api.pexels.com/v1/search?query=" + URLEncoder.encode(query, "UTF-8") + "$orientParam&per_page=40&page=$page"
             val request = Request.Builder()
                 .url(url)
-                .header("Authorization", PEXELS_API_KEY)
+                .header("Authorization", pexelsApiKey)
                 .header("User-Agent", "Mozilla/5.0 MediaFetch/1.0")
                 .build()
 
@@ -758,11 +831,15 @@ object MediaSearchEngine {
     /**
      * Pixabay 4K / HD Stock Videos
      */
-    suspend fun searchPixabayVideos(query: String, page: Int = 1): List<SearchResultItem> = withContext(Dispatchers.IO) {
+    suspend fun searchPixabayVideos(query: String, page: Int = 1, orientation: String = "all"): List<SearchResultItem> = withContext(Dispatchers.IO) {
         val items = mutableListOf<SearchResultItem>()
+        if (pixabayApiKey.isBlank()) return@withContext items
         try {
-            val url = "https://pixabay.com/api/videos/?key=" + PIXABAY_API_KEY +
-                    "&q=" + URLEncoder.encode(query, "UTF-8") + "&per_page=30&page=$page"
+            val orientParam = if (orientation.equals("landscape", ignoreCase = true)) "&orientation=horizontal"
+                else if (orientation.equals("portrait", ignoreCase = true)) "&orientation=vertical"
+                else ""
+            val url = "https://pixabay.com/api/videos/?key=" + pixabayApiKey +
+                    "&q=" + URLEncoder.encode(query, "UTF-8") + "$orientParam&per_page=40&page=$page"
             val request = Request.Builder()
                 .url(url)
                 .header("User-Agent", "Mozilla/5.0 MediaFetch/1.0")
@@ -806,7 +883,6 @@ object MediaSearchEngine {
                             bestRes = "${tinyObj.optInt("height", 360)}p"
                         }
 
-                        // Robust thumbnail extraction: check medium, small, tiny, large thumbnail fields first, then fallback to picture_id or userImageURL
                         val picId = h.optString("picture_id", "")
                         val thumb = (mediumObj?.optString("thumbnail", "")?.takeIf { it.isNotBlank() }
                             ?: smallObj?.optString("thumbnail", "")?.takeIf { it.isNotBlank() }
@@ -847,11 +923,15 @@ object MediaSearchEngine {
     /**
      * Pixabay High-Res Photos & Vector Art
      */
-    suspend fun searchPixabayPhotos(query: String, page: Int = 1): List<SearchResultItem> = withContext(Dispatchers.IO) {
+    suspend fun searchPixabayPhotos(query: String, page: Int = 1, orientation: String = "all"): List<SearchResultItem> = withContext(Dispatchers.IO) {
         val items = mutableListOf<SearchResultItem>()
+        if (pixabayApiKey.isBlank()) return@withContext items
         try {
-            val url = "https://pixabay.com/api/?key=" + PIXABAY_API_KEY +
-                    "&q=" + URLEncoder.encode(query, "UTF-8") + "&per_page=30&page=$page&image_type=photo"
+            val orientParam = if (orientation.equals("landscape", ignoreCase = true)) "&orientation=horizontal"
+                else if (orientation.equals("portrait", ignoreCase = true)) "&orientation=vertical"
+                else ""
+            val url = "https://pixabay.com/api/?key=" + pixabayApiKey +
+                    "&q=" + URLEncoder.encode(query, "UTF-8") + "$orientParam&per_page=40&page=$page&image_type=photo"
             val request = Request.Builder()
                 .url(url)
                 .header("User-Agent", "Mozilla/5.0 MediaFetch/1.0")
@@ -900,6 +980,218 @@ object MediaSearchEngine {
             // Ignore
         }
         items
+    }
+
+    /**
+     * Universal Songs & Music Search (100M+ Songs, Albums, Artists, Playlists - Keyless)
+     */
+    suspend fun searchSongs(query: String, filter: String = "all", page: Int = 1): List<SearchResultItem> = withContext(Dispatchers.IO) {
+        val clean = query.trim()
+        if (clean.isBlank()) return@withContext emptyList<SearchResultItem>()
+        val results = mutableListOf<SearchResultItem>()
+
+        try {
+            val encQuery = URLEncoder.encode(clean, "UTF-8")
+
+            // 0. Jamendo 320kbps MP3 Free Tracks (Full-length streams & direct downloads)
+            if (filter == "songs" || filter == "all") {
+                try {
+                    val jUrl = "https://api.jamendo.com/v3.0/tracks/?client_id=3dce8b55&format=json&limit=50&namesearch=$encQuery&include=musicinfo&audioformat=mp32"
+                    val req = Request.Builder().url(jUrl).build()
+                    client.newCall(req).execute().use { resp ->
+                        if (resp.isSuccessful) {
+                            val body = resp.body?.string()
+                            if (body != null) {
+                                val json = JSONObject(body)
+                                val arr = json.optJSONArray("results") ?: JSONArray()
+                                for (i in 0 until arr.length()) {
+                                    val item = arr.getJSONObject(i)
+                                    val trackName = item.optString("name", "Track")
+                                    val artistName = item.optString("artist_name", "Artist")
+                                    val trackId = item.optString("id", "$i")
+                                    val audioUrl = item.optString("audio", "")
+                                    val downloadUrl = item.optString("audiodownload", audioUrl)
+                                    val artUrl = item.optString("image", "").ifBlank { "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600" }
+                                    val durSec = item.optLong("duration", 180L)
+                                    val durFmt = String.format("%d:%02d", durSec / 60, durSec % 60)
+
+                                    results.add(SearchResultItem(
+                                        id = "jamendo_$trackId",
+                                        title = trackName,
+                                        author = artistName,
+                                        durationFormatted = durFmt,
+                                        durationSeconds = durSec,
+                                        thumbnail = artUrl,
+                                        directUrl = audioUrl,
+                                        platform = "Songs",
+                                        mediaType = "audio",
+                                        downloadUrl = downloadUrl.ifBlank { audioUrl },
+                                        pageUrl = item.optString("shareurl", audioUrl),
+                                        resolutionBadge = "320k MP3"
+                                    ))
+                                }
+                            }
+                        }
+                    }
+                } catch (_: Exception) {}
+            }
+
+            // 1. iTunes Songs
+            if (filter == "songs" || filter == "all") {
+                val url = "https://itunes.apple.com/search?term=$encQuery&entity=song&limit=${if (filter == "all") 30 else 50}"
+                val req = Request.Builder().url(url).build()
+                client.newCall(req).execute().use { resp ->
+                    if (resp.isSuccessful) {
+                        val body = resp.body?.string()
+                        if (body != null) {
+                            val json = JSONObject(body)
+                            val arr = json.optJSONArray("results") ?: JSONArray()
+                            for (i in 0 until arr.length()) {
+                                val item = arr.getJSONObject(i)
+                                val trackName = item.optString("trackName", "Track")
+                                val artistName = item.optString("artistName", "Artist")
+                                val trackId = item.optLong("trackId", 0L)
+                                val previewUrl = item.optString("previewUrl", "")
+                                val artUrl = item.optString("artworkUrl100", "").replace("100x100bb", "600x600bb")
+                                val durMs = item.optLong("trackTimeMillis", 0L)
+                                val durSec = durMs / 1000
+                                val durFmt = String.format("%d:%02d", durSec / 60, durSec % 60)
+
+                                results.add(SearchResultItem(
+                                    id = "song_$trackId",
+                                    title = trackName,
+                                    author = artistName,
+                                    durationFormatted = durFmt,
+                                    durationSeconds = durSec,
+                                    thumbnail = artUrl,
+                                    directUrl = previewUrl,
+                                    platform = "Songs",
+                                    mediaType = "audio",
+                                    downloadUrl = previewUrl,
+                                    pageUrl = item.optString("trackViewUrl", ""),
+                                    resolutionBadge = "SONG"
+                                ))
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 2. Artists
+            if (filter == "artists" || filter == "all") {
+                val url = "https://itunes.apple.com/search?term=$encQuery&entity=musicArtist&limit=${if (filter == "all") 15 else 35}"
+                val req = Request.Builder().url(url).build()
+                client.newCall(req).execute().use { resp ->
+                    if (resp.isSuccessful) {
+                        val body = resp.body?.string()
+                        if (body != null) {
+                            val json = JSONObject(body)
+                            val arr = json.optJSONArray("results") ?: JSONArray()
+                            for (i in 0 until arr.length()) {
+                                val item = arr.getJSONObject(i)
+                                val artistName = item.optString("artistName", "Artist")
+                                val artistId = item.optLong("artistId", 0L)
+
+                                results.add(SearchResultItem(
+                                    id = "artist_$artistId",
+                                    title = artistName,
+                                    author = item.optString("primaryGenreName", "Artist"),
+                                    durationFormatted = "Top Hits",
+                                    durationSeconds = 0L,
+                                    thumbnail = "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600",
+                                    directUrl = "",
+                                    platform = "Songs",
+                                    mediaType = "audio",
+                                    downloadUrl = "",
+                                    pageUrl = item.optString("artistLinkUrl", ""),
+                                    resolutionBadge = "ARTIST"
+                                ))
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 3. Albums
+            if (filter == "albums" || filter == "all") {
+                val url = "https://itunes.apple.com/search?term=$encQuery&entity=album&limit=${if (filter == "all") 20 else 45}"
+                val req = Request.Builder().url(url).build()
+                client.newCall(req).execute().use { resp ->
+                    if (resp.isSuccessful) {
+                        val body = resp.body?.string()
+                        if (body != null) {
+                            val json = JSONObject(body)
+                            val arr = json.optJSONArray("results") ?: JSONArray()
+                            for (i in 0 until arr.length()) {
+                                val item = arr.getJSONObject(i)
+                                val colName = item.optString("collectionName", "Album")
+                                val artistName = item.optString("artistName", "Artist")
+                                val colId = item.optLong("collectionId", 0L)
+                                val artUrl = item.optString("artworkUrl100", "").replace("100x100bb", "600x600bb")
+                                val trackCount = item.optInt("trackCount", 0)
+
+                                results.add(SearchResultItem(
+                                    id = "album_$colId",
+                                    title = colName,
+                                    author = artistName,
+                                    durationFormatted = "$trackCount Tracks",
+                                    durationSeconds = 0L,
+                                    thumbnail = artUrl,
+                                    directUrl = "",
+                                    platform = "Songs",
+                                    mediaType = "audio",
+                                    downloadUrl = "",
+                                    pageUrl = item.optString("collectionViewUrl", ""),
+                                    resolutionBadge = "ALBUM"
+                                ))
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 4. Playlists / Sets
+            if (filter == "playlists" || filter == "all") {
+                val url = "https://itunes.apple.com/search?term=$encQuery&entity=album&limit=${if (filter == "all") 15 else 35}"
+                val req = Request.Builder().url(url).build()
+                client.newCall(req).execute().use { resp ->
+                    if (resp.isSuccessful) {
+                        val body = resp.body?.string()
+                        if (body != null) {
+                            val json = JSONObject(body)
+                            val arr = json.optJSONArray("results") ?: JSONArray()
+                            for (i in 0 until arr.length()) {
+                                val item = arr.getJSONObject(i)
+                                val colName = item.optString("collectionName", clean)
+                                val artistName = item.optString("artistName", "Curated")
+                                val colId = item.optLong("collectionId", 0L)
+                                val artUrl = item.optString("artworkUrl100", "").replace("100x100bb", "600x600bb")
+                                val trackCount = item.optInt("trackCount", 12)
+
+                                results.add(SearchResultItem(
+                                    id = "playlist_$colId",
+                                    title = "$colName (Set)",
+                                    author = artistName,
+                                    durationFormatted = "$trackCount Songs",
+                                    durationSeconds = 0L,
+                                    thumbnail = artUrl,
+                                    directUrl = "",
+                                    platform = "Songs",
+                                    mediaType = "audio",
+                                    downloadUrl = "",
+                                    pageUrl = item.optString("collectionViewUrl", ""),
+                                    resolutionBadge = "PLAYLIST"
+                                ))
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        results
     }
 
     private fun parseDurationToSeconds(durationText: String): Long {

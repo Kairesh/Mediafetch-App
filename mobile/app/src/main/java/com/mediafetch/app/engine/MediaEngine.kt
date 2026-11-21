@@ -195,6 +195,7 @@ object MediaEngine {
             lower.contains("fiverr.com") -> "Fiverr"
             lower.contains("artstation.com") -> "ArtStation"
             lower.contains("vimeo.com") -> "Vimeo"
+            lower.contains("snapchat.com") -> "Snapchat"
             lower.contains("pixabay.com") -> "Pixabay"
             lower.contains("unsplash.com") -> "Unsplash"
             lower.contains("pexels.com") -> "Pexels"
@@ -258,6 +259,8 @@ object MediaEngine {
             "Dribbble" -> resolveDribbble(url, context)
             "Fiverr" -> resolveFiverr(url, context)
             "ArtStation" -> resolveArtStation(url, context)
+            "Vimeo" -> resolveVimeo(url, context)
+            "Snapchat" -> resolveSnapchat(url, context)
             "Pixabay", "Unsplash", "Pexels" -> resolveStockPhoto(url, platform)
             else -> resolveGeneric(url, platform, context)
         }
@@ -4291,6 +4294,172 @@ object MediaEngine {
         )
     }
 
+    private suspend fun resolveVimeo(url: String, context: Context? = null): MediaItem {
+        var videoId = ""
+        val vMatch = Pattern.compile("(?:vimeo\\.com/|player\\.vimeo\\.com/video/)(\\d+)", Pattern.CASE_INSENSITIVE).matcher(url)
+        if (vMatch.find()) {
+            videoId = vMatch.group(1) ?: ""
+        }
+        var title = "Vimeo Video"
+        var author = "Vimeo Creator"
+        var thumbnail = "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800"
+        var durationSec = 60L
+        val streamMap = mutableMapOf<String, String>()
+
+        if (videoId.isNotBlank()) {
+            try {
+                val cfgUrl = "https://player.vimeo.com/video/$videoId/config"
+                val req = Request.Builder()
+                    .url(cfgUrl)
+                    .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                    .header("Referer", "https://vimeo.com/")
+                    .build()
+                val resp = client.newCall(req).execute()
+                if (resp.isSuccessful) {
+                    val bodyStr = resp.body?.string() ?: ""
+                    val json = JSONObject(bodyStr)
+                    val videoObj = json.optJSONObject("video")
+                    if (videoObj != null) {
+                        title = videoObj.optString("title", title)
+                        durationSec = videoObj.optLong("duration", 60L)
+                        val thumbs = videoObj.optJSONObject("thumbs")
+                        if (thumbs != null) {
+                            thumbnail = thumbs.optString("1280", thumbs.optString("base", thumbnail))
+                        }
+                        val owner = videoObj.optJSONObject("owner")
+                        if (owner != null) {
+                            author = owner.optString("name", author)
+                        }
+                    }
+                    val reqObj = json.optJSONObject("request")
+                    val filesObj = reqObj?.optJSONObject("files")
+                    val progArr = filesObj?.optJSONArray("progressive")
+                    if (progArr != null && progArr.length() > 0) {
+                        for (i in 0 until progArr.length()) {
+                            val f = progArr.optJSONObject(i) ?: continue
+                            val fUrl = f.optString("url", "")
+                            val q = f.optString("quality", "")
+                            if (fUrl.isNotBlank()) {
+                                if (q.contains("1080")) streamMap["1080p"] = fUrl
+                                else if (q.contains("720")) streamMap["720p"] = fUrl
+                                else if (q.contains("480") || q.contains("360")) streamMap["480p"] = fUrl
+                                if (!streamMap.containsKey("default")) streamMap["default"] = fUrl
+                            }
+                        }
+                    }
+                    val hlsObj = filesObj?.optJSONObject("hls")
+                    val hlsUrl = hlsObj?.optString("default_cdn", "")?.let { cdnKey ->
+                        hlsObj.optJSONObject("cdns")?.optJSONObject(cdnKey)?.optString("url", "")
+                    } ?: hlsObj?.optJSONObject("cdns")?.let { cdns ->
+                        cdns.optJSONObject(cdns.keys().next())?.optString("url", "")
+                    }
+                    if (streamMap.isEmpty() && !hlsUrl.isNullOrBlank()) {
+                        streamMap["default"] = hlsUrl
+                    }
+                }
+            } catch (_: Exception) {}
+        }
+
+        if (streamMap.isEmpty() && context != null) {
+            try {
+                val sniff = StreamExtractor.sniffStream(context, url, timeoutMs = 8000L)
+                if (sniff.streamUrl.isNotBlank()) streamMap["default"] = sniff.streamUrl
+                if (sniff.title.isNotBlank()) title = sniff.title
+                if (sniff.author.isNotBlank()) author = sniff.author
+                if (sniff.thumbnail.isNotBlank()) thumbnail = sniff.thumbnail
+            } catch (_: Exception) {}
+        }
+
+        val topStream = streamMap["1080p"] ?: streamMap["720p"] ?: streamMap["default"] ?: ""
+        val qualities = generateVideoQualities(durationSec, topStream, streamMap, maxSourceRes = if (streamMap.containsKey("1080p")) "1080p" else "720p")
+        return MediaItem(
+            url = url,
+            title = title,
+            author = author,
+            durationSeconds = durationSec,
+            thumbnail = thumbnail,
+            platform = "Vimeo",
+            mediaType = MediaType.VIDEO,
+            qualities = qualities
+        )
+    }
+
+    private suspend fun resolveSnapchat(url: String, context: Context? = null): MediaItem {
+        var title = "Snapchat Spotlight"
+        var author = "Snapchat Creator"
+        var thumbnail = "https://images.unsplash.com/photo-1611262588024-d12430b98920?w=800"
+        var directVideoUrl = ""
+        var durationSec = 15L
+        val imageUrls = mutableListOf<String>()
+
+        try {
+            val req = Request.Builder()
+                .url(url)
+                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+                .build()
+            val resp = client.newCall(req).execute()
+            if (resp.isSuccessful) {
+                val html = resp.body?.string() ?: ""
+                val tMat = Pattern.compile("<meta property=\"og:title\" content=\"([^\"]+)\"").matcher(html)
+                if (tMat.find()) title = tMat.group(1)?.replace("&amp;", "&") ?: title
+                val aMat = Pattern.compile("<meta property=\"og:site_name\" content=\"([^\"]+)\"").matcher(html)
+                if (aMat.find()) author = aMat.group(1)?.replace("&amp;", "&") ?: author
+                val imgMat = Pattern.compile("<meta property=\"og:image\" content=\"([^\"]+)\"").matcher(html)
+                if (imgMat.find()) {
+                    val img = imgMat.group(1)?.replace("&amp;", "&") ?: ""
+                    if (img.isNotBlank()) {
+                        thumbnail = img
+                        imageUrls.add(img)
+                    }
+                }
+                val vMat = Pattern.compile("<meta property=\"og:video(?::secure_url)?\" content=\"([^\"]+)\"").matcher(html)
+                if (vMat.find()) {
+                    directVideoUrl = vMat.group(1)?.replace("&amp;", "&") ?: ""
+                }
+                if (directVideoUrl.isBlank()) {
+                    val nextMat = Pattern.compile("<script id=\"__NEXT_DATA__\"[^>]*>(\\{.+?\\})</script>").matcher(html)
+                    if (nextMat.find()) {
+                        val nextJson = JSONObject(nextMat.group(1) ?: "{}")
+                        val mediaUrl = nextJson.optJSONObject("props")?.optJSONObject("pageProps")
+                            ?.optJSONObject("storyStreamingMetadata")?.optString("mediaUrl", "") ?: ""
+                        if (mediaUrl.isNotBlank()) directVideoUrl = mediaUrl
+                    }
+                }
+            }
+        } catch (_: Exception) {}
+
+        if (directVideoUrl.isBlank() && context != null) {
+            try {
+                val sniff = StreamExtractor.sniffStream(context, url, timeoutMs = 8000L)
+                if (sniff.streamUrl.isNotBlank()) directVideoUrl = sniff.streamUrl
+                if (sniff.title.isNotBlank()) title = sniff.title
+                if (sniff.author.isNotBlank()) author = sniff.author
+                if (sniff.thumbnail.isNotBlank()) thumbnail = sniff.thumbnail
+            } catch (_: Exception) {}
+        }
+
+        val isVideo = directVideoUrl.isNotBlank()
+        val streamMap = if (isVideo) mapOf("default" to directVideoUrl) else emptyMap()
+        val qualities = if (isVideo) {
+            generateVideoQualities(durationSec, directVideoUrl, streamMap, maxSourceRes = "1080p")
+        } else {
+            generateImageQualities(if (imageUrls.isNotEmpty()) imageUrls[0] else thumbnail)
+        }
+
+        return MediaItem(
+            url = url,
+            title = title,
+            author = author,
+            durationSeconds = if (isVideo) durationSec else 0L,
+            thumbnail = thumbnail,
+            platform = "Snapchat",
+            mediaType = if (isVideo) MediaType.VIDEO else MediaType.IMAGE,
+            qualities = qualities,
+            imageUrls = imageUrls
+        )
+    }
+
     private suspend fun resolveCloudMedia(url: String, platform: String, context: Context? = null): MediaItem {
         var directUrl = url
         var title = "$platform File"
@@ -4453,6 +4622,7 @@ object MediaEngine {
         var durationSeconds = 60L
         val imageUrls = mutableListOf<String>()
         val carouselSlides = mutableListOf<JSONObject>()
+        val cdnVids = mutableListOf<String>()
         if (isImg) imageUrls.add(url)
 
         // Scrape HTML metadata with Desktop User-Agent
@@ -4548,6 +4718,18 @@ object MediaEngine {
                         imageUrls.add(candidate)
                     }
                 }
+
+                // Scan for rich in-page videos (galleries / portfolios)
+                val vPat = Pattern.compile("https?://[a-zA-Z0-9.\\-_/]+\\.(?:mp4|webm|mov|m4v)(?:\\?[^\"'\\s<>]*)?", Pattern.CASE_INSENSITIVE).matcher(html)
+                while (vPat.find()) {
+                    val cand = vPat.group(0) ?: ""
+                    if (cand.isNotBlank() && !cand.contains("blank") && !cand.contains("pixel") && !cand.contains("tracking") && !cand.contains("analytics") && !cdnVids.contains(cand)) {
+                        cdnVids.add(cand)
+                    }
+                }
+                if (directVideoUrl.isBlank() && cdnVids.isNotEmpty()) {
+                    directVideoUrl = cdnVids[0]
+                }
             }
         } catch (_: Exception) {}
 
@@ -4573,7 +4755,8 @@ object MediaEngine {
         }
 
         val isGif = url.lowercase().contains(".gif") || directVideoUrl.lowercase().contains(".gif")
-        val isVideo = directVideoUrl.isNotBlank() && !isGif
+        val hasMultiVideos = cdnVids.size > 1
+        val isVideo = (directVideoUrl.isNotBlank() || cdnVids.isNotEmpty()) && !isGif
         val isAudio = directAudioUrl.isNotBlank() && !isVideo && !isImg && !isGif
         val hasMultiImages = imageUrls.size > 1 && !isVideo && !isAudio
 
@@ -4585,27 +4768,45 @@ object MediaEngine {
         }
 
         val playlistItems = mutableListOf<PlaylistItem>()
-        imageUrls.forEachIndexed { idx, iUrl ->
-            carouselSlides.add(JSONObject().apply {
-                put("slideIndex", idx + 1)
-                put("url", iUrl)
-                put("thumbnail", iUrl)
-                put("mediaType", "image")
-            })
-            playlistItems.add(
-                PlaylistItem(
-                    id = "generic_${idx + 1}",
-                    title = "$title - Image ${idx + 1}",
-                    author = author,
-                    durationSeconds = 0L,
-                    thumbnail = iUrl,
-                    url = iUrl,
-                    isSelected = true
+        if (hasMultiVideos) {
+            cdnVids.forEachIndexed { idx, vUrl ->
+                playlistItems.add(
+                    PlaylistItem(
+                        id = "generic_vid_${idx + 1}",
+                        title = "$title - Video ${idx + 1}",
+                        author = author,
+                        durationSeconds = 60L,
+                        thumbnail = thumbnail,
+                        url = vUrl,
+                        isSelected = true,
+                        isImage = false
+                    )
                 )
-            )
+            }
+        } else {
+            imageUrls.forEachIndexed { idx, iUrl ->
+                carouselSlides.add(JSONObject().apply {
+                    put("slideIndex", idx + 1)
+                    put("url", iUrl)
+                    put("thumbnail", iUrl)
+                    put("mediaType", "image")
+                })
+                playlistItems.add(
+                    PlaylistItem(
+                        id = "generic_${idx + 1}",
+                        title = "$title - Image ${idx + 1}",
+                        author = author,
+                        durationSeconds = 0L,
+                        thumbnail = iUrl,
+                        url = iUrl,
+                        isSelected = true
+                    )
+                )
+            }
         }
 
         val mediaType = when {
+            hasMultiVideos -> MediaType.PLAYLIST
             isAudio -> MediaType.AUDIO
             isVideo -> MediaType.VIDEO
             hasMultiImages -> MediaType.PLAYLIST
@@ -4620,7 +4821,7 @@ object MediaEngine {
             thumbnail = if ((isImg || isGif) && thumbnail.contains("unsplash")) url else thumbnail,
             platform = platform,
             mediaType = mediaType,
-            isPlaylist = hasMultiImages,
+            isPlaylist = hasMultiVideos || hasMultiImages,
             playlistItems = playlistItems,
             carouselSlides = carouselSlides,
             qualities = qualities,
