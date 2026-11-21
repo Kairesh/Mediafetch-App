@@ -206,9 +206,9 @@ object StreamExtractor {
                                 mainHandler.postDelayed({
                                     finishWith("")
                                 }, 600L)
-                            } else if (th.isNotBlank() && (url.contains("/p/") || platform == "Pinterest")) {
+                            } else if (th.isNotBlank() && (url.contains("/p/") || platform == "Pinterest" || platform == "LinkedIn" || platform == "Behance" || platform == "Dribbble" || platform == "Fiverr" || platform == "TikTok" || capturedSlides.isNotEmpty())) {
                                 mainHandler.postDelayed({
-                                    if (capturedSlides.isEmpty() && capturedThumb.isNotEmpty()) {
+                                    if (capturedThumb.isNotEmpty()) {
                                         finishWith("")
                                     }
                                 }, 1500L)
@@ -241,9 +241,12 @@ object StreamExtractor {
 
                             val isCdnImage = (reqLower.contains("cdninstagram.com") || reqLower.contains("fbcdn.net") ||
                                 reqLower.contains("twimg.com") || reqLower.contains("tiktokcdn.com") ||
-                                reqLower.contains("pinimg.com")) &&
-                                (reqLower.contains(".jpg") || reqLower.contains(".webp") || reqLower.contains(".png")) &&
-                                !reqLower.contains("rsrc.php")
+                                reqLower.contains("pinimg.com") || reqLower.contains("dribbble.com") ||
+                                reqLower.contains("behance.net") || reqLower.contains("adobe.com") ||
+                                reqLower.contains("licdn.com") || reqLower.contains("reddit") ||
+                                reqLower.contains("redd.it") || reqLower.contains("unsplash.com")) &&
+                                (reqLower.contains(".jpg") || reqLower.contains(".jpeg") || reqLower.contains(".webp") || reqLower.contains(".png")) &&
+                                !reqLower.contains("rsrc.php") && !reqLower.contains("emoji")
 
                             if (!isAvatar && isCdnImage) {
                                 if (capturedThumb.isEmpty()) {
@@ -262,7 +265,7 @@ object StreamExtractor {
                         // 2. Identify authentic VIDEO streams
                         val isInstagramVideo = (reqLower.contains("cdninstagram.com") || reqLower.contains("fbcdn.net")) &&
                             (reqLower.contains(".mp4") || reqLower.contains("/v/t50.") || reqLower.contains("/v/t2/f2/m") || reqLower.contains("mime_type=video_mp4") || (accept.contains("video/") && !accept.contains("image/"))) &&
-                            !reqLower.contains(".jpg") && !reqLower.contains(".png") && !reqLower.contains(".webp") && !reqLower.contains("/bytestart/")
+                            !reqLower.contains(".jpg") && !reqLower.contains(".png") && !reqLower.contains(".webp") && !reqLower.contains("/bytestart/") && !reqLower.contains("dash_") && !reqLower.contains("-dash-")
 
                         val isTwitterVideo = reqLower.contains("video.twimg.com") && (reqLower.contains(".mp4") || reqLower.contains(".m3u8"))
 
@@ -454,7 +457,7 @@ object StreamExtractor {
                                         var slideIdx = 1;
 
                                         // Harvest slide elements
-                                        var slideEls = document.querySelectorAll('.CarouselItem, li.CarouselItem, [data-testid="carousel-item"], ul li img, .slide, [role="tabpanel"], .EmbeddedMediaImage, article img, article video');
+                                        var slideEls = document.querySelectorAll('.CarouselItem, li.CarouselItem, [data-testid="carousel-item"], ul li img, .slide, [role="tabpanel"], .EmbeddedMediaImage, article img, article video, [data-visualcompletion="media-vc-image"], div[data-pagelet*="Photo"] img, .project-module img, .shot-overlay img');
                                         slideEls.forEach(function(el) {
                                             var img = el.tagName === 'IMG' ? el : el.querySelector('img');
                                             var vid = el.tagName === 'VIDEO' ? el : el.querySelector('video');
@@ -474,18 +477,23 @@ object StreamExtractor {
                                         });
 
                                         if (slides.length === 0) {
-                                            var allDomImgs = Array.from(document.querySelectorAll('article img, .EmbeddedMedia img, img.EmbeddedMediaImage, .post-container img'));
+                                            var allDomImgs = Array.from(document.querySelectorAll('article img, .EmbeddedMedia img, img.EmbeddedMediaImage, .post-container img, .feed-shared-image img, .gallery-item img, [data-test-id="pin-image"] img, .carousel img, .slider img, main img, [data-visualcompletion="media-vc-image"], div[data-pagelet*="Photo"] img, .project-module img, .shot-media-container img'));
                                             allDomImgs.forEach(function(img) {
-                                                var isrc = img.currentSrc || img.src || '';
-                                                if (isrc && (isrc.includes('cdninstagram') || isrc.includes('fbcdn') || isrc.includes('pinimg')) &&
-                                                    !isrc.includes('150x150') && !isrc.includes('t51.2885-19') && !isrc.includes('avatar') && !seenSrcs[isrc]) {
-                                                    seenSrcs[isrc] = true;
-                                                    slides.push({
-                                                        slideIndex: slideIdx++,
-                                                        url: isrc,
-                                                        thumbnail: isrc,
-                                                        mediaType: 'image'
-                                                    });
+                                                var isrc = img.currentSrc || img.src || img.getAttribute('data-delayed-url') || img.getAttribute('data-src') || '';
+                                                if (isrc && (isrc.startsWith('http://') || isrc.startsWith('https://')) &&
+                                                    !isrc.includes('150x150') && !isrc.includes('t51.2885-19') && !isrc.includes('avatar') && !isrc.includes('profile') &&
+                                                    !isrc.includes('emoji') && !isrc.includes('badge') && !isrc.includes('spacer') && !seenSrcs[isrc]) {
+                                                    var w = img.naturalWidth || img.width || 400;
+                                                    var h = img.naturalHeight || img.height || 400;
+                                                    if (w >= 160 || h >= 160 || isrc.includes('licdn.com') || isrc.includes('pinimg') || isrc.includes('fiverr') || isrc.includes('dribbble') || isrc.includes('tiktok') || isrc.includes('behance') || isrc.includes('fbcdn.net') || isrc.includes('scontent') || isrc.includes('twimg.com')) {
+                                                        seenSrcs[isrc] = true;
+                                                        slides.push({
+                                                            slideIndex: slideIdx++,
+                                                            url: isrc,
+                                                            thumbnail: isrc,
+                                                            mediaType: 'image'
+                                                        });
+                                                    }
                                                 }
                                             });
                                         }

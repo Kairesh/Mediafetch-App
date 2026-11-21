@@ -40,6 +40,8 @@ class ShareActivity : AppCompatActivity() {
     private var downloadService: DownloadService? = null
     private var isServiceBound = false
     private var sharedUrl: String = ""
+    private var resolvedMediaTitle: String = ""
+    private var resolvedMediaAuthor: String = ""
     private var safeTopDp: Int = 24
     private var safeBottomDp: Int = 24
 
@@ -131,6 +133,8 @@ class ShareActivity : AppCompatActivity() {
         fun resolveMedia(url: String) {
             lifecycleScope.launch(Dispatchers.IO) {
                 val mediaInfo = MediaEngine.resolveMedia(url, this@ShareActivity)
+                resolvedMediaTitle = mediaInfo.title
+                resolvedMediaAuthor = mediaInfo.author
                 val json = mediaInfo.toJsonObject().toString()
                 withContext(Dispatchers.Main) {
                     webView.evaluateJavascript("window.onMediaResolved($json);", null)
@@ -216,12 +220,19 @@ class ShareActivity : AppCompatActivity() {
                 val isVid = slide.optString("mediaType") == "video" || format.lowercase().contains("video") || format.lowercase().contains("1080")
                 val slideIdx = slide.optInt("slideIndex", 1)
 
-                val ext = if (isVid) "mp4" else "jpg"
+                val urlExt = when {
+                    slideUrl.contains(".png", ignoreCase = true) -> "png"
+                    slideUrl.contains(".webp", ignoreCase = true) -> "webp"
+                    slideUrl.contains(".gif", ignoreCase = true) -> "gif"
+                    isVid -> "mp4"
+                    else -> "jpg"
+                }
+                val ext = if (isVid) "mp4" else urlExt
                 val quality = QualityOption(
                     id = "slide_${slideIdx}_$ext",
                     label = if (isVid) "Slide $slideIdx Video (HD)" else "Slide $slideIdx Photo",
                     resolution = if (isVid) "HD Video" else "Original Photo",
-                    format = if (isVid) "MP4" else "JPG",
+                    format = if (isVid) "MP4" else ext.uppercase(),
                     ext = ext,
                     estimatedSizeBytes = if (isVid) 15 * 1024 * 1024L else 3 * 1024 * 1024L,
                     bitrateKbps = if (isVid) 4000 else 0,
@@ -230,11 +241,19 @@ class ShareActivity : AppCompatActivity() {
                     directDownloadUrl = slideUrl
                 )
 
+                val itemTitle = if (resolvedMediaTitle.isNotBlank() && !resolvedMediaTitle.startsWith("Shared Media")) {
+                    "$resolvedMediaTitle - Slide $slideIdx"
+                } else "Slide $slideIdx"
+
+                val itemAuthor = if (resolvedMediaAuthor.isNotBlank() && resolvedMediaAuthor != "Author") {
+                    resolvedMediaAuthor
+                } else "Creator"
+
                 val task = DownloadTask(
                     id = UUID.randomUUID().toString(),
                     url = slideUrl,
-                    title = "Slide $slideIdx",
-                    author = "@instagram",
+                    title = itemTitle,
+                    author = itemAuthor,
                     thumbnail = thumbUrl,
                     quality = quality,
                     totalBytes = quality.estimatedSizeBytes
@@ -270,13 +289,21 @@ class ShareActivity : AppCompatActivity() {
                     val thumbUrl = slide.optString("thumbnail", slideUrl)
                     val isVid = slide.optString("mediaType") == "video" || format.lowercase().contains("video")
                     val slideIdx = slide.optInt("slideIndex", i + 1)
-                    val ext = if (isVid) "mp4" else "jpg"
+
+                    val urlExt = when {
+                        slideUrl.contains(".png", ignoreCase = true) -> "png"
+                        slideUrl.contains(".webp", ignoreCase = true) -> "webp"
+                        slideUrl.contains(".gif", ignoreCase = true) -> "gif"
+                        isVid -> "mp4"
+                        else -> "jpg"
+                    }
+                    val ext = if (isVid) "mp4" else urlExt
 
                     val quality = QualityOption(
                         id = "slide_${slideIdx}_$ext",
                         label = if (isVid) "Slide $slideIdx Video (HD)" else "Slide $slideIdx Photo",
                         resolution = if (isVid) "HD Video" else "Original Photo",
-                        format = if (isVid) "MP4" else "JPG",
+                        format = if (isVid) "MP4" else ext.uppercase(),
                         ext = ext,
                         estimatedSizeBytes = if (isVid) 15 * 1024 * 1024L else 3 * 1024 * 1024L,
                         bitrateKbps = if (isVid) 4000 else 0,
@@ -285,11 +312,19 @@ class ShareActivity : AppCompatActivity() {
                         directDownloadUrl = slideUrl
                     )
 
+                    val itemTitle = if (resolvedMediaTitle.isNotBlank() && !resolvedMediaTitle.startsWith("Shared Media")) {
+                        "$resolvedMediaTitle - Slide $slideIdx"
+                    } else "Slide $slideIdx"
+
+                    val itemAuthor = if (resolvedMediaAuthor.isNotBlank() && resolvedMediaAuthor != "Author") {
+                        resolvedMediaAuthor
+                    } else "Creator"
+
                     val task = DownloadTask(
                         id = UUID.randomUUID().toString(),
                         url = slideUrl,
-                        title = "Slide $slideIdx",
-                        author = "@instagram",
+                        title = itemTitle,
+                        author = itemAuthor,
                         thumbnail = thumbUrl,
                         quality = quality,
                         totalBytes = quality.estimatedSizeBytes

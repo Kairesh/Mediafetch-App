@@ -20,15 +20,15 @@
     "releaseNotes": "Fixed Instagram photo downloads to preserve authentic full aspect ratios (portrait/landscape) without square cropping. Fixed media card and seeker badges to cleanly display PHOTO instead of VIDEO. Fixed single photo posts and direct image extraction across X (Twitter), Facebook, and universal web platforms with maximum original resolution. Restored timeline auto-import and fullscreen panel stability."
   },
   "mobile": {
-    "version": "1.0.54",
-    "versionCode": 54,
-    "releaseDate": "2026-10-18",
+    "version": "1.0.55",
+    "versionCode": 55,
+    "releaseDate": "2026-11-21",
     "apkUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch.apk",
     "mandatory": false,
     "releaseNotes": [
-      "New true Glassmorphism theme engine: Frosted, Clear, and Blur styles ported directly from MediaFetch Pro CEP plugin.",
-      "Optimized GPU compositing and zero nested blurs for extended battery life and smooth 60/120fps scrolling.",
-      "Short, clean theme selector (Amoled, Frosted, Clear, Blur) with high-contrast text legibility across all UI elements."
+      "Fixed trimmed video audio/video synchronization: precise hardware keyframe alignment eliminates audio lag and playback desync.",
+      "Added multi-image and carousel download support across Facebook (albums/multi-photo), Dribbble, Behance, Pinterest (Story/Idea pins), X/Twitter, Reddit, and Threads.",
+      "Fixed image downloads to preserve authentic full aspect ratios, original resolution, true binary formats, and clean metadata filenames across direct and share sheet downloads."
     ]
   }
 }

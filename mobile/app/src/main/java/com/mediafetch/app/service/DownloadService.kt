@@ -612,8 +612,8 @@ class DownloadService : Service() {
                 var directUrl = task.quality.directDownloadUrl ?: (if (task.quality.isImage) task.thumbnail else null)
                 var audioUrl = task.quality.audioDownloadUrl
 
-                // 1. If direct stream is missing for video/audio, resolve via MediaEngine
-                if (directUrl.isNullOrBlank() && !task.quality.isImage) {
+                // 1. If direct stream is missing for video, audio, or image, resolve via MediaEngine
+                if (directUrl.isNullOrBlank() || directUrl.contains("unsplash")) {
                     try {
                         val mediaItem = MediaEngine.resolveMedia(task.url, this@DownloadService)
                         val match = mediaItem.qualities.find { it.id == task.quality.id }
@@ -622,12 +622,15 @@ class DownloadService : Service() {
                         if (match?.directDownloadUrl != null && match.directDownloadUrl!!.isNotBlank()) {
                             directUrl = match.directDownloadUrl
                             task.quality.directDownloadUrl = directUrl
+                        } else if (task.quality.isImage && mediaItem.imageUrls.isNotEmpty()) {
+                            directUrl = mediaItem.imageUrls.first()
+                            task.quality.directDownloadUrl = directUrl
                         }
                         if (match?.audioDownloadUrl != null && match.audioDownloadUrl!!.isNotBlank()) {
                             audioUrl = match.audioDownloadUrl
                             task.quality.audioDownloadUrl = audioUrl
                         }
-                        if (task.title.startsWith("Threads") || task.title.startsWith("Pinterest") || task.title.startsWith("Spotify") || task.title.startsWith("Instagram") || task.title.startsWith("X / Twitter") || task.title.startsWith("Web Media") || task.title.startsWith("Reddit")) {
+                        if (task.title.startsWith("Threads") || task.title.startsWith("Pinterest") || task.title.startsWith("Spotify") || task.title.startsWith("Instagram") || task.title.startsWith("X / Twitter") || task.title.startsWith("Web Media") || task.title.startsWith("Reddit") || task.title.startsWith("Facebook")) {
                             if (mediaItem.title.isNotBlank() && !mediaItem.title.startsWith("Web Media")) {
                                 task.title = mediaItem.title
                             }
@@ -643,15 +646,18 @@ class DownloadService : Service() {
                 }
 
                 // 2. Failsafe: If direct stream is STILL missing, launch StreamExtractor directly!
-                if (directUrl.isNullOrBlank() && !task.quality.isImage) {
+                if (directUrl.isNullOrBlank() || directUrl.contains("unsplash")) {
                     try {
                         val snifferResult = StreamExtractor.sniffStream(this@DownloadService, task.url, timeoutMs = 10000L)
                         if (snifferResult.streamUrl.isNotBlank()) {
                             directUrl = snifferResult.streamUrl
                             task.quality.directDownloadUrl = directUrl
-                            if (snifferResult.title.isNotBlank() && (task.title.startsWith("Instagram") || task.title.startsWith("X / Twitter") || task.title.startsWith("Web Media") || task.title.startsWith("Reddit"))) {
+                            if (snifferResult.title.isNotBlank() && (task.title.startsWith("Instagram") || task.title.startsWith("X / Twitter") || task.title.startsWith("Web Media") || task.title.startsWith("Reddit") || task.title.startsWith("Facebook"))) {
                                 task.title = snifferResult.title
                             }
+                        } else if (task.quality.isImage && snifferResult.imageUrls.isNotEmpty()) {
+                            directUrl = snifferResult.imageUrls.first()
+                            task.quality.directDownloadUrl = directUrl
                         }
                     } catch (e: Exception) {
                         // Ignore
@@ -737,28 +743,17 @@ class DownloadService : Service() {
                         if (shouldMux) {
                             if (resolvedUrl.lowercase().contains(".m3u8") || audioUrl?.lowercase()?.contains(".m3u8") == true) {
                                 // HLS Stream with separate audio or video playlist
-                                val isTrimmed = task.isTrimmed && task.clipEndSeconds > task.clipStartSeconds
-                                val hlsOut = if (isTrimmed) getStagingFile("temp_hls_mux_${System.currentTimeMillis()}.mp4") else targetFile
-                                try {
-                                    val hlsOk = downloadHlsStreamToFile(
-                                        m3u8Url = resolvedUrl,
-                                        audioM3u8Url = audioUrl,
-                                        pageUrl = task.url,
-                                        targetFile = hlsOut,
-                                        task = task,
-                                        progressStart = 0,
-                                        progressWeight = if (isTrimmed) 0.90 else 1.0
-                                    )
-                                    if (hlsOk && hlsOut.exists() && hlsOut.length() > 1024) {
-                                        if (isTrimmed) {
-                                            val trimOk = trimMediaFile(hlsOut, targetFile, task.clipStartSeconds, task.clipEndSeconds)
-                                            isDownloadSuccess = trimOk && targetFile.exists() && targetFile.length() > 1024
-                                        } else {
-                                            isDownloadSuccess = true
-                                        }
-                                    }
-                                } finally {
-                                    if (isTrimmed && hlsOut.exists()) try { hlsOut.delete() } catch (_: Exception) {}
+                                val hlsOk = downloadHlsStreamToFile(
+                                    m3u8Url = resolvedUrl,
+                                    audioM3u8Url = audioUrl,
+                                    pageUrl = task.url,
+                                    targetFile = targetFile,
+                                    task = task,
+                                    progressStart = 0,
+                                    progressWeight = 1.0
+                                )
+                                if (hlsOk && targetFile.exists() && targetFile.length() > 1024) {
+                                    isDownloadSuccess = true
                                 }
                             } else {
                                 // Adaptive stream fallback: download video track + audio track and mux (YouTube / Reddit DASH)
@@ -862,34 +857,17 @@ class DownloadService : Service() {
                         }
                     } else if (resolvedUrl.lowercase().contains(".m3u8")) {
                             // HLS Stream (.m3u8 playlist) - Download segments and remux to standard MP4
-                            val isTrimmed = task.isTrimmed && task.clipEndSeconds > task.clipStartSeconds && !task.quality.isImage
-                            val hlsOut = if (isTrimmed) {
-                                getStagingFile("temp_hls_mux_${System.currentTimeMillis()}.mp4")
-                            } else {
-                                targetFile
-                            }
-                            try {
-                                val hlsOk = downloadHlsStreamToFile(
-                                    m3u8Url = resolvedUrl,
-                                    audioM3u8Url = task.quality.audioDownloadUrl,
-                                    pageUrl = task.url,
-                                    targetFile = hlsOut,
-                                    task = task,
-                                    progressStart = 0,
-                                    progressWeight = if (isTrimmed) 0.90 else 1.0
-                                )
-                                if (hlsOk && hlsOut.exists() && hlsOut.length() > 1024) {
-                                    if (isTrimmed) {
-                                        val trimOk = trimMediaFile(hlsOut, targetFile, task.clipStartSeconds, task.clipEndSeconds)
-                                        isDownloadSuccess = trimOk && targetFile.exists() && targetFile.length() > 1024
-                                    } else {
-                                        isDownloadSuccess = true
-                                    }
-                                }
-                            } finally {
-                                if (isTrimmed) {
-                                    try { if (hlsOut.exists()) hlsOut.delete() } catch (_: Exception) {}
-                                }
+                            val hlsOk = downloadHlsStreamToFile(
+                                m3u8Url = resolvedUrl,
+                                audioM3u8Url = task.quality.audioDownloadUrl,
+                                pageUrl = task.url,
+                                targetFile = targetFile,
+                                task = task,
+                                progressStart = 0,
+                                progressWeight = 1.0
+                            )
+                            if (hlsOk && targetFile.exists() && targetFile.length() > 1024) {
+                                isDownloadSuccess = true
                             }
                         } else {
                             // Progressive stream (direct video+audio, audio-only, or image)
@@ -932,6 +910,29 @@ class DownloadService : Service() {
                 val isVideo = !task.quality.isAudioOnly && !task.quality.isImage
                 if (isActive && targetFile.exists() && isValidMediaFile(targetFile, isVideo)) {
                     isDownloadSuccess = true
+
+                    // True binary image format detection & extension correction
+                    if (task.quality.isImage && targetFile.length() >= 16) {
+                        try {
+                            val header = ByteArray(16)
+                            FileInputStream(targetFile).use { it.read(header) }
+                            val realExt = when {
+                                header[0] == 0x89.toByte() && header[1] == 0x50.toByte() && header[2] == 0x4E.toByte() && header[3] == 0x47.toByte() -> "png"
+                                header[0] == 0x47.toByte() && header[1] == 0x49.toByte() && header[2] == 0x46.toByte() -> "gif"
+                                header[0] == 0x52.toByte() && header[1] == 0x49.toByte() && header[2] == 0x46.toByte() && header[3] == 0x46.toByte() &&
+                                    header[8] == 0x57.toByte() && header[9] == 0x45.toByte() && header[10] == 0x42.toByte() && header[11] == 0x50.toByte() -> "webp"
+                                header[0] == 0xFF.toByte() && header[1] == 0xD8.toByte() && header[2] == 0xFF.toByte() -> "jpg"
+                                else -> null
+                            }
+                            if (realExt != null && !targetFile.extension.equals(realExt, ignoreCase = true)) {
+                                val correctedFile = File(targetFile.parentFile, "${targetFile.nameWithoutExtension}.$realExt")
+                                if (targetFile.renameTo(correctedFile)) {
+                                    targetFile = correctedFile
+                                    task.filePath = targetFile.absolutePath
+                                }
+                            }
+                        } catch (_: Exception) {}
+                    }
                 } else if (targetFile.exists() && !isValidMediaFile(targetFile, isVideo)) {
                     isDownloadSuccess = false
                     try { targetFile.delete() } catch (_: Exception) {}
@@ -1222,15 +1223,22 @@ class DownloadService : Service() {
                 }
             }
 
+            val isTrimmed = task.isTrimmed && task.clipEndSeconds > task.clipStartSeconds
+            val searchStart = if (isTrimmed) (task.clipStartSeconds.toDouble() - 2.0).coerceAtLeast(0.0) else 0.0
+            val searchEnd = if (isTrimmed) task.clipEndSeconds.toDouble() + 1.0 else 0.0
+
             suspend fun downloadSegmentsToFile(
                 playlistContent: String,
                 mediaBaseUrl: String,
                 isAudio: Boolean,
                 pStart: Int,
                 pWeight: Double
-            ): Pair<File?, Boolean> {
-                val segmentUrls = mutableListOf<String>()
+            ): Triple<File?, Boolean, Double> {
+                data class HlsSeg(val url: String, val dur: Double, val s: Double, val e: Double)
+                val allSegments = mutableListOf<HlsSeg>()
                 var initSegmentUrl: String? = null
+                var currentSegDuration = 2.0
+                var cumulativeTime = 0.0
 
                 for (line in playlistContent.lines()) {
                     val trimmed = line.trim()
@@ -1239,12 +1247,34 @@ class DownloadService : Service() {
                         if (uriMatch != null) {
                             initSegmentUrl = resolveUri(mediaBaseUrl, uriMatch.groupValues[1])
                         }
+                    } else if (trimmed.startsWith("#EXTINF:")) {
+                        val durStr = trimmed.substringAfter("#EXTINF:").substringBefore(",").trim()
+                        currentSegDuration = durStr.toDoubleOrNull() ?: 2.0
                     } else if (trimmed.isNotEmpty() && !trimmed.startsWith("#")) {
-                        segmentUrls.add(resolveUri(mediaBaseUrl, trimmed))
+                        val s = cumulativeTime
+                        val e = cumulativeTime + currentSegDuration
+                        allSegments.add(HlsSeg(resolveUri(mediaBaseUrl, trimmed), currentSegDuration, s, e))
+                        cumulativeTime += currentSegDuration
                     }
                 }
 
-                if (segmentUrls.isEmpty()) return Pair(null, false)
+                if (allSegments.isEmpty()) return Triple(null, false, 0.0)
+
+                val targetSegments = if (isTrimmed) {
+                    val filtered = allSegments.filter { it.e >= searchStart && it.s <= searchEnd }
+                    if (filtered.isNotEmpty()) filtered else allSegments
+                } else {
+                    allSegments
+                }
+
+                val firstSegmentStart = targetSegments.firstOrNull()?.s ?: 0.0
+                val segmentUrls = targetSegments.map { it.url }
+
+                if (isTrimmed && !isAudio && task.totalBytes <= 0L) {
+                    task.totalBytes = targetSegments.size * 350L * 1024L
+                    updateNotification(task)
+                    onTaskUpdated?.invoke(task)
+                }
 
                 val isFmp4 = initSegmentUrl != null || playlistContent.contains("#EXT-X-MAP:") ||
                     segmentUrls.any { it.contains(".m4s") || it.contains(".mp4") }
@@ -1268,7 +1298,7 @@ class DownloadService : Service() {
 
                     val totalSegments = segmentUrls.size
                     for (idx in segmentUrls.indices) {
-                        if (!isTaskActive(task.id)) return Pair(null, isFmp4)
+                        if (!isTaskActive(task.id)) return Triple(null, isFmp4, firstSegmentStart)
                         val segUrl = segmentUrls[idx]
                         val segReq = Request.Builder()
                             .url(segUrl)
@@ -1289,7 +1319,7 @@ class DownloadService : Service() {
                     }
                 }
 
-                return if (outFile.exists() && outFile.length() > 1024) Pair(outFile, isFmp4) else Pair(null, isFmp4)
+                return if (outFile.exists() && outFile.length() > 1024) Triple(outFile, isFmp4, firstSegmentStart) else Triple(null, isFmp4, firstSegmentStart)
             }
 
             // Determine progress budget
@@ -1297,7 +1327,7 @@ class DownloadService : Service() {
             val videoWeight = if (hasSeparateAudio) progressWeight * 0.75 else progressWeight * 0.90
             val audioWeight = if (hasSeparateAudio) progressWeight * 0.18 else 0.0
 
-            val (vFile, isVideoFmp4) = downloadSegmentsToFile(
+            val (vFile, isVideoFmp4, vSegStart) = downloadSegmentsToFile(
                 videoPlaylistContent,
                 videoMediaUrl,
                 isAudio = false,
@@ -1324,7 +1354,7 @@ class DownloadService : Service() {
                     }
                 }
                 if (audioContent.isNotBlank()) {
-                    val (aFile, _) = downloadSegmentsToFile(
+                    val (aFile, _, _) = downloadSegmentsToFile(
                         audioContent,
                         audioMediaUrl,
                         isAudio = true,
@@ -1339,27 +1369,59 @@ class DownloadService : Service() {
 
             updateTaskStage(task, (progressStart + progressWeight * 93).toInt(), "Muxing final MP4...")
 
+            val intermediateFile = if (isTrimmed) {
+                getStagingFile("temp_hls_slice_${System.currentTimeMillis()}.mp4")
+            } else {
+                targetFile
+            }
+
+            var mergedOk = false
+
             // 1. If both video and audio tracks were downloaded separately, mux with MediaMuxer!
             if (tempAudioFile != null && tempAudioFile.exists() && tempAudioFile.length() > 1024) {
-                val muxOk = muxVideoAndAudio(tempVideoFile, tempAudioFile, targetFile, 0L, 0L)
-                if (muxOk && targetFile.exists() && isValidMediaFile(targetFile, true)) {
-                    return@withContext true
+                val muxOk = muxVideoAndAudio(tempVideoFile, tempAudioFile, intermediateFile, 0L, 0L)
+                if (muxOk && intermediateFile.exists() && isValidMediaFile(intermediateFile, true)) {
+                    mergedOk = true
                 }
             }
 
             // 2. If single video file (or TS with multiplexed audio), remux to progressive MP4!
-            val remuxOk = remuxToMp4(tempVideoFile, targetFile)
-            if (remuxOk && targetFile.exists() && isValidMediaFile(targetFile, true)) {
-                return@withContext true
+            if (!mergedOk) {
+                val remuxOk = remuxToMp4(tempVideoFile, intermediateFile)
+                if (remuxOk && intermediateFile.exists() && isValidMediaFile(intermediateFile, true)) {
+                    mergedOk = true
+                }
             }
 
             // 3. Fallback: if tempVideoFile is already a valid progressive MP4
-            if (isValidMediaFile(tempVideoFile, true)) {
-                tempVideoFile.copyTo(targetFile, overwrite = true)
-                return@withContext true
+            if (!mergedOk && isValidMediaFile(tempVideoFile, true)) {
+                tempVideoFile.copyTo(intermediateFile, overwrite = true)
+                mergedOk = true
             }
 
-            return@withContext false
+            if (!mergedOk || !intermediateFile.exists() || intermediateFile.length() < 1024) {
+                if (isTrimmed && intermediateFile.exists()) try { intermediateFile.delete() } catch (_: Exception) {}
+                return@withContext false
+            }
+
+            if (isTrimmed) {
+                try {
+                    val relStart = (task.clipStartSeconds.toDouble() - vSegStart).coerceAtLeast(0.0).toLong()
+                    val relEnd = relStart + (task.clipEndSeconds - task.clipStartSeconds)
+                    updateTaskStage(task, (progressStart + progressWeight * 97).toInt(), "Trimming precise clip...")
+                    val trimOk = trimMediaFile(intermediateFile, targetFile, relStart, relEnd)
+                    if (trimOk && targetFile.exists() && isValidMediaFile(targetFile, true)) {
+                        return@withContext true
+                    } else {
+                        intermediateFile.copyTo(targetFile, overwrite = true)
+                        return@withContext isValidMediaFile(targetFile, true)
+                    }
+                } finally {
+                    try { if (intermediateFile.exists()) intermediateFile.delete() } catch (_: Exception) {}
+                }
+            } else {
+                return@withContext true
+            }
         } catch (_: Exception) {
             return@withContext false
         } finally {
@@ -1520,7 +1582,7 @@ class DownloadService : Service() {
                                 else if (clen > 0L) clen
                                 else (if (totalLength > 0L) totalLength else task.totalBytes)
 
-                            val buffer = ByteArray(64 * 1024)
+                            val buffer = ByteArray(128 * 1024)
                             var lastUpdate = System.currentTimeMillis()
                             var bytesSinceLastUpdate = 0L
 
@@ -1581,13 +1643,13 @@ class DownloadService : Service() {
                 }
             }
 
-            // 3. YouTube & CDN Range Chunking (prevents GoogleVideo TCP throttling)
-            val chunkSize = 512L * 1024L // 512 KB chunks
+            // 3. YouTube & CDN Range Chunking (prevents GoogleVideo TCP throttling with optimal 4MB chunks)
+            val chunkSize = 4L * 1024L * 1024L // 4 MB chunks for high throughput
             if (isYouTube && totalLength > 128L * 1024L) {
                 var downloaded = 0L
                 var lastUpdate = System.currentTimeMillis()
                 var bytesSinceLastUpdate = 0L
-                val buffer = ByteArray(64 * 1024)
+                val buffer = ByteArray(128 * 1024)
                 var rangeSuccess = true
 
                 FileOutputStream(destFile).use { fileOut ->
@@ -2002,18 +2064,17 @@ class DownloadService : Service() {
             }
 
             val initialVideoTime = videoExtractor.sampleTime
-            val videoBaseUs = if (isTrimming) {
+            val syncBaseUs = if (isTrimming) {
                 if (initialVideoTime >= 0L) initialVideoTime else startUs
-            } else 0L
+            } else (if (initialVideoTime >= 0L) initialVideoTime else 0L)
 
-            if (audioTrackIndex != -1 && isTrimming && videoBaseUs > 0) {
-                audioExtractor.seekTo(videoBaseUs, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
+            if (audioTrackIndex != -1 && isTrimming && syncBaseUs > 0) {
+                audioExtractor.seekTo(syncBaseUs, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
             }
 
-            // In non-trimming mode, align origins so both start at time 0
-            val vStartUs = if (isTrimming) videoBaseUs else (if (initialVideoTime >= 0L) initialVideoTime else 0L)
-            val initialAudioTime = if (audioTrackIndex != -1) audioExtractor.sampleTime else -1L
-            val aStartUs = if (isTrimming) videoBaseUs else (if (initialAudioTime >= 0L) initialAudioTime else 0L)
+            // In non-trimming mode and trimming mode, both tracks share the identical syncBaseUs
+            val vStartUs = syncBaseUs
+            val aStartUs = syncBaseUs
 
             var videoDone = false
             var audioDone = (audioTrackIndex == -1)
@@ -2068,8 +2129,8 @@ class DownloadService : Service() {
                     if (!videoDone) videoExtractor.advance()
                 } else {
                     val sampleTime = audioExtractor.sampleTime
-                    // Skip pre-roll audio before video start when trimming
-                    if (isTrimming && vStartUs > 0 && sampleTime < vStartUs - 25_000L) {
+                    // Skip pre-roll audio before video start keyframe when trimming
+                    if (isTrimming && vStartUs > 0 && sampleTime < vStartUs - 10_000L) {
                         audioExtractor.advance()
                         continue
                     }
@@ -2153,21 +2214,31 @@ class DownloadService : Service() {
             if (trackMap.isEmpty()) return false
             muxer.start()
 
-            // Select both tracks for natural chronological interleaving
-            if (videoTrackIdx != -1) extractor.selectTrack(videoTrackIdx)
-            if (audioTrackIdx != -1) extractor.selectTrack(audioTrackIdx)
-
             val startUs = startSec * 1_000_000L
             val clipDurationUs = (endSec - startSec) * 1_000_000L
+
+            // 1. Select ONLY video track first to seek directly to the keyframe
+            if (videoTrackIdx != -1) {
+                extractor.selectTrack(videoTrackIdx)
+            }
             if (startUs > 0) {
                 extractor.seekTo(startUs, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
+            }
+
+            val actualVideoStartUs = if (videoTrackIdx != -1) extractor.sampleTime else -1L
+            val syncBaseUs = if (actualVideoStartUs >= 0L) actualVideoStartUs else startUs
+
+            // 2. Select audio track and seek to the exact same sync base
+            if (audioTrackIdx != -1) {
+                extractor.selectTrack(audioTrackIdx)
+                if (syncBaseUs > 0) {
+                    extractor.seekTo(syncBaseUs, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
+                }
             }
 
             val buffer = ByteBuffer.allocate(1024 * 1024)
             val bufferInfo = MediaCodec.BufferInfo()
 
-            var videoBaseUs = -1L
-            var audioBaseUs = -1L
             var lastVideoPts = -1L
             var lastAudioPts = -1L
             var videoMaxPts = 0L
@@ -2175,7 +2246,7 @@ class DownloadService : Service() {
             var audioFinished = (audioTrackIdx == -1)
 
             // Single unified loop: MediaExtractor yields samples across both tracks chronologically,
-            // producing a 100% interleaved, buttery smooth MP4 output.
+            // producing a 100% interleaved, buttery smooth MP4 output with zero audio/video desync.
             while (!videoFinished || !audioFinished) {
                 val trackIdx = extractor.sampleTrackIndex
                 if (trackIdx < 0) break
@@ -2188,10 +2259,7 @@ class DownloadService : Service() {
                         extractor.advance()
                         continue
                     }
-                    if (videoBaseUs < 0L) {
-                        videoBaseUs = sampleTime
-                    }
-                    var pts = (sampleTime - videoBaseUs).coerceAtLeast(0L)
+                    var pts = (sampleTime - syncBaseUs).coerceAtLeast(0L)
                     if (pts >= clipDurationUs) {
                         videoFinished = true
                         extractor.unselectTrack(videoTrackIdx)
@@ -2220,16 +2288,12 @@ class DownloadService : Service() {
                         extractor.advance()
                         continue
                     }
-                    val syncBase = if (videoBaseUs >= 0L) videoBaseUs else startUs
-                    if (syncBase > 0 && sampleTime < syncBase - 25_000L) {
+                    if (syncBaseUs > 0 && sampleTime < syncBaseUs - 10_000L) {
                         extractor.advance()
                         continue
                     }
-                    if (audioBaseUs < 0L) {
-                        audioBaseUs = if (syncBase >= 0L) syncBase else sampleTime
-                    }
-                    var pts = (sampleTime - audioBaseUs).coerceAtLeast(0L)
-                    val audioLimit = if (videoMaxPts > 0L) videoMaxPts + 200_000L else clipDurationUs
+                    var pts = (sampleTime - syncBaseUs).coerceAtLeast(0L)
+                    val audioLimit = if (videoMaxPts > 0L) (videoMaxPts + 200_000L).coerceAtMost(clipDurationUs + 200_000L) else clipDurationUs
                     if (pts >= audioLimit) {
                         audioFinished = true
                         extractor.unselectTrack(audioTrackIdx)
