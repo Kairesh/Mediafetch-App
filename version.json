@@ -1,18 +1,18 @@
 {
-  "version": "1.8.59",
+  "version": "1.8.60",
   "name": "MediaFetch Adobe CEP",
   "standardVersion": "1.8.32",
-  "proVersion": "1.8.59",
+  "proVersion": "1.8.60",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "Fixed YouTube videos being misclassified as Photo / Cover when yt-dlp encounters n-challenge stream extraction failures. Added automatic yt-dlp recovery and retry for YouTube video analysis and downloads.",
+  "releaseNotes": "Added optional Per-Project Workspace Automation toggles in Settings > Downloads: (1) Auto-switch download path to active Pr/Ae project folder on project change, and (2) Separate panel Downloads list per Pr/Ae project (while keeping All History global). Added multi-project import protection for Premiere Pro.",
   "pro": {
-    "version": "1.8.59",
+    "version": "1.8.60",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-    "releaseNotes": "Fixed YouTube videos being misclassified as Photo / Cover when yt-dlp encounters n-challenge stream extraction failures. Added automatic yt-dlp recovery and retry for YouTube video analysis and downloads."
+    "releaseNotes": "Added optional Per-Project Workspace Automation toggles in Settings > Downloads: (1) Auto-switch download path to active Pr/Ae project folder on project change, and (2) Separate panel Downloads list per Pr/Ae project (while keeping All History global). Added multi-project import protection for Premiere Pro."
   },
   "standard": {
     "version": "1.8.32",
