@@ -1,23 +1,23 @@
 {
-  "version": "1.8.60",
+  "version": "1.8.61",
   "name": "MediaFetch Adobe CEP",
-  "standardVersion": "1.8.32",
-  "proVersion": "1.8.60",
+  "standardVersion": "1.8.33",
+  "proVersion": "1.8.61",
   "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
   "standardPackageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
   "backupPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Pro_Update.zip",
   "backupStandardPackageUrl": "https://cdn.jsdelivr.net/gh/Kairesh/Mediafetch-App@main/MediaFetch_Standard_Update.zip",
   "updateUrl": "https://github.com/Kairesh/Mediafetch-App/releases/latest",
-  "releaseNotes": "Added optional Per-Project Workspace Automation toggles in Settings > Downloads: (1) Auto-switch download path to active Pr/Ae project folder on project change, and (2) Separate panel Downloads list per Pr/Ae project (while keeping All History global). Added multi-project import protection for Premiere Pro.",
+  "releaseNotes": "Added Responsive Landscape Split-Layout: widen the panel (720px+) to view Controls on the left and Downloads side-by-side on the right, or narrow it to snap back to compact portrait mode. Includes a one-time What's New notice.",
   "pro": {
-    "version": "1.8.60",
+    "version": "1.8.61",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Pro_Update.zip",
-    "releaseNotes": "Added optional Per-Project Workspace Automation toggles in Settings > Downloads: (1) Auto-switch download path to active Pr/Ae project folder on project change, and (2) Separate panel Downloads list per Pr/Ae project (while keeping All History global). Added multi-project import protection for Premiere Pro."
+    "releaseNotes": "Added Responsive Landscape Split-Layout: widen the panel (720px+) to view Controls on the left and Downloads side-by-side on the right, or narrow it to snap back to compact portrait mode. Includes a one-time What's New notice."
   },
   "standard": {
-    "version": "1.8.32",
+    "version": "1.8.33",
     "packageUrl": "https://raw.githubusercontent.com/Kairesh/Mediafetch-App/main/MediaFetch_Standard_Update.zip",
-    "releaseNotes": "Fixed YouTube videos being misclassified as Photo / Cover when yt-dlp encounters n-challenge stream extraction failures. Added automatic yt-dlp recovery and retry for YouTube video analysis."
+    "releaseNotes": "Added Responsive Landscape Split-Layout: widen the panel (720px+) to view Controls on the left and Downloads side-by-side on the right, or narrow it to snap back to compact portrait mode. Includes a one-time What's New notice."
   },
   "mobile": {
     "version": "1.0.56",
